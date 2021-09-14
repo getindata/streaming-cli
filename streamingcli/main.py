@@ -1,6 +1,12 @@
+import typer
+
+app = typer.Typer()
+
+
+@app.command()
 def version():
-    print('Streaming CLI: V0.1.0')
+    typer.echo("Streaming CLI: V0.1.0")
 
 
-if __name__ == '__main__':
-    version()
+if __name__ == "__main__":
+    app()
