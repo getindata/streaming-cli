@@ -1,24 +1,23 @@
 import click
 
 
-@click.group()
-def cli():
+@click.group(invoke_without_command=True)
+@click.pass_context
+@click.version_option()
+def cli(ctx):
+    if ctx.invoked_subcommand is None:
+        click.echo(ctx.get_help())
+        ctx.exit()
     pass
 
 
-@click.command()
-def version():
-    click.echo("Streaming CLI: V0.1.2")
-
-
-@click.command()
+@cli.command()
 @click.option('--project_name', prompt='Project name',
               help='Project name which will become Flink job name in Ververica platform')
 def init(project_name: str):
     click.echo(f"Initializing streaming project: {project_name}")
 
 
-cli.add_command(version)
 cli.add_command(init)
 
 
