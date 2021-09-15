@@ -1,12 +1,26 @@
-import typer
-
-app = typer.Typer()
+import click
 
 
-@app.command()
+@click.group()
+def cli():
+    pass
+
+
+@click.command()
 def version():
-    typer.echo("Streaming CLI: V0.1.0")
+    click.echo("Streaming CLI: V0.1.2")
 
 
-if __name__ == "__main__":
-    app()
+@click.command()
+@click.option('--project_name', prompt='Project name',
+              help='Project name which will become Flink job name in Ververica platform')
+def init(project_name: str):
+    click.echo(f"Initializing streaming project: {project_name}")
+
+
+cli.add_command(version)
+cli.add_command(init)
+
+
+if __name__ == '__main__':
+    cli()

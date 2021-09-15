@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="streamingcli",
-    version="0.1.1",
+    version="0.1.2",
     author="GetInData",
     author_email="office@getindata.com",
     description="Streaming platform CLI",
@@ -16,4 +16,13 @@ setuptools.setup(
         "Programming Language :: Python :: 3",
         "Operating System :: OS Independent",
     ],
+    install_requires=[
+        'Click',
+    ],
+    py_modules=['scli'],
+    entry_points={
+        'console_scripts': [
+            'scli = streamingcli.main:cli',
+        ],
+    },
 )
