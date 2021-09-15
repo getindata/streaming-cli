@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="streamingcli",
-    version="0.1.2",
+    version="0.1.3",
     author="GetInData",
     author_email="office@getindata.com",
     description="Streaming platform CLI",
