@@ -1,4 +1,5 @@
 import click
+from streamingcli.NewProjectInitializer import NewProjectInitializer
 
 
 @click.group(invoke_without_command=True)
@@ -16,6 +17,8 @@ def cli(ctx):
               help='Project name which will become Flink job name in Ververica platform')
 def init(project_name: str):
     click.echo(f"Initializing streaming project: {project_name}")
+    NewProjectInitializer.createProject(project_name)
+    click.echo(f"Project: {project_name} initialized")
 
 
 cli.add_command(init)

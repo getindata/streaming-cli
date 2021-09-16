@@ -17,7 +17,8 @@ setuptools.setup(
         "Operating System :: OS Independent",
     ],
     install_requires=[
-        'Click',
+        'click',
+        'gitpython'
     ],
     py_modules=['scli'],
     entry_points={

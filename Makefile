@@ -6,3 +6,6 @@ install-pip-setuptools:
 
 package: install
 	python setup.py sdist bdist_wheel
+
+flink/init:
+	scli init --project_name tmp_project

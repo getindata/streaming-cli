@@ -4,3 +4,4 @@ venv/
 dist/
 build/
 streamingcli.egg-info/
+tmp_project/
