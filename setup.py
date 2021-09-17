@@ -18,7 +18,8 @@ setuptools.setup(
     ],
     install_requires=[
         'click',
-        'gitpython'
+        'gitpython',
+        'pyyaml'
     ],
     py_modules=['scli'],
     entry_points={

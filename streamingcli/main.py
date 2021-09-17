@@ -1,5 +1,5 @@
 import click
-from streamingcli.NewProjectInitializer import NewProjectInitializer
+from streamingcli.project.initializer import NewProjectInitializer
 
 
 @click.group(invoke_without_command=True)

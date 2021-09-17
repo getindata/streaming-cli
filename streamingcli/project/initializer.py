@@ -1,4 +1,5 @@
 from streamingcli.Config import INITIAL_PROJECT_REPO
+from streamingcli.project.project_config import ProjectConfigGenerator
 import click
 import git
 
@@ -13,3 +14,5 @@ class NewProjectInitializer:
                     bar.update(current_item=cur_count, n_steps=int(cur_count))
 
             git.Repo.clone_from(INITIAL_PROJECT_REPO, f"./{project_name}", progress=CloneProgress())
+
+        ProjectConfigGenerator.generate_initial_project_config(project_name)
