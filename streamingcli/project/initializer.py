@@ -2,11 +2,19 @@ from streamingcli.Config import INITIAL_PROJECT_REPO
 from streamingcli.project.project_config import ProjectConfigGenerator
 import click
 import git
+import pathlib
 
 
 class NewProjectInitializer:
     @staticmethod
+    def check_if_directory_exists(project_name: str) -> bool:
+        return pathlib.Path(f"./{project_name}").exists()
+
+    @staticmethod
     def createProject(project_name: str):
+        if NewProjectInitializer.check_if_directory_exists(project_name=project_name):
+            raise click.ClickException("Project directory already exists!")
+
         with click.progressbar(length=100,
                                label='Generating project structure') as bar:
             class CloneProgress(git.RemoteProgress):
