@@ -19,7 +19,9 @@ setuptools.setup(
     install_requires=[
         'click',
         'gitpython',
-        'pyyaml'
+        'pyyaml',
+        'kubernetes',
+        'dataclasses_json'
     ],
     py_modules=['scli'],
     entry_points={
