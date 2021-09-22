@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from dataclasses_json import dataclass_json
-from streamingcli.project.project_config import ProjectConfig
+from streamingcli.project.local_project_config import LocalProjectConfig
 
 
 @dataclass_json
@@ -11,7 +11,7 @@ class ProjectConfigMap:
 
 class ProjectConfigMapFactory:
     @staticmethod
-    def create_from_project_config(project_config: ProjectConfig) -> ProjectConfigMap:
+    def create_from_project_config(project_config: LocalProjectConfig) -> ProjectConfigMap:
         return ProjectConfigMap(project_name=project_config.project_name)
 
     @staticmethod

@@ -1,5 +1,5 @@
 from streamingcli.Config import INITIAL_PROJECT_REPO
-from streamingcli.project.project_config import ProjectConfigFactory
+from streamingcli.project.local_project_config import LocalProjectConfigFactory
 import click
 import git
 import pathlib
@@ -23,4 +23,4 @@ class NewProjectInitializer:
 
             git.Repo.clone_from(INITIAL_PROJECT_REPO, f"./{project_name}", progress=CloneProgress())
 
-        ProjectConfigFactory.generate_initial_project_config(project_name)
+        LocalProjectConfigFactory.generate_initial_project_config(project_name)

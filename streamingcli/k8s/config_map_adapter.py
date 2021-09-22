@@ -1,6 +1,6 @@
 from kubernetes import config, dynamic
 from kubernetes.client import api_client
-from streamingcli.project.project_config import ProjectConfig
+from streamingcli.project.local_project_config import LocalProjectConfig
 from streamingcli.k8s.project_config_map import ProjectConfigMap, ProjectConfigMapFactory
 from streamingcli.Config import PROJECT_CONFIG_FILE_NAME
 from kubernetes.client.exceptions import ApiException
@@ -23,7 +23,7 @@ class ProjectConfigMapAdapter:
 
 
     @staticmethod
-    def load_project_config_map(project_config: ProjectConfig):
+    def load_project_config_map(project_config: LocalProjectConfig):
         # Creating a dynamic client
         client = dynamic.DynamicClient(
             api_client.ApiClient(configuration=config.load_kube_config())
@@ -42,7 +42,7 @@ class ProjectConfigMapAdapter:
             return ProjectConfigMapFactory.create_from_json(configmap_json)
 
     @staticmethod
-    def update_project_config_map(project_config: ProjectConfig, project_configmap: ProjectConfigMap):
+    def update_project_config_map(project_config: LocalProjectConfig, project_configmap: ProjectConfigMap):
         # Creating a dynamic client
         client = dynamic.DynamicClient(
             api_client.ApiClient(configuration=config.load_kube_config())
@@ -76,7 +76,7 @@ class ProjectConfigMapAdapter:
             )
 
     @staticmethod
-    def delete(project_config: ProjectConfig):
+    def delete(project_config: LocalProjectConfig):
         # Creating a dynamic client
         client = dynamic.DynamicClient(
             api_client.ApiClient(configuration=config.load_kube_config())
