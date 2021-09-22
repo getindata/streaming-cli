@@ -2,23 +2,6 @@ from typing import Dict, Optional
 import requests
 import json
 
-# curl --location --request POST 'https://vvp.streaming-platform.getindata.dev/apitokens/v1/namespaces/default/apitokens' \
-# --header 'accept: application/json' \
-# --header 'Content-Type: application/json' \
-# --data-raw '{
-#   "name": "namespaces/default/apitokens/ci-token",
-#   "role": "editor"
-# }'
-
-# {
-#     "apiToken": {
-#         "name": "namespaces/default/apitokens/ci-token",
-#         "secret": "xxx",
-#         "role": "editor",
-#         "createTime": "2021-09-02T09:21:20.875745Z"
-#     }
-# }
-
 
 class VervericaWebTokenFactory:
 

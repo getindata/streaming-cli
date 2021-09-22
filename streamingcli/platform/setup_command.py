@@ -2,7 +2,7 @@ import click
 from streamingcli.platform.ververica.webtoken_factory import VervericaWebTokenFactory
 
 
-class VervericaSetupCommand:
+class PlatformSetupCommand:
 
     @staticmethod
     def setup_ververica(ververica_url: str, ververica_namespace: str, kubernetes_namespace: str):
@@ -25,4 +25,6 @@ class VervericaSetupCommand:
         }
         # TODO store URL and secret_name in K8S configmap
         click.echo(f"Streaming platform configuration stored in Kubernetes configmap name: {streaming_platform_configmap_name}")
+
+        click.echo(f"Streaming Platform setup finished")
 

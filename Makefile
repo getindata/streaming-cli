@@ -9,3 +9,6 @@ package: install
 
 flink/init:
 	scli init --project_name tmp_project
+
+platform/setup:
+	scli platform_setup --ververica_url "https://vvp.streaming-platform.example.com" --ververica_namespace default --kubernetes_namespace vvp

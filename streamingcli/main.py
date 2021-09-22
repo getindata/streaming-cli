@@ -1,6 +1,6 @@
 import click
 from streamingcli.project.init_command import NewProjectInitializer
-from streamingcli.platform.ververica.setup_command import VervericaSetupCommand
+from streamingcli.platform.setup_command import PlatformSetupCommand
 
 
 @click.group(invoke_without_command=True)
@@ -27,13 +27,16 @@ def init(project_name: str):
               help='URR for Ververica cluster, i.e: "https://vvp.streaming-platform.example.com"')
 @click.option('--ververica_namespace', prompt='Ververica namespace',
               help='Ververica namespace')
-def ververica_setup(ververica_url: str, ververica_namespace: str):
-    VervericaSetupCommand.setup_ververica(ververica_url=ververica_url, ververica_namespace=ververica_namespace)
+@click.option('--kubernetes_namespace', prompt='Kubernetes Ververica namespace',
+              help='Kubernetes Ververica namespace')
+def platform_setup(ververica_url: str, ververica_namespace: str, kubernetes_namespace: str):
+    PlatformSetupCommand.setup_ververica(ververica_url=ververica_url,
+                                         ververica_namespace=ververica_namespace,
+                                         kubernetes_namespace=kubernetes_namespace)
 
 
 cli.add_command(init)
-cli.add_command(ververica_setup)
-
+cli.add_command(platform_setup)
 
 if __name__ == '__main__':
     cli()
