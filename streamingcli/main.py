@@ -27,12 +27,12 @@ def init(project_name: str):
               help='URR for Ververica cluster, i.e: "https://vvp.streaming-platform.example.com"')
 @click.option('--ververica_namespace', prompt='Ververica namespace',
               help='Ververica namespace')
-@click.option('--kubernetes_namespace', prompt='Kubernetes Ververica namespace',
-              help='Kubernetes Ververica namespace')
-def platform_setup(ververica_url: str, ververica_namespace: str, kubernetes_namespace: str):
+@click.option('--ververica_kubernetes_namespace', prompt='Kubernetes namespace where Ververica is deployed',
+              help='Kubernetes namespace where Ververica is deployed')
+def platform_setup(ververica_url: str, ververica_namespace: str, ververica_kubernetes_namespace: str):
     PlatformSetupCommand.setup_ververica(ververica_url=ververica_url,
                                          ververica_namespace=ververica_namespace,
-                                         kubernetes_namespace=kubernetes_namespace)
+                                         ververica_kubernetes_namespace=ververica_kubernetes_namespace)
 
 
 cli.add_command(init)
