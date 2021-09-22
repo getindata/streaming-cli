@@ -1,5 +1,5 @@
 import click
-from streamingcli.ververica.webtoken_factory import VervericaWebTokenFactory
+from streamingcli.platform.ververica.webtoken_factory import VervericaWebTokenFactory
 
 
 class VervericaSetupCommand:

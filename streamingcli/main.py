@@ -1,6 +1,6 @@
 import click
 from streamingcli.project.init_command import NewProjectInitializer
-from streamingcli.ververica.setup_command import VervericaSetupCommand
+from streamingcli.platform.ververica.setup_command import VervericaSetupCommand
 
 
 @click.group(invoke_without_command=True)

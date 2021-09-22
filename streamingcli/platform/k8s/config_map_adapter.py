@@ -1,8 +1,7 @@
 from kubernetes import config, dynamic
 from kubernetes.client import api_client
 from streamingcli.project.local_project_config import LocalProjectConfig
-from streamingcli.k8s.project_config_map import ProjectConfigMap, ProjectConfigMapFactory
-from streamingcli.Config import PROJECT_CONFIG_FILE_NAME
+from streamingcli.platform.k8s.project_config_map import ProjectConfigMap, ProjectConfigMapFactory
 from kubernetes.client.exceptions import ApiException
 
 
