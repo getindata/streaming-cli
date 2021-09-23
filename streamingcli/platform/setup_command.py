@@ -1,5 +1,10 @@
 import click
 from streamingcli.platform.ververica.webtoken_factory import VervericaWebTokenFactory
+from streamingcli.platform.platform_config_map import (
+    PlatformConfig,
+    PlatformConfigAdapter
+)
+from streamingcli.Config import PLATFORM_K8S_SECRET_NAME
 
 
 class PlatformSetupCommand:
@@ -12,19 +17,17 @@ class PlatformSetupCommand:
             raise click.ClickException("Ververica WebToken generation error")
         click.echo(f"Ververica WebToken: {webtoken['name']} generated")
 
-        streaming_platform_secret_name = "streaming-platform-secret"
         # TODO store webtoken in K8S secret
-        click.echo(f"Ververica WebToken stored in Kubernetes secret name: {streaming_platform_secret_name}")
+        click.echo("Ververica WebToken stored in Kubernetes secret")
 
-        streaming_platform_configmap_name = "streaming-platform-config"
-        streaming_platform_config = {
-            "ververica_url": ververica_url,
-            "ververica_namespace": ververica_namespace,
-            "secret_name": streaming_platform_secret_name,
-            "ververica_kubernetes_namespace": ververica_kubernetes_namespace
-        }
-        # TODO store URL and secret_name in K8S configmap
-        click.echo(f"Streaming platform configuration stored in Kubernetes configmap name: {streaming_platform_configmap_name}")
+        streaming_platform_config = PlatformConfig(
+            ververica_url=ververica_url,
+            ververica_namespace=ververica_namespace,
+            secret_name=PLATFORM_K8S_SECRET_NAME,
+            ververica_kubernetes_namespace=ververica_kubernetes_namespace
+        )
+        PlatformConfigAdapter.save_platform_config(streaming_platform_config)
+        click.echo("Streaming platform configuration stored in Kubernetes configmap")
 
         click.echo(f"Streaming Platform setup finished")
 

@@ -1,18 +1,24 @@
+from typing import Dict
+
 from kubernetes import config, dynamic
 from kubernetes.client import api_client
 from streamingcli.project.local_project_config import LocalProjectConfig
-from streamingcli.platform.k8s.project_config_map import ProjectConfigMap, ProjectConfigMapFactory
+from streamingcli.project.project_config_map import ProjectConfigMap, ProjectConfigMapFactory
+from streamingcli.platform.k8s.config_loader import KubernetesConfigLoader
 from kubernetes.client.exceptions import ApiException
 
 
 # https://github.com/kubernetes-client/python/blob/master/examples/dynamic-client/configmap.py
-class ProjectConfigMapAdapter:
+class KubernetesConfigmapAdapter:
 
     @staticmethod
-    def _fetch_k8s_configmap(api, configmap_name: str):
+    def load_k8s_configmap(configmap_name: str, namespace: str):
+        client = KubernetesConfigLoader.get_client()
+        api = client.resources.get(api_version="v1", kind="ConfigMap")
+
         try:
             return api.get(
-                name=configmap_name, namespace="default", label_selector="streaming=true"  # TODO set K8S namespace in project config
+                name=configmap_name, namespace=namespace, label_selector="streaming=true"
             )
         except ApiException as err:
             if err.status == 404:
@@ -20,37 +26,10 @@ class ProjectConfigMapAdapter:
             else:
                 raise err
 
-
     @staticmethod
-    def load_project_config_map(project_config: LocalProjectConfig):
-        # Creating a dynamic client
-        client = dynamic.DynamicClient(
-            api_client.ApiClient(configuration=config.load_kube_config())
-        )
-
-        # fetching the configmap api
+    def save_k8s_configmap(configmap_name: str, namespace: str, configmap_data: Dict):
+        client = KubernetesConfigLoader.get_client()
         api = client.resources.get(api_version="v1", kind="ConfigMap")
-
-        configmap_name = project_config.project_configmap_name
-
-        configmap_list = ProjectConfigMapAdapter._fetch_k8s_configmap(api, configmap_name)
-        if configmap_list is None:
-            return ProjectConfigMapFactory.create_from_project_config(project_config)
-        else:
-            configmap_json = configmap_list.data['project_configmap.json']
-            return ProjectConfigMapFactory.create_from_json(configmap_json)
-
-    @staticmethod
-    def update_project_config_map(project_config: LocalProjectConfig, project_configmap: ProjectConfigMap):
-        # Creating a dynamic client
-        client = dynamic.DynamicClient(
-            api_client.ApiClient(configuration=config.load_kube_config())
-        )
-
-        # fetching the configmap api
-        api = client.resources.get(api_version="v1", kind="ConfigMap")
-
-        configmap_name = project_config.project_configmap_name
 
         configmap_manifest = {
             "kind": "ConfigMap",
@@ -61,29 +40,19 @@ class ProjectConfigMapAdapter:
                     "streaming": "true",
                 },
             },
-            "data": {
-                "project_configmap.json": project_configmap.to_json(),
-            },
+            "data": configmap_data,
         }
 
-        current_configmap = ProjectConfigMapAdapter._fetch_k8s_configmap(api, configmap_name)
+        current_configmap = KubernetesConfigmapAdapter.load_k8s_configmap(configmap_name, namespace)
         if current_configmap is None:
-            configmap = api.create(body=configmap_manifest, namespace="default")  # TODO set K8S namespace in project config
+            configmap = api.create(body=configmap_manifest, namespace=namespace)
         else:
             configmap_patched = api.patch(
-                name=configmap_name, namespace="default", body=configmap_manifest  # TODO set K8S namespace in project config
+                name=configmap_name, namespace=namespace, body=configmap_manifest
             )
 
     @staticmethod
-    def delete(project_config: LocalProjectConfig):
-        # Creating a dynamic client
-        client = dynamic.DynamicClient(
-            api_client.ApiClient(configuration=config.load_kube_config())
-        )
-
-        # fetching the configmap api
+    def delete_k8s_configmap(configmap_name: str, namespace: str):
+        client = KubernetesConfigLoader.get_client()
         api = client.resources.get(api_version="v1", kind="ConfigMap")
-
-        configmap_name = project_config.project_configmap_name
-        api.delete(name=configmap_name, body={}, namespace="default")
-
+        api.delete(name=configmap_name, body={}, namespace=namespace)

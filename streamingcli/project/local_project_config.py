@@ -1,5 +1,5 @@
 import yaml
-from streamingcli.Config import PROJECT_CONFIG_FILE_NAME
+from streamingcli.Config import PROJECT_LOCAL_CONFIG_FILE_NAME
 from typing import Dict, Optional
 import click
 
@@ -45,12 +45,12 @@ class LocalProjectConfigFactory:
 class LocalProjectConfigIO:
     @staticmethod
     def project_config_default_path():
-        return f"./{PROJECT_CONFIG_FILE_NAME}"
+        return f"./{PROJECT_LOCAL_CONFIG_FILE_NAME}"
 
     @staticmethod
     def save_project_config(config: LocalProjectConfig):
         config_yaml = yaml.dump(config.to_yaml_object())
-        with open(f"./{config.project_name}/{PROJECT_CONFIG_FILE_NAME}", "w") as config_file:
+        with open(f"./{config.project_name}/{PROJECT_LOCAL_CONFIG_FILE_NAME}", "w") as config_file:
             config_file.write(config_yaml)
 
     @staticmethod
