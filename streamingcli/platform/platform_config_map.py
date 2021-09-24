@@ -4,7 +4,7 @@ from streamingcli.platform.k8s.config_map_adapter import KubernetesConfigmapAdap
 from streamingcli.Config import (
     PLATFORM_K8S_CONFIGMAP_NAME,
     PLATFORM_K8S_CONFIGMAP_KEY,
-    PLATFORM_K8S_SECRET_KEY
+    PLATFORM_K8S_SECRET_NAME
 )
 import click
 
@@ -15,7 +15,7 @@ class PlatformConfig:
     ververica_url: str
     ververica_namespace: str = field(default="default")
     ververica_kubernetes_namespace: str = field(default="vvp")
-    secret_name: str = field(default=PLATFORM_K8S_SECRET_KEY)
+    secret_name: str = field(default=PLATFORM_K8S_SECRET_NAME)
 
 
 class PlatformConfigFactory:
