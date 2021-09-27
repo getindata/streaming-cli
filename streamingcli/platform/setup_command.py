@@ -1,5 +1,6 @@
 import click
 from streamingcli.platform.ververica.webtoken_factory import VervericaWebTokenFactory
+from streamingcli.platform.k8s.secret_adapter import KubernetesSecretAdapter
 from streamingcli.platform.platform_config_map import (
     PlatformConfig,
     PlatformConfigAdapter
@@ -17,8 +18,8 @@ class PlatformSetupCommand:
             raise click.ClickException("Ververica WebToken generation error")
         click.echo(f"Ververica WebToken: {webtoken['name']} generated")
 
-        # TODO store webtoken in K8S secret
         click.echo("Ververica WebToken stored in Kubernetes secret")
+        KubernetesSecretAdapter.save_k8s_secret(secret_name=PLATFORM_K8S_SECRET_NAME, namespace=ververica_kubernetes_namespace, secret_data=webtoken)
 
         streaming_platform_config = PlatformConfig(
             ververica_url=ververica_url,

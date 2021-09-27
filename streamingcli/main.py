@@ -35,8 +35,8 @@ def platform_setup(ververica_url: str, ververica_namespace: str, ververica_kuber
                                          ververica_kubernetes_namespace=ververica_kubernetes_namespace)
 
 
-cli.add_command(init)
-cli.add_command(platform_setup)
+cli.add_command(init, "init")
+cli.add_command(platform_setup, "platform_setup")
 
 if __name__ == '__main__':
     cli()

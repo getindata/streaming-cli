@@ -11,4 +11,4 @@ flink/init:
 	scli init --project_name tmp_project
 
 platform/setup:
-	scli platform_setup --ververica_url "https://vvp.streaming-platform.example.com" --ververica_namespace default --kubernetes_namespace vvp
+	scli platform_setup --ververica_url "http://localhost:8080" --ververica_namespace default --ververica_kubernetes_namespace vvp

@@ -1,6 +1,7 @@
 from typing import Dict, Optional
 import requests
 import json
+import click
 
 
 class VervericaWebTokenFactory:
@@ -14,15 +15,18 @@ class VervericaWebTokenFactory:
             "role": "editor"
         }
         response = requests.post(apitokens_url, json.dumps(request_body), headers={
-            "accept": "application / json",
+            "accept": "application/json",
             "Content-Type": "application/json"
         })
-        print(response)
         if response.status_code == 200:
-            webtoken_secret = json.loads(response.json()["apiToken"]["secret"])
+            webtoken_secret = response.json()["apiToken"]["secret"]
             return {
                 "name": webtoken_name,
                 "secret": webtoken_secret
             }
+        elif response.status_code == 409:
+            raise click.ClickException("Ververica WebToken already exists! Remove it first")
         else:
+            print(response.status_code)
             return None
+
