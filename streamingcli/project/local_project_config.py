@@ -58,10 +58,11 @@ class LocalProjectConfigIO:
         config_file_path = LocalProjectConfigIO.project_config_default_path()
         try:
             with open(config_file_path, "r+") as config_file:
-                file_content = config_file.readlines()
-                config_yaml = yaml.load(file_content)
+                file_content = "".join(config_file.readlines())
+                config_yaml = yaml.load(stream=file_content, Loader=yaml.FullLoader)
                 return LocalProjectConfigFactory.from_yaml_object(config_yaml)
-        except:
+        except Exception as e:
+            print(e)
             raise click.ClickException("Current directory is not streaming project. Initialize project first")
 
 
