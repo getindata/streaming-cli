@@ -8,7 +8,10 @@ package: install
 	python setup.py sdist bdist_wheel
 
 flink/init:
-	scli init --project_name tmp_project
+	scli project init --project_name tmp_project
+
+flink/deploy:
+	scli project deploy
 
 platform/setup:
-	scli platform_setup --ververica_url "http://localhost:8080" --ververica_namespace default --ververica_kubernetes_namespace vvp
+	scli platform setup --ververica_url "http://localhost:8080" --ververica_namespace default --ververica_kubernetes_namespace vvp

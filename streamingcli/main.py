@@ -1,6 +1,7 @@
 import click
 from streamingcli.project.init_command import NewProjectInitializer
 from streamingcli.platform.setup_command import PlatformSetupCommand
+from streamingcli.project.deploy_command import ProjectDeployer
 
 
 @click.group(invoke_without_command=True)
@@ -13,16 +14,31 @@ def cli(ctx):
     pass
 
 
-@cli.command()
+@cli.group()
+def project():
+    pass
+
+
+@project.command()
 @click.option('--project_name', prompt='Project name',
               help='Project name which will become Flink job name in Ververica platform')
-def init(project_name: str):
+def project_init(project_name: str):
     click.echo(f"Initializing streaming project: {project_name}")
     NewProjectInitializer.createProject(project_name)
     click.echo(f"Project: {project_name} initialized")
 
 
-@cli.command()
+@project.command()
+def project_deploy():
+    ProjectDeployer.deploy_project()
+
+
+@cli.group()
+def platform():
+    pass
+
+
+@platform.command()
 @click.option('--ververica_url', prompt='Ververica URL',
               help='URR for Ververica cluster, i.e: "https://vvp.streaming-platform.example.com"')
 @click.option('--ververica_namespace', prompt='Ververica namespace',
@@ -35,8 +51,9 @@ def platform_setup(ververica_url: str, ververica_namespace: str, ververica_kuber
                                          ververica_kubernetes_namespace=ververica_kubernetes_namespace)
 
 
-cli.add_command(init, "init")
-cli.add_command(platform_setup, "platform_setup")
+project.add_command(project_init, "init")
+project.add_command(project_deploy, "deploy")
+platform.add_command(platform_setup, "setup")
 
 if __name__ == '__main__':
     cli()
