@@ -1,0 +1,44 @@
+metadata:
+  displayName: {{project_name}}
+spec:
+  deploymentTargetId: null
+  deploymentTargetName: vvp
+  maxJobCreationAttempts: 4
+  maxSavepointCreationAttempts: 4
+  restoreStrategy:
+    allowNonRestoredState: false
+    kind: LATEST_STATE
+  sessionClusterName: null
+  state: RUNNING
+  template:
+    metadata:
+      annotations:
+        flink.queryable-state.enabled: 'false'
+        flink.security.ssl.enabled: 'false'
+    spec:
+      artifact:
+        entryClass: com.getindata.streaming.FlinkPythonLoader
+        flinkImageRegistry: registry.ververica.com/v2.5
+        flinkImageRepository: flink
+        flinkImageTag: 1.13.2-stream1-scala_2.12-java8
+        flinkVersion: '1.13'
+        jarUri: >-
+          https://gitlab.com/getindata/streaming-labs/flink-python-loader/-/package_files/16679765/download
+        kind: JAR
+      flinkConfiguration:
+        execution.checkpointing.externalized-checkpoint-retention: RETAIN_ON_CANCELLATION
+        execution.checkpointing.interval: 10s
+      logging:
+        log4jLoggers:
+          '': INFO
+        loggingProfile: default
+      parallelism: 1
+      resources:
+        jobmanager:
+          cpu: 1
+          memory: 1G
+        taskmanager:
+          cpu: 1
+          memory: 1G
+  upgradeStrategy:
+    kind: STATEFUL

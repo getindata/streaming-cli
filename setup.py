@@ -27,4 +27,7 @@ setuptools.setup(
             'scli = streamingcli.main:cli',
         ],
     },
+    package_data={
+          'streamingcli.project': ['templates/*'],
+    },
 )
