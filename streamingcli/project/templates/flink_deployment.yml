@@ -22,8 +22,7 @@ spec:
         flinkImageRepository: flink
         flinkImageTag: 1.13.2-stream1-scala_2.12-java8
         flinkVersion: '1.13'
-        jarUri: >-
-          https://gitlab.com/getindata/streaming-labs/flink-python-loader/-/package_files/16679765/download
+        jarUri: file:///flink/lib/flink-python-loader.jar
         kind: JAR
       flinkConfiguration:
         execution.checkpointing.externalized-checkpoint-retention: RETAIN_ON_CANCELLATION

@@ -10,6 +10,12 @@ package: install
 flink/init:
 	scli project init --project_name tmp_project
 
+flink/build:
+	cd tmp_project; docker build --file=.vvp/Dockerfile .
+
+flink/run:
+	cd tmp_project; docker run tmp_project
+
 flink/deploy:
 	cd tmp_project; scli project deploy
 

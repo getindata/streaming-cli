@@ -1,7 +1,8 @@
 import yaml
-from streamingcli.Config import PROJECT_LOCAL_CONFIG_FILE_NAME
+from streamingcli.Config import PROJECT_LOCAL_CONFIG_FILE_NAME, PROJECT_LOCAL_TEMPLATE_DIR_NAME
 from typing import Dict, Optional
 import click
+import os
 
 
 class LocalProjectConfig:
@@ -43,6 +44,10 @@ class LocalProjectConfigFactory:
 
 
 class LocalProjectConfigIO:
+    @staticmethod
+    def create_template_directory(project_name: str):
+        os.makedirs(f"{project_name}/{PROJECT_LOCAL_TEMPLATE_DIR_NAME}")
+
     @staticmethod
     def project_config_default_path():
         return f"./{PROJECT_LOCAL_CONFIG_FILE_NAME}"
