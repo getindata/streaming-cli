@@ -1,0 +1,18 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+click = "*"
+kubernetes = "*"
+dataclasses-json = "*"
+GitPython = "*"
+PyYAML = "*"
+Jinja2 = "*"
+setuptools = "*"
+
+[dev-packages]
+
+[requires]
+python_version = "3.9"

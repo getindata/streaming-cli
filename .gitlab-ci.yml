@@ -1,7 +1,65 @@
-image: python:latest
+variables:
+  DOCKER_TAG: "${CI_COMMIT_SHA}"
 
-run:
+stages:
+  - build
+  - package
+  - ship
+
+image: python:3.9
+
+whl:
+  stage: build
+  before_script:
+    - pip install pipenv
+    - pipenv lock -r > requirements.txt
   script:
-    - pip install twine
     - python setup.py sdist bdist_wheel
-    - TWINE_PASSWORD=${CI_JOB_TOKEN} TWINE_USERNAME=gitlab-ci-token python -m twine upload --repository-url ${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/pypi dist/*
+  artifacts:
+    paths:
+      - dist/*
+
+.dockerize:
+  stage: package
+  services:
+    - docker:19.03.13-dind
+  image: docker:19.03.13
+  needs:
+    - whl
+
+dockerize:
+  extends:
+    .dockerize
+  script:
+    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
+    - docker build --pull -t "$CI_REGISTRY_IMAGE:$DOCKER_TAG" .
+    - docker push "$CI_REGISTRY_IMAGE:$DOCKER_TAG"
+  only:
+    - branches
+
+docker-sign:
+  extends:
+    .dockerize
+  script:
+    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
+    - docker pull "$CI_REGISTRY_IMAGE:$DOCKER_TAG"
+    - docker tag "$CI_REGISTRY_IMAGE:$DOCKER_TAG" "$CI_REGISTRY_IMAGE:${CI_COMMIT_TAG}"
+    - docker push "$CI_REGISTRY_IMAGE:${CI_COMMIT_TAG}"
+    - docker tag "$CI_REGISTRY_IMAGE:$DOCKER_TAG" "$CI_REGISTRY_IMAGE:latest"
+    - docker push "$CI_REGISTRY_IMAGE:latest"
+  only:
+    - tags
+
+pypi:
+  stage: ship
+  before_script:
+    - pip install pipenv twine
+    - pipenv lock -r > requirements.txt
+  script:
+    - python setup.py verify
+    - TWINE_USERNAME="gitlab-ci-token" TWINE_PASSWORD="${CI_JOB_TOKEN}"
+      python -m twine upload --repository-url ${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/pypi dist/*
+  needs:
+    - whl
+  rules:
+    - if: "$CI_COMMIT_TAG"

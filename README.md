@@ -6,6 +6,6 @@
 ## Install CLI locally
 
 ```shell
-make install-pip-setuptools
+make install
 make package
 ```

@@ -1,0 +1,9 @@
+version: "2"
+
+services:
+  scli:
+    image: "${IMAGE_HUB:-}${APP_IMAGE:-getindata/streaming-labs/streaming-cli}:${IMAGE_TAG:-latest}"
+    build:
+      context: .
+    volumes:
+      - .:/app

@@ -1,7 +1,0 @@
-setuptools
-click
-gitpython
-pyyaml
-kubernetes
-dataclasses_json
-jinja2
