@@ -1,11 +1,14 @@
+docker/build:
+	docker-compose build
+
 install:
-	pip install .
+	pipenv install
 
-install-pip-setuptools:
-	python -m pip install -U "pip>=20.0" "setuptools>=38.0" wheel
+requirements:
+	pipenv lock -r > requirements.txt
 
-package: install
-	python setup.py sdist bdist_wheel
+package: requirements
+	pipenv run python setup.py sdist bdist_wheel
 
 flink/init:
 	scli project init --project_name tmp_project

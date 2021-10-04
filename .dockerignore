@@ -1,8 +1,9 @@
 venv/
 .venv/
 .idea/
-dist/
 build/
 streamingcli.egg-info/
 tmp_project/
 requirements.txt
+docker-compose.yml
+Dockerfile
