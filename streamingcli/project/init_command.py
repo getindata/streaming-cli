@@ -29,6 +29,7 @@ class NewProjectInitializer:
         LocalProjectConfigFactory.generate_initial_project_config(project_name)
         LocalProjectConfigIO.create_template_directory(project_name=project_name)
         NewProjectInitializer.generate_dockerfile_template(project_name=project_name)
+        TemplateLoader.copy_binary("flink-python-loader.jar", f"./{project_name}/{PROJECT_LOCAL_TEMPLATE_DIR_NAME}/flink-python-loader.jar")
 
     @staticmethod
     def generate_dockerfile_template(project_name: str):
@@ -36,4 +37,3 @@ class NewProjectInitializer:
         project_dockerfile = Environment().from_string(template).render(project_name=project_name)
         with open(f"./{project_name}/{PROJECT_LOCAL_TEMPLATE_DIR_NAME}/Dockerfile", "w") as docker_file:
             docker_file.write(project_dockerfile)
-

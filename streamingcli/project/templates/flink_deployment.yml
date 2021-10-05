@@ -17,13 +17,16 @@ spec:
         flink.security.ssl.enabled: 'false'
     spec:
       artifact:
-        entryClass: com.getindata.streaming.FlinkPythonLoader
         flinkImageRegistry: registry.ververica.com/v2.5
         flinkImageRepository: flink
         flinkImageTag: 1.13.2-stream1-scala_2.12-java8
         flinkVersion: '1.13'
-        jarUri: file:///flink/lib/flink-python-loader.jar
+        jarUri: file:///flink/usrlib/flink-python-loader.jar
+        entryClass: com.getindata.streaming.FlinkPythonLoader
         kind: JAR
+        additionalDependencies:
+          - file:///flink/python_src/flink_app.py
+        mainArgs: --python_path=/flink/python_src/flink_app.py
       flinkConfiguration:
         execution.checkpointing.externalized-checkpoint-retention: RETAIN_ON_CANCELLATION
         execution.checkpointing.interval: 10s
