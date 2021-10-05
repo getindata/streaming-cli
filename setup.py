@@ -6,16 +6,18 @@ from setuptools import find_packages
 from setuptools.command.install import install
 
 
-VERSION = "1.1.11"
+VERSION = "1.1.12"
 
 with open("README.md", "r") as fh:
     long_description = fh.read()
+
 
 def get_requirements(filename):
     with open(filename, "r", encoding="utf-8") as fp:
         reqs = [x.strip() for x in fp.read().splitlines()
                 if not x.strip().startswith('#') and not x.strip().startswith('-i')]
     return reqs
+
 
 class VerifyVersionCommand(install):
     """Custom command to verify that the git tag matches our version"""

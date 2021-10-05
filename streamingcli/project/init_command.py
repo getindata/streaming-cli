@@ -35,5 +35,5 @@ class NewProjectInitializer:
     def generate_dockerfile_template(project_name: str):
         template = TemplateLoader.load_project_template("Dockerfile")
         project_dockerfile = Environment().from_string(template).render(project_name=project_name)
-        with open(f"./{project_name}/{PROJECT_LOCAL_TEMPLATE_DIR_NAME}/Dockerfile", "w") as docker_file:
+        with open(f"./{project_name}/Dockerfile", "w") as docker_file:
             docker_file.write(project_dockerfile)
