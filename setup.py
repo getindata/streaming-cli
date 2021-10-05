@@ -6,7 +6,7 @@ from setuptools import find_packages
 from setuptools.command.install import install
 
 
-VERSION = "1.1.10"
+VERSION = "1.1.11"
 
 with open("README.md", "r") as fh:
     long_description = fh.read()
@@ -40,9 +40,9 @@ setup(
     long_description=long_description,
     url="https://gitlab.com/getindata/streaming-labs/streaming-cli",
     packages=find_packages(),
-    python_requires='>=3.7',
+    python_requires='>=3.9',
     classifiers=[
-        "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
         "Operating System :: OS Independent",
     ],
     install_requires=get_requirements('requirements.txt'),
