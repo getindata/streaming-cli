@@ -1,11 +1,13 @@
-### Streaming platform CLI ###
+# Streaming platform CLI
 
-## Prerequisities ##
-* Install Python 3.8+
+## Usage
+### Prerequisities ##
+* `pipenv`
 
-## Install CLI locally
+### Build
+* `make setup` - Install dependencies required to build a wheel package
+* `make package` - Create a wheel package
 
-```shell
-make install
-make package
-```
+### Install
+* `make install` - Install a wheel package
+* `make install/force` - Reinstall a wheel package
