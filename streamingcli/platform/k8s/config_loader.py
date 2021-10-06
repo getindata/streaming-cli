@@ -11,7 +11,14 @@ class KubernetesConfigLoader:
     def get_client() -> client.CoreV1Api:
         global k8s_api_client
         if k8s_api_client is None:
-            config.load_kube_config()
+            try:
+                config.load_incluster_config()
+            except config.ConfigException:
+                try:
+                    config.load_kube_config()
+                except config.ConfigException:
+                    raise Exception("Could not configure kubernetes python client")
+
             k8s_api_client = client.CoreV1Api()
         return k8s_api_client
 
