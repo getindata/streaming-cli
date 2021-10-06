@@ -45,8 +45,7 @@ def platform():
               help='Ververica namespace')
 @click.option('--ververica_kubernetes_namespace', prompt='Kubernetes namespace where Ververica is deployed',
               help='Kubernetes namespace where Ververica is deployed')
-@click.option('--force', prompt='Force recreate tokens and secrets',
-              help='Force recreate tokens and secrets', is_flag=True)
+@click.option('--force', help='Force recreate tokens and secrets', is_flag=True)
 def platform_setup(ververica_url: str, ververica_namespace: str, ververica_kubernetes_namespace: str, force: bool):
     PlatformSetupCommand.setup_ververica(ververica_url=ververica_url,
                                          ververica_namespace=ververica_namespace,
