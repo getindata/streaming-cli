@@ -11,8 +11,11 @@ from streamingcli.Config import PLATFORM_K8S_SECRET_NAME
 class PlatformSetupCommand:
 
     @staticmethod
-    def setup_ververica(ververica_url: str, ververica_namespace: str, ververica_kubernetes_namespace: str):
+    def setup_ververica(ververica_url: str, ververica_namespace: str, ververica_kubernetes_namespace: str, force: bool):
         click.echo(f"Generate Ververica WebToken ...")
+        if force:
+            VervericaWebTokenFactory.delete_token(ververica_url=ververica_url, ververica_namespace=ververica_namespace);
+            click.echo(f"Ververica WebToken removed")
         webtoken = VervericaWebTokenFactory.create_token(ververica_url=ververica_url, ververica_namespace=ververica_namespace)
         if webtoken is None:
             raise click.ClickException("Ververica WebToken generation error")

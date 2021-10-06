@@ -6,7 +6,7 @@ from setuptools import find_packages
 from setuptools.command.install import install
 
 
-VERSION = "1.1.12"
+VERSION = "1.1.13"
 
 with open("README.md", "r") as fh:
     long_description = fh.read()

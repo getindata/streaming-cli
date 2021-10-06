@@ -30,3 +30,11 @@ class VervericaWebTokenFactory:
             print(response.status_code)
             return None
 
+    @staticmethod
+    def delete_token(ververica_url: str, ververica_namespace: str):
+        webtoken_name = f"namespaces/{ververica_namespace}/apitokens/ci-token"
+        apitokens_url = f"{ververica_url}/apitokens/v1/{webtoken_name}"
+        response = requests.post(apitokens_url)
+        print(response.json())
+        if response.status_code != 200 and response.status_code != 404 and response.status_code != 400:
+            raise click.ClickException("Ververica WebToken already exists! Remove it first")

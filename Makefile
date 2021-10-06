@@ -7,22 +7,24 @@ docker/run:
 setup:
 	pipenv install
 
-requirements:
+cli/requirements:
 	pipenv lock -r > requirements.txt
 
-package: requirements
+cli/package: cli/requirements
 	pipenv run python setup.py sdist bdist_wheel
 
-uninstall:
+cli/uninstall:
 	pipenv run python -m pip uninstall streamingcli
 
-install:
+cli/install:
 	pipenv run python -m pip install dist/*.whl
 
-install/force:
+cli/install/force:
 	pipenv run python -m pip install --force-reinstall dist/*.whl
 
-install/from-pypi:
+cli/build: cli/package cli/install/force
+
+cli/install/from-pypi:
 	pipenv run python -m pip install streamingcli --extra-index-url https://__token__:$GITLAB_TOKEN@gitlab.com/api/v4/projects/29597698/packages/pypi/simple --upgrade
 
 flink/init:
@@ -38,4 +40,4 @@ flink/deploy:
 	cd tmp_project; pipenv run scli project deploy
 
 platform/setup:
-	pipenv run scli platform setup --ververica_url "http://localhost:8080" --ververica_namespace default --ververica_kubernetes_namespace vvp
+	pipenv run scli platform setup --ververica_url "http://localhost:8080" --ververica_namespace default --ververica_kubernetes_namespace vvp --force
