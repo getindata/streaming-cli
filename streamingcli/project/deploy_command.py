@@ -22,6 +22,6 @@ class ProjectDeployer:
         print("ok")
 
     @staticmethod
-    def generate_project_template(project_name: str) -> str:
+    def generate_project_template(project_name: str, docker_image_tag: str) -> str:
         template = TemplateLoader.load_project_template("flink_deployment.yml")
-        return Environment().from_string(template).render(project_name=project_name)
+        return Environment().from_string(template).render(project_name=project_name, docker_image_tag=docker_image_tag)
