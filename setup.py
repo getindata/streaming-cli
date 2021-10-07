@@ -6,7 +6,7 @@ from setuptools import find_packages
 from setuptools.command.install import install
 
 
-VERSION = "1.1.14"
+__version__ = "1.1.14"
 
 with open("README.md", "r") as fh:
     long_description = fh.read()
@@ -26,16 +26,16 @@ class VerifyVersionCommand(install):
     def run(self):
         tag = os.getenv('CI_COMMIT_TAG')
 
-        if tag != f"v{VERSION}":
+        if tag != f"v{__version__}":
             info = "Git tag: {0} does not match the version of this app: {1}".format(
-                tag, VERSION
+                tag, __version__
             )
             sys.exit(info)
 
 
 setup(
     name="streamingcli",
-    version=VERSION,
+    version=__version__,
     author="GetInData",
     author_email="office@getindata.com",
     description="Streaming platform CLI",
