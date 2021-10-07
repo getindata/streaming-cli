@@ -1,4 +1,5 @@
 import click
+from streamingcli.project.cicd_command import CICDInitializer
 from streamingcli.project.init_command import NewProjectInitializer
 from streamingcli.platform.setup_command import PlatformSetupCommand
 from streamingcli.project.deploy_command import ProjectDeployer
@@ -59,10 +60,22 @@ def platform_setup(ververica_url: str, ververica_namespace: str, ververica_kuber
                                          force=force)
 
 
+@project.group()
+def cicd():
+    pass
+
+@cicd.command()
+@click.option('--provider', prompt="Provider's name",
+            help="Provider's name", type=click.Choice(['gitlab'], case_sensitive=False))
+def cicd_setup(provider: str):
+    CICDInitializer.setup_cicd(provider)
+
+
 project.add_command(project_init, "init")
 project.add_command(project_deploy, "deploy")
 project.add_command(project_build, "build")
 platform.add_command(platform_setup, "setup")
+cicd.add_command(cicd_setup, "setup")
 
 if __name__ == '__main__':
     cli()

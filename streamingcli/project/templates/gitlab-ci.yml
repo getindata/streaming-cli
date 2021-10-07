@@ -1,0 +1,34 @@
+variables:
+  DOCKER_TAG: "{{project_name}}-${CI_COMMIT_SHA}"
+
+stages:
+  - package
+
+.dockerize:
+  stage: package
+  services:
+    - docker:19.03.13-dind
+  image: docker:19.03.13
+
+dockerize:
+  extends:
+    .dockerize
+  script:
+    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
+    - docker build --pull -t "$CI_REGISTRY_IMAGE:$DOCKER_TAG" .
+    - docker push "$CI_REGISTRY_IMAGE:$DOCKER_TAG"
+  only:
+    - branches
+
+docker-sign:
+  extends:
+    .dockerize
+  script:
+    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
+    - docker pull "$CI_REGISTRY_IMAGE:$DOCKER_TAG"
+    - docker tag "$CI_REGISTRY_IMAGE:$DOCKER_TAG" "$CI_REGISTRY_IMAGE:${CI_COMMIT_TAG#v}"
+    - docker push "$CI_REGISTRY_IMAGE:${CI_COMMIT_TAG#v}"
+    - docker tag "$CI_REGISTRY_IMAGE:$DOCKER_TAG" "$CI_REGISTRY_IMAGE:latest"
+    - docker push "$CI_REGISTRY_IMAGE:latest"
+  only:
+    - tags
