@@ -18,8 +18,8 @@ spec:
     spec:
       artifact:
         flinkImageRegistry: registry.ververica.com/v2.5
-        flinkImageRepository: flink
-        flinkImageTag: 1.13.2-stream1-scala_2.12-java8
+        flinkImageRepository: {{project_name}}
+        flinkImageTag: {{docker_image_tag}}
         flinkVersion: '1.13'
         jarUri: file:///flink/usrlib/flink-python-loader.jar
         entryClass: com.getindata.streaming.FlinkPythonLoader

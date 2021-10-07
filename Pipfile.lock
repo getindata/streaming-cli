@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "4c16d7d64bfc1b963658049452bcc85b7270ff281a6da93c9b8c79075584ca08"
+            "sha256": "2edc89fd44bb32746d115b53c21f1d56668996f3dabfbb7cf6c55d6ea2953edd"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -54,6 +54,14 @@
             ],
             "index": "pypi",
             "version": "==0.5.6"
+        },
+        "docker": {
+            "hashes": [
+                "sha256:21ec4998e90dff7a7aaaa098ca8d839c7de412b89e6f6c30908372d58fecf663",
+                "sha256:9b17f0723d83c1f3418d2aa17bf90b24dbe97deda06208dd4262fa30a6ee87eb"
+            ],
+            "index": "pypi",
+            "version": "==5.0.2"
         },
         "gitdb": {
             "hashes": [

@@ -12,9 +12,9 @@ class ProjectDeployer:
 
         # TODO Load kubernetes ConfigMap
         # TODO Load kubernetes secret
-        # TODO Upload project artifact/code into Min.io... or make dockerfile with python code
         # TODO Generate deployment YAML
-        deployment_yml = ProjectDeployer.generate_project_template(project_name=local_project_config.project_name)
+        docker_image_tag = f"{local_project_config.project_name}:{local_project_config.project_version}"
+        deployment_yml = ProjectDeployer.generate_project_template(project_name=local_project_config.project_name, docker_image_tag=docker_image_tag)
         print(deployment_yml)
 
         # TODO Post deployment YAML to Ververica cluster
