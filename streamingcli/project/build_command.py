@@ -14,3 +14,7 @@ class ProjectBuilder:
         client = docker.from_env()
         (image, logs) = client.images.build(path=".", tag=image_tag)
         click.echo(f"Docker image {image.short_id} created with tags: {image.tags}")
+
+        # TODO zapisać TAG w konfiguracji ?
+        # TODO zapisać template deploymentu do katalogu projektu
+        return image.tags[0]

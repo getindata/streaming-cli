@@ -3,10 +3,9 @@ from jinja2 import Environment
 from streamingcli.project.template_loader import TemplateLoader
 from streamingcli.project.local_project_config import LocalProjectConfigIO
 
-
 class ProjectDeployer:
     @staticmethod
-    def deploy_project():
+    def deploy_project(overrides_from_yaml: str = None):
         # Load local project config
         local_project_config = LocalProjectConfigIO.load_project_config()
 

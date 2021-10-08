@@ -1,0 +1,12 @@
+name: John
+age: 31
+automobiles:
+- brand: Honda
+  type: Odyssey
+  year: 2018
+- brand: Toyota
+  type: Sienna
+  year: 2015
+planes:
+- plane1: Cesna
+  year: 2018
