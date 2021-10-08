@@ -31,8 +31,10 @@ def project_init(project_name: str):
 
 
 @project.command()
-def project_deploy():
-    ProjectDeployer.deploy_project()
+@click.option('--overrides_from_yaml',
+              help='Path to additional deployment YAML file to merge with Ververica one')
+def project_deploy(overrides_from_yaml: str = None):
+    ProjectDeployer.deploy_project(overrides_from_yaml)
 
 
 @project.command()
