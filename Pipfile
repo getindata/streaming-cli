@@ -12,6 +12,7 @@ PyYAML = "*"
 Jinja2 = "*"
 setuptools = "*"
 docker = "*"
+HiYaPyCo = "*"
 
 [dev-packages]
 pytest = "*"

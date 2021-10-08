@@ -1,12 +1,8 @@
-name: John
 age: 31
 automobiles:
 - brand: Ford
   type: Focus
   year: 2018
-- brand: Toyota
-  type: Sienna
-  year: 2015
 planes:
 - plane1: Cesna
   year: 2018

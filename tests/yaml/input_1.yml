@@ -1,0 +1,9 @@
+name: John
+age: 30
+automobiles:
+- brand: Honda
+  type: Odyssey
+  year: 2014
+- brand: Toyota
+  type: Sienna
+  year: 2015

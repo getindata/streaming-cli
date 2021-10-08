@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "9c9b721b14216fd72059707cde804be58f6be352acd42185656628edc7027038"
+            "sha256": "d6f8ca0d7cb52c3d0fdf60b1152d9f0bb91182ace121d4f450e89258769a35b6"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -87,6 +87,14 @@
             "markers": "python_version >= '3.6'",
             "version": "==2.3.0"
         },
+        "hiyapyco": {
+            "hashes": [
+                "sha256:568c99f5cd9ccbde4b76323fcedb8490d1b7c51a257d74580e262ceea7f8a65b",
+                "sha256:ffee19eea74ee4d92d02b67f4d08b3654182fb529affa608eaff7e09d27267e1"
+            ],
+            "index": "pypi",
+            "version": "==0.4.16"
+        },
         "idna": {
             "hashes": [
                 "sha256:14475042e284991034cb48e06f6851428fb14c4dc953acd9be9a5e95c7b6dd7a",
@@ -97,11 +105,11 @@
         },
         "jinja2": {
             "hashes": [
-                "sha256:827a0e32839ab1600d4eb1c4c33ec5a8edfbc5cb42dafa13b81f182f97784b45",
-                "sha256:8569982d3f0889eed11dd620c706d39b60c36d6d25843961f33f77fb6bc6b20c"
+                "sha256:03e47ad063331dd6a3f04a43eddca8a966a26ba0c5b7207a9a9e4e08f1b29419",
+                "sha256:a6d58433de0ae800347cab1fa3043cebbabe8baa9d29e668f1c768cb87a333c6"
             ],
             "index": "pypi",
-            "version": "==3.0.2"
+            "version": "==2.11.3"
         },
         "kubernetes": {
             "hashes": [
