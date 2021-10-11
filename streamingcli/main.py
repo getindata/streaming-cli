@@ -4,6 +4,7 @@ from streamingcli.project.init_command import NewProjectInitializer
 from streamingcli.platform.setup_command import PlatformSetupCommand
 from streamingcli.project.deploy_command import ProjectDeployer
 from streamingcli.project.build_command import ProjectBuilder
+from streamingcli.Config import PLATFORM_DEFAULT_DEPLOYMENT_TARGET_NAME
 
 
 @click.group(invoke_without_command=True)
@@ -52,13 +53,20 @@ def platform():
               help='URR for Ververica cluster, i.e: "https://vvp.streaming-platform.example.com"')
 @click.option('--ververica_namespace', prompt='Ververica namespace',
               help='Ververica namespace')
+@click.option('--ververica_deployment_target', prompt='Ververica deployment target name',
+              help='Ververica deployment target name')
 @click.option('--ververica_kubernetes_namespace', prompt='Kubernetes namespace where Ververica is deployed',
               help='Kubernetes namespace where Ververica is deployed')
 @click.option('--force', help='Force recreate tokens and secrets', is_flag=True)
-def platform_setup(ververica_url: str, ververica_namespace: str, ververica_kubernetes_namespace: str, force: bool):
+def platform_setup(ververica_url: str,
+                   ververica_namespace: str,
+                   ververica_kubernetes_namespace: str,
+                   force: bool,
+                   ververica_deployment_target: str = PLATFORM_DEFAULT_DEPLOYMENT_TARGET_NAME):
     PlatformSetupCommand.setup_ververica(ververica_url=ververica_url,
                                          ververica_namespace=ververica_namespace,
                                          ververica_kubernetes_namespace=ververica_kubernetes_namespace,
+                                         ververica_deployment_target_name=ververica_deployment_target,
                                          force=force)
 
 

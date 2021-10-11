@@ -5,6 +5,8 @@ import click
 
 
 class VervericaWebTokenFactory:
+    WEBTOKEN_NAME_ATTRIBUTE = "name"
+    WEBTOKEN_SECRET_ATTRIBUTE = "secret"
 
     @staticmethod
     def create_token(ververica_url: str, ververica_namespace: str) -> Optional[Dict]:
@@ -21,8 +23,8 @@ class VervericaWebTokenFactory:
         if response.status_code == 200:
             webtoken_secret = response.json()["apiToken"]["secret"]
             return {
-                "name": webtoken_name,
-                "secret": webtoken_secret
+                VervericaWebTokenFactory.WEBTOKEN_NAME_ATTRIBUTE: webtoken_name,
+                VervericaWebTokenFactory.WEBTOKEN_SECRET_ATTRIBUTE: webtoken_secret
             }
         elif response.status_code == 409:
             raise click.ClickException("Ververica WebToken already exists! Remove it first")
