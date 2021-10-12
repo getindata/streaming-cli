@@ -29,21 +29,21 @@ class PlatformSetupCommand:
         click.echo("Ververica WebToken stored in Kubernetes secret")
         KubernetesSecretAdapter.save_k8s_secret(secret_name=PLATFORM_K8S_SECRET_NAME, namespace=ververica_kubernetes_namespace, secret_data=webtoken)
 
-        VervericaDeploymentTargetFactory.create_deployment_target(
+        deployment_target_id = VervericaDeploymentTargetFactory.create_deployment_target(
             ververica_url=ververica_url,
             ververica_namespace=ververica_namespace,
             ververica_kubernetes_namespace=ververica_kubernetes_namespace,
             ververica_webtoken=webtoken,
             ververica_deployment_target_name=ververica_deployment_target_name
         )
-        click.echo(f"Ververica deployment target: {ververica_deployment_target_name} created")
 
         streaming_platform_config = PlatformConfig(
             ververica_url=ververica_url,
             ververica_namespace=ververica_namespace,
             secret_name=PLATFORM_K8S_SECRET_NAME,
             ververica_kubernetes_namespace=ververica_kubernetes_namespace,
-            ververica_deployment_target_name=ververica_deployment_target_name
+            ververica_deployment_target_name=ververica_deployment_target_name,
+            ververica_deployment_target_id=deployment_target_id
         )
         PlatformConfigAdapter.save_platform_config(streaming_platform_config)
         click.echo("Streaming platform configuration stored in Kubernetes configmap")

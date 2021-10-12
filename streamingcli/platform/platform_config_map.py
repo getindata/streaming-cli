@@ -18,6 +18,7 @@ class PlatformConfig:
     ververica_kubernetes_namespace: str = field(default="vvp")
     secret_name: str = field(default=PLATFORM_K8S_SECRET_NAME)
     ververica_deployment_target_name: str = field(default=PLATFORM_DEFAULT_DEPLOYMENT_TARGET_NAME)
+    ververica_deployment_target_id: str = field(default=None)
 
 
 class PlatformConfigFactory:
