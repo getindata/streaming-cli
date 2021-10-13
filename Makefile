@@ -5,7 +5,10 @@ docker/run:
 	docker-compose run --rm scli project init --project_name tmp_project
 
 setup:
-	pipenv install
+	pipenv install --dev
+
+test:
+	pipenv run pytest
 
 cli/requirements:
 	pipenv lock -r > requirements.txt

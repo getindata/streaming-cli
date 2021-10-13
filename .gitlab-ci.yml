@@ -3,6 +3,7 @@ variables:
 
 stages:
   - build
+  - test
   - package
   - ship
 
@@ -18,6 +19,16 @@ whl:
   artifacts:
     paths:
       - dist/*
+
+pytest:
+  stage: test
+  before_script:
+    - pip install pipenv
+    - pip install pipenv --dev
+  script:
+    - pipenv run pytest
+  except:
+    - tags
 
 .dockerize:
   stage: package
