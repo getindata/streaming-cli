@@ -2,14 +2,20 @@ from typing import Dict, Optional
 import requests
 import json
 import click
+from dataclasses import dataclass
+from dataclasses_json import dataclass_json
+
+
+@dataclass_json
+@dataclass
+class VervericaWebToken:
+    name: str
+    secret: str
 
 
 class VervericaWebTokenFactory:
-    WEBTOKEN_NAME_ATTRIBUTE = "name"
-    WEBTOKEN_SECRET_ATTRIBUTE = "secret"
-
     @staticmethod
-    def create_token(ververica_url: str, ververica_namespace: str) -> Optional[Dict]:
+    def create_token(ververica_url: str, ververica_namespace: str) -> Optional[VervericaWebToken]:
         apitokens_url = f"{ververica_url}/apitokens/v1/namespaces/{ververica_namespace}/apitokens"
         webtoken_name = f"namespaces/{ververica_namespace}/apitokens/ci-token"
         request_body = {
@@ -22,15 +28,11 @@ class VervericaWebTokenFactory:
         })
         if response.status_code == 200:
             webtoken_secret = response.json()["apiToken"]["secret"]
-            return {
-                VervericaWebTokenFactory.WEBTOKEN_NAME_ATTRIBUTE: webtoken_name,
-                VervericaWebTokenFactory.WEBTOKEN_SECRET_ATTRIBUTE: webtoken_secret
-            }
+            return VervericaWebToken(name=webtoken_name, secret=webtoken_secret)
         elif response.status_code == 409:
             raise click.ClickException("Ververica WebToken already exists! Remove it first")
         else:
-            print(response.status_code)
-            return None
+            raise click.ClickException(f"Ververica WebToken generation error: {response.status_code}")
 
     @staticmethod
     def delete_token(ververica_url: str, ververica_namespace: str):

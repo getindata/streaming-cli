@@ -1,5 +1,7 @@
 import click
 from jinja2 import Environment
+
+from streamingcli.platform.platform_config_map import PlatformConfigAdapter
 from streamingcli.project.template_loader import TemplateLoader
 from streamingcli.project.local_project_config import LocalProjectConfigIO
 from streamingcli.project.yaml_merger import YamlMerger
@@ -11,6 +13,9 @@ class ProjectDeployer:
     def deploy_project(overrides_from_yaml: Optional[str] = None):
         # Load local project config
         local_project_config = LocalProjectConfigIO.load_project_config()
+
+        # Load platform ConfigMap
+        PlatformConfigAdapter.load_platform_config(local_project_config.)
 
         # TODO Load kubernetes ConfigMap
         # TODO Load kubernetes secret

@@ -1,6 +1,4 @@
-from typing import Dict, Optional
-
-from streamingcli.platform.ververica.webtoken_factory import VervericaWebTokenFactory
+from typing import Optional
 from streamingcli.project.template_loader import TemplateLoader
 from jinja2 import Environment
 import requests
@@ -13,13 +11,13 @@ class VervericaDeploymentTargetFactory:
     @staticmethod
     def get_existing_deployment_target_id_by_name(ververica_url: str,
                                                   ververica_namespace: str,
-                                                  ververica_webtoken: Dict,
+                                                  ververica_webtoken_secret: str,
                                                   ververica_deployment_target_name: str) -> Optional[str]:
         dp_url = f"{ververica_url}/api/v1/namespaces/{ververica_namespace}/deployment-targets"
         response = requests.get(dp_url, headers={
             "accept": "application/yaml",
             "Content-Type": "application/yaml",
-            "Authorization": f"Bearer {ververica_webtoken[VervericaWebTokenFactory.WEBTOKEN_SECRET_ATTRIBUTE]}",
+            "Authorization": f"Bearer {ververica_webtoken_secret}",
         })
         all_deployment_targets = yaml.safe_load(response.content)
         for item in all_deployment_targets["items"]:
@@ -45,12 +43,12 @@ class VervericaDeploymentTargetFactory:
     def create_deployment_target(ververica_url: str,
                                  ververica_namespace: str,
                                  ververica_kubernetes_namespace: str,
-                                 ververica_webtoken: Dict,
+                                 ververica_webtoken_secret: str,
                                  ververica_deployment_target_name: str):
         deployment_target_id = VervericaDeploymentTargetFactory.get_existing_deployment_target_id_by_name(
             ververica_url=ververica_url,
             ververica_namespace=ververica_namespace,
-            ververica_webtoken=ververica_webtoken,
+            ververica_webtoken_secret=ververica_webtoken_secret,
             ververica_deployment_target_name=ververica_deployment_target_name
         )
         if deployment_target_id is not None:
@@ -68,7 +66,7 @@ class VervericaDeploymentTargetFactory:
         response = requests.post(dp_url, deployment_target_yaml, headers={
             "accept": "application/yaml",
             "Content-Type": "application/yaml",
-            "Authorization": f"Bearer {ververica_webtoken[VervericaWebTokenFactory.WEBTOKEN_SECRET_ATTRIBUTE]}",
+            "Authorization": f"Bearer {ververica_webtoken_secret}",
         })
 
         if response.status_code != 201:

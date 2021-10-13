@@ -1,4 +1,3 @@
-import json
 from typing import Dict
 from base64 import b64encode, b64decode
 from streamingcli.platform.k8s.config_loader import KubernetesConfigLoader
@@ -6,7 +5,6 @@ from kubernetes.client.exceptions import ApiException
 from kubernetes.client import V1Secret, V1ObjectMeta
 
 
-# https://stackoverflow.com/questions/46763148/how-to-create-secrets-using-kubernetes-python-client
 class KubernetesSecretAdapter:
 
     @staticmethod
