@@ -25,7 +25,7 @@ class PlatformSetupCommand:
         webtoken = VervericaWebTokenFactory.create_token(ververica_url=ververica_url, ververica_namespace=ververica_namespace)
         if webtoken is None:
             raise click.ClickException("Ververica WebToken generation error")
-        click.echo(f"Ververica WebToken: {webtoken['name']} generated")
+        click.echo(f"Ververica WebToken: {webtoken.name} generated")
 
         click.echo("Ververica WebToken stored in Kubernetes secret")
         KubernetesSecretAdapter.save_k8s_secret(secret_name=PLATFORM_K8S_SECRET_NAME, namespace=ververica_kubernetes_namespace, secret_data=asdict(webtoken))
