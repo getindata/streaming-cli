@@ -7,6 +7,7 @@ from streamingcli.platform.platform_config_map import (
     PlatformConfigAdapter
 )
 from streamingcli.Config import PLATFORM_K8S_SECRET_NAME
+from dataclasses import asdict
 
 
 class PlatformSetupCommand:
@@ -24,16 +25,16 @@ class PlatformSetupCommand:
         webtoken = VervericaWebTokenFactory.create_token(ververica_url=ververica_url, ververica_namespace=ververica_namespace)
         if webtoken is None:
             raise click.ClickException("Ververica WebToken generation error")
-        click.echo(f"Ververica WebToken: {webtoken['name']} generated")
+        click.echo(f"Ververica WebToken: {webtoken.name} generated")
 
         click.echo("Ververica WebToken stored in Kubernetes secret")
-        KubernetesSecretAdapter.save_k8s_secret(secret_name=PLATFORM_K8S_SECRET_NAME, namespace=ververica_kubernetes_namespace, secret_data=webtoken)
+        KubernetesSecretAdapter.save_k8s_secret(secret_name=PLATFORM_K8S_SECRET_NAME, namespace=ververica_kubernetes_namespace, secret_data=asdict(webtoken))
 
         deployment_target_id = VervericaDeploymentTargetFactory.create_deployment_target(
             ververica_url=ververica_url,
             ververica_namespace=ververica_namespace,
             ververica_kubernetes_namespace=ververica_kubernetes_namespace,
-            ververica_webtoken=webtoken,
+            ververica_webtoken_secret=webtoken.secret,
             ververica_deployment_target_name=ververica_deployment_target_name
         )
 
