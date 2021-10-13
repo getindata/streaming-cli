@@ -14,9 +14,6 @@ class ProjectDeployer:
         # Load local project config
         local_project_config = LocalProjectConfigIO.load_project_config()
 
-        # Load platform ConfigMap
-        PlatformConfigAdapter.load_platform_config(local_project_config.)
-
         # TODO Load kubernetes ConfigMap
         # TODO Load kubernetes secret
 
