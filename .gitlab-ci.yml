@@ -1,8 +1,10 @@
 variables:
   DOCKER_TAG: "${CI_COMMIT_SHA}"
+  PIPENV_VENV_IN_PROJECT: "true"
 
 stages:
   - build
+  - test
   - package
   - ship
 
@@ -19,13 +21,24 @@ whl:
     paths:
       - dist/*
 
+pytest:
+  stage: test
+  before_script:
+    - pip install pipenv
+    - pipenv install --dev
+  script:
+    - pipenv run pytest
+  cache:
+    paths:
+      - .venv/*
+  except:
+    - tags
+
 .dockerize:
   stage: package
   services:
     - docker:19.03.13-dind
   image: docker:19.03.13
-  needs:
-    - whl
 
 dockerize:
   extends:
