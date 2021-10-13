@@ -46,4 +46,4 @@ flink/deploy/overrides:
 	cd tmp_project; pipenv run scli project deploy --overrides_from_yaml=./deployment_prod.yml
 
 platform/setup:
-	pipenv run scli platform setup --ververica_url "http://localhost:8080" --ververica_namespace default --ververica_kubernetes_namespace vvp --force
+	pipenv run scli platform setup --ververica_url "http://localhost:8080" --ververica_namespace default --ververica_kubernetes_namespace vvp --ververica_deployment_target default --force

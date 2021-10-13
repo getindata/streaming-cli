@@ -1,0 +1,8 @@
+kind: DeploymentTarget
+apiVersion: v1
+metadata:
+  name: {{ververica_deployment_target_name}}
+  namespace: {{ververica_namespace}}
+spec:
+  kubernetes:
+    namespace: {{ververica_kubernetes_namespace}}
