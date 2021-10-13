@@ -24,7 +24,7 @@ pytest:
   stage: test
   before_script:
     - pip install pipenv
-    - pip install pipenv --dev
+    - pipenv install --dev
   script:
     - pipenv run pytest
   except:
