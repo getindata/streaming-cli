@@ -1,8 +1,8 @@
 metadata:
   displayName: {{project_name}}
 spec:
-  deploymentTargetId: null
-  deploymentTargetName: vvp
+  deploymentTargetId: {{deployment_target_id}}
+  deploymentTargetName: {{deployment_target_name}}
   maxJobCreationAttempts: 4
   maxSavepointCreationAttempts: 4
   restoreStrategy:
