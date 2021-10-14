@@ -52,4 +52,4 @@ class VervericaWebTokenLoader:
             secret_name=PLATFORM_K8S_SECRET_NAME,
             namespace=kubernetes_namespace
         )
-        return VervericaWebToken.from_json(token)
+        return VervericaWebToken.from_json(json.dumps(token))

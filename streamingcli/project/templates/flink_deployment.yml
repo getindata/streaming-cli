@@ -2,7 +2,6 @@ metadata:
   displayName: {{project_name}}
 spec:
   deploymentTargetId: {{deployment_target_id}}
-  deploymentTargetName: {{deployment_target_name}}
   maxJobCreationAttempts: 4
   maxSavepointCreationAttempts: 4
   restoreStrategy:
@@ -17,7 +16,7 @@ spec:
         flink.security.ssl.enabled: 'false'
     spec:
       artifact:
-        flinkImageRegistry: {{docker_registy_url}}
+        flinkImageRegistry: {{docker_registry_url}}
         flinkImageRepository: {{project_name}}
         flinkImageTag: {{docker_image_tag}}
         flinkVersion: '1.13'

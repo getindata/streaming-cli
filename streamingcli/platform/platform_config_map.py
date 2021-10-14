@@ -37,12 +37,12 @@ class PlatformConfigAdapter:
     def load_platform_config(kubernetes_namespace: str) -> PlatformConfig:
         configmap_name = PLATFORM_K8S_CONFIGMAP_NAME
 
-        configmap_list = KubernetesConfigmapAdapter.load_k8s_configmap(configmap_name=configmap_name,
+        configmap_dict = KubernetesConfigmapAdapter.load_k8s_configmap(configmap_name=configmap_name,
                                                                        namespace=kubernetes_namespace)
-        if configmap_list is None:
+        if configmap_dict is None:
             raise click.ClickException("Platform config load failed")
         else:
-            configmap_json = configmap_list.data[PLATFORM_K8S_CONFIGMAP_KEY]
+            configmap_json = configmap_dict[PLATFORM_K8S_CONFIGMAP_KEY]
             return PlatformConfigFactory.create_from_json(configmap_json)
 
     @staticmethod

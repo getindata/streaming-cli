@@ -6,7 +6,7 @@ from setuptools import find_packages
 from setuptools.command.install import install
 
 
-__version__ = "1.1.18"
+__version__ = "1.1.19"
 
 with open("README.md", "r") as fh:
     long_description = fh.read()
@@ -55,7 +55,7 @@ setup(
         ],
     },
     package_data={
-          'streamingcli.project': ['templates/*'],
+            'streamingcli.project': ['templates/*'],
     },
     cmdclass={
         'verify': VerifyVersionCommand,

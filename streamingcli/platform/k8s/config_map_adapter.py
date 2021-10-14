@@ -1,4 +1,4 @@
-from typing import Dict
+from typing import Dict, Optional
 
 from streamingcli.platform.k8s.config_loader import KubernetesConfigLoader
 from kubernetes.client.exceptions import ApiException
@@ -7,7 +7,7 @@ from kubernetes.client.exceptions import ApiException
 class KubernetesConfigmapAdapter:
 
     @staticmethod
-    def load_k8s_configmap(configmap_name: str, namespace: str):
+    def load_k8s_configmap(configmap_name: str, namespace: str) -> Optional[Dict]:
         k8s_api_client = KubernetesConfigLoader.get_client()
         configmap = k8s_api_client.read_namespaced_config_map(name=configmap_name, namespace=namespace)
         if configmap is None:
