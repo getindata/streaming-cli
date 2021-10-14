@@ -31,7 +31,10 @@ class ProjectDeployer:
         deployment_yml = ProjectDeployer.generate_project_template(
             project_name=local_project_config.project_name,
             docker_registry_url=docker_registry_url,
-            docker_image_tag=docker_image_tag)
+            docker_image_tag=docker_image_tag,
+            deployment_target_id=platform_config.ververica_deployment_target_id,
+            deployment_target_name=platform_config.ververica_deployment_target_name
+        )
         if overrides_from_yaml:
             deployment_yml = YamlMerger.merge_two_yaml(deployment_yml, overrides_from_yaml)
 
@@ -41,10 +44,18 @@ class ProjectDeployer:
         click.echo(f"Created deployment: http://localhost:8080/app/#/namespaces/default/deployments/{deployment_name}")
 
     @staticmethod
-    def generate_project_template(project_name: str, docker_registry_url: str, docker_image_tag: str) -> str:
+    def generate_project_template(
+            project_name: str,
+            docker_registry_url: str,
+            docker_image_tag: str,
+            deployment_target_id: str,
+            deployment_target_name: str
+    ) -> str:
         template = TemplateLoader.load_project_template("flink_deployment.yml")
         return Environment().from_string(template).render(
             project_name=project_name,
             docker_registry_url=docker_registry_url,
-            docker_image_tag=docker_image_tag
+            docker_image_tag=docker_image_tag,
+            deployment_target_id=deployment_target_id,
+            deployment_target_name=deployment_target_name
         )
