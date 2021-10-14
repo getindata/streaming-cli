@@ -2,6 +2,7 @@ import click
 from jinja2 import Environment
 
 from streamingcli.platform.platform_config_map import PlatformConfigAdapter
+from streamingcli.platform.ververica.deployment_adapter import DeploymentAdapter
 from streamingcli.project.template_loader import TemplateLoader
 from streamingcli.project.local_project_config import LocalProjectConfigIO
 from streamingcli.project.yaml_merger import YamlMerger
@@ -22,10 +23,11 @@ class ProjectDeployer:
         deployment_yml = ProjectDeployer.generate_project_template(project_name=local_project_config.project_name, docker_image_tag=docker_image_tag)
         if overrides_from_yaml:
             deployment_yml = YamlMerger.merge_two_yaml(deployment_yml, overrides_from_yaml)
-        print(deployment_yml)
 
         click.echo(f"Deploying streaming project: {local_project_config.project_name} ...")
-        # TODO Post deployment YAML to Ververica cluster
+        # TODO Read url and namespace from config
+        deployment_name = DeploymentAdapter.deploy(deployment_yml, ververica_url="http://localhost:8080", ververica_namespace="default")
+        click.echo(f"Created deployment: http://localhost:8080/app/#/namespaces/default/deployments/{deployment_name}")
 
     @staticmethod
     def generate_project_template(project_name: str, docker_image_tag: str) -> str:
