@@ -4,6 +4,8 @@ import json
 import click
 from dataclasses import dataclass
 from dataclasses_json import dataclass_json
+from streamingcli.platform.k8s.secret_adapter import KubernetesSecretAdapter
+from streamingcli.Config import PLATFORM_K8S_SECRET_NAME
 
 
 @dataclass_json
@@ -41,3 +43,13 @@ class VervericaWebTokenFactory:
         response = requests.delete(apitokens_url)
         if response.status_code != 200 and response.status_code != 404:
             raise click.ClickException("Cant remove Ververica WebToken")
+
+
+class VervericaWebTokenLoader:
+    @staticmethod
+    def load_webtoken(kubernetes_namespace: str) -> VervericaWebToken:
+        token = KubernetesSecretAdapter.load_k8s_secret(
+            secret_name=PLATFORM_K8S_SECRET_NAME,
+            namespace=kubernetes_namespace
+        )
+        return VervericaWebToken.from_json(token)
