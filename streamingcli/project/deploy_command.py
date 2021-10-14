@@ -17,7 +17,7 @@ class ProjectDeployer:
         local_project_config = LocalProjectConfigIO.load_project_config()
 
         # Load platform ConfigMap
-        kubernetes_namespace = "default"  # TODO load from config
+        kubernetes_namespace = "vvp"  # TODO load from config
         platform_config = PlatformConfigAdapter.load_platform_config(kubernetes_namespace=kubernetes_namespace)
 
         # TODO Load kubernetes ConfigMap
@@ -32,30 +32,34 @@ class ProjectDeployer:
             project_name=local_project_config.project_name,
             docker_registry_url=docker_registry_url,
             docker_image_tag=docker_image_tag,
-            deployment_target_id=platform_config.ververica_deployment_target_id,
-            deployment_target_name=platform_config.ververica_deployment_target_name
+            deployment_target_id=platform_config.ververica_deployment_target_id
         )
         if overrides_from_yaml:
             deployment_yml = YamlMerger.merge_two_yaml(deployment_yml, overrides_from_yaml)
-
         click.echo(f"Deploying streaming project: {local_project_config.project_name} ...")
-        # TODO Read url and namespace from config
-        deployment_name = DeploymentAdapter.deploy(deployment_yml, ververica_url="http://localhost:8080", ververica_namespace="default")
-        click.echo(f"Created deployment: http://localhost:8080/app/#/namespaces/default/deployments/{deployment_name}")
+
+        deployment_name = DeploymentAdapter.deploy(
+            deployment_yml=deployment_yml, 
+            ververica_url=platform_config.ververica_url, 
+            ververica_namespace=platform_config.ververica_namespace,
+            auth_token=webtoken.secret
+        )
+        click.echo(f"Created deployment: "
+            f"{platform_config.ververica_url}/app/#/namespaces/"
+            f"{platform_config.ververica_namespace}/deployments/{deployment_name}"
+        )
 
     @staticmethod
     def generate_project_template(
             project_name: str,
             docker_registry_url: str,
             docker_image_tag: str,
-            deployment_target_id: str,
-            deployment_target_name: str
+            deployment_target_id: str
     ) -> str:
         template = TemplateLoader.load_project_template("flink_deployment.yml")
         return Environment().from_string(template).render(
             project_name=project_name,
             docker_registry_url=docker_registry_url,
             docker_image_tag=docker_image_tag,
-            deployment_target_id=deployment_target_id,
-            deployment_target_name=deployment_target_name
+            deployment_target_id=deployment_target_id
         )
