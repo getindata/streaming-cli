@@ -1,13 +1,15 @@
+from typing import Optional
+
 import click
 from jinja2 import Environment
-
 from streamingcli.platform.platform_config_map import PlatformConfigAdapter
-from streamingcli.platform.ververica.deployment_adapter import DeploymentAdapter
-from streamingcli.project.template_loader import TemplateLoader
+from streamingcli.platform.ververica.deployment_adapter import \
+    DeploymentAdapter
+from streamingcli.platform.ververica.webtoken_factory import \
+    VervericaWebTokenLoader
 from streamingcli.project.local_project_config import LocalProjectConfigIO
+from streamingcli.project.template_loader import TemplateLoader
 from streamingcli.project.yaml_merger import YamlMerger
-from streamingcli.platform.ververica.webtoken_factory import VervericaWebTokenLoader
-from typing import Optional
 
 
 class ProjectDeployer:
@@ -26,8 +28,8 @@ class ProjectDeployer:
         webtoken = VervericaWebTokenLoader.load_webtoken(kubernetes_namespace=kubernetes_namespace)
 
         # Generate deployment YAML
-        docker_registry_url = "registry.ververica.com/v2.5"  # TODO parametrize that
-        docker_image_tag = f"{local_project_config.project_name}:{local_project_config.project_version}"
+        docker_registry_url = "localhost:5000"  # TODO parametrize that
+        docker_image_tag = local_project_config.project_version
         deployment_yml = ProjectDeployer.generate_project_template(
             project_name=local_project_config.project_name,
             docker_registry_url=docker_registry_url,

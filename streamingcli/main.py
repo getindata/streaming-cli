@@ -1,10 +1,12 @@
 import click
-from streamingcli.project.cicd_command import CICDInitializer
-from streamingcli.project.init_command import NewProjectInitializer
-from streamingcli.platform.setup_command import PlatformSetupCommand
-from streamingcli.project.deploy_command import ProjectDeployer
-from streamingcli.project.build_command import ProjectBuilder
+
 from streamingcli.Config import PLATFORM_DEFAULT_DEPLOYMENT_TARGET_NAME
+from streamingcli.platform.setup_command import PlatformSetupCommand
+from streamingcli.project.build_command import ProjectBuilder
+from streamingcli.project.cicd_command import CICDInitializer
+from streamingcli.project.deploy_command import ProjectDeployer
+from streamingcli.project.init_command import NewProjectInitializer
+from streamingcli.project.publish_command import ProjectPublisher
 
 
 @click.group(invoke_without_command=True)
@@ -42,6 +44,11 @@ def project_deploy(overrides_from_yaml: str = None):
 def project_build():
     ProjectBuilder.build_project()
 
+@project.command()
+@click.option('--registry_url', prompt='Docker registry URL',
+                help='URL for Docker registry, i.e: "https://hub.docker.com/"')
+def project_publish(registry_url: str):
+    ProjectPublisher.publish(registry_url)
 
 @cli.group()
 def platform():
@@ -84,6 +91,7 @@ def cicd_setup(provider: str):
 project.add_command(project_init, "init")
 project.add_command(project_deploy, "deploy")
 project.add_command(project_build, "build")
+project.add_command(project_publish, "publish")
 platform.add_command(platform_setup, "setup")
 cicd.add_command(cicd_setup, "setup")
 
