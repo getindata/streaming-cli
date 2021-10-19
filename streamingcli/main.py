@@ -7,6 +7,7 @@ from streamingcli.project.cicd_command import CICDInitializer
 from streamingcli.project.deploy_command import ProjectDeployer
 from streamingcli.project.init_command import NewProjectInitializer
 from streamingcli.project.publish_command import ProjectPublisher
+from streamingcli.project.configure_command import ConfigureProjectProfile
 
 
 @click.group(invoke_without_command=True)
@@ -34,6 +35,19 @@ def project_init(project_name: str):
 
 
 @project.command()
+@click.option('--profile_name', prompt='Project profile name to create',
+              help='Project profile name to create')
+@click.option('--ververica_kubernetes_namespace', prompt='Kubernetes namespace where Ververica is deployed',
+              help='Kubernetes namespace where Ververica is deployed')
+@click.option('--docker_registry_url', prompt='Docker registry URL',
+              help='URL for Docker registry, i.e: "https://hub.docker.com/"')
+def project_config(profile_name: str, ververica_kubernetes_namespace: str, docker_registry_url: str):
+    ConfigureProjectProfile.create_profile(profile_name=profile_name,
+                                           ververica_kubernetes_namespace=ververica_kubernetes_namespace,
+                                           docker_registry_url=docker_registry_url)
+
+
+@project.command()
 @click.option('--overrides_from_yaml',
               help='Path to additional deployment YAML file to merge with Ververica one')
 def project_deploy(overrides_from_yaml: str = None):
@@ -57,7 +71,7 @@ def platform():
 
 @platform.command()
 @click.option('--ververica_url', prompt='Ververica URL',
-              help='URR for Ververica cluster, i.e: "https://vvp.streaming-platform.example.com"')
+              help='URL for Ververica cluster, i.e: "https://vvp.streaming-platform.example.com"')
 @click.option('--ververica_namespace', prompt='Ververica namespace',
               help='Ververica namespace')
 @click.option('--ververica_deployment_target', prompt='Ververica deployment target name',
@@ -92,6 +106,7 @@ project.add_command(project_init, "init")
 project.add_command(project_deploy, "deploy")
 project.add_command(project_build, "build")
 project.add_command(project_publish, "publish")
+project.add_command(project_config, "config")
 platform.add_command(platform_setup, "setup")
 cicd.add_command(cicd_setup, "setup")
 

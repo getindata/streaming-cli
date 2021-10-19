@@ -33,19 +33,22 @@ cli/version:
 cli/install/from-pypi:
 	pipenv run python -m pip install streamingcli --extra-index-url https://__token__:$GITLAB_TOKEN@gitlab.com/api/v4/projects/29597698/packages/pypi/simple --upgrade
 
-flink/init:
+project/init:
 	pipenv run scli project init --project_name tmp_project
 
-flink/build:
+project/config:
+	cd tmp_project; pipenv run scli project config --profile_name local --ververica_kubernetes_namespace vvp --docker_registry_url http://localhost:5000
+
+project/build:
 	cd tmp_project; pipenv run scli project build
 
-flink/run:
+project/run:
 	cd tmp_project; docker run tmp_project
 
-flink/deploy:
+project/deploy:
 	cd tmp_project; pipenv run scli project deploy
 
-flink/deploy/overrides:
+project/deploy/overrides:
 	cd tmp_project; pipenv run scli project deploy --overrides_from_yaml=./deployment_prod.yml
 
 platform/setup:

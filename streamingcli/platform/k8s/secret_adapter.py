@@ -65,12 +65,3 @@ class KubernetesSecretAdapter:
         except ApiException as e:
             if e.status != 404:
                 raise e
-
-
-if __name__ == "__main__":
-    secret_str = {
-        "tajne": "abc"
-    }
-    KubernetesSecretAdapter.save_k8s_secret(secret_name="scli-secret", namespace="default", secret_data=secret_str)
-    sec = KubernetesSecretAdapter.load_k8s_secret(secret_name="scli-secret", namespace="default")
-    print(sec)
