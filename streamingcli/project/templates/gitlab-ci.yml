@@ -1,5 +1,5 @@
 variables:
-  DOCKER_TAG: "{{project_name}}-${CI_COMMIT_SHA}"
+  DOCKER_TAG: "{{project_version}}"
 
 stages:
   - package
