@@ -120,7 +120,6 @@ project.add_command(project_init, "init")
 project.add_command(project_deploy, "deploy")
 project.add_command(project_build, "build")
 project.add_command(project_publish, "publish")
-project.add_command(project_config, "config")
 platform.add_command(platform_setup, "setup")
 cicd.add_command(cicd_setup, "setup")
 
