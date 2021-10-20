@@ -20,10 +20,10 @@ spec:
         flinkImageRepository: {{project_name}}
         flinkImageTag: {{docker_image_tag}}
         flinkVersion: '1.13'
-        jarUri: file:///flink/usrlib/flink-python-loader.jar
+        jarUri: file:///app/lib/flink-python-loader-1.0-SNAPSHOT.jar
         entryClass: com.getindata.streaming.FlinkPythonLoader
         kind: JAR
-        mainArgs: /flink/python_src/flink_app.py
+        mainArgs: /app/src/flink_app.py
       flinkConfiguration:
         execution.checkpointing.externalized-checkpoint-retention: RETAIN_ON_CANCELLATION
         execution.checkpointing.interval: 10s

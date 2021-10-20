@@ -19,7 +19,7 @@ class ProjectDeployer:
         local_project_config = LocalProjectConfigIO.load_project_config()
 
         # Load platform ConfigMap
-        kubernetes_namespace = "vvp"  # TODO load from config
+        kubernetes_namespace = "vvp-team1"  # TODO load from config
         platform_config = PlatformConfigAdapter.load_platform_config(kubernetes_namespace=kubernetes_namespace)
 
         # TODO Load kubernetes ConfigMap
