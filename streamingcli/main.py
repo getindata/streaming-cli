@@ -2,6 +2,7 @@ import click
 
 from streamingcli.Config import PLATFORM_DEFAULT_DEPLOYMENT_TARGET_NAME
 from streamingcli.platform.setup_command import PlatformSetupCommand
+from streamingcli.platform.apitoken_create_command import VervericaApiTokenCreateCommand
 from streamingcli.project.build_command import ProjectBuilder
 from streamingcli.project.cicd_command import CICDInitializer
 from streamingcli.project.deploy_command import ProjectDeployer
@@ -72,11 +73,13 @@ def project_deploy(profile: str = None,
 def project_build():
     ProjectBuilder.build_project()
 
+
 @project.command()
 @click.option('--registry_url', prompt='Docker registry URL',
                 help='URL for Docker registry, i.e: "https://hub.docker.com/"')
 def project_publish(registry_url: str):
     ProjectPublisher.publish(registry_url)
+
 
 @cli.group()
 def platform():
@@ -105,13 +108,37 @@ def platform_setup(ververica_url: str,
                                          force=force)
 
 
+@platform.group("api-token")
+def api_token():
+    pass
+
+
+@api_token.command()
+@click.option('--vvp-url', 'ververica_url', prompt='Ververica URL',
+              help='URL for Ververica cluster, i.e: "https://vvp.streaming-platform.example.com"')
+@click.option('--vvp-namespace', 'ververica_namespace', prompt='Ververica namespace',
+              help='Ververica namespace')
+@click.option('--name', 'apitoken_name', prompt='Ververica ApiToken name',
+              help='Ververica ApiToken name')
+@click.option('--role', 'apitoken_role', prompt='Ververica ApiToken role',
+              help='Ververica ApiToken role')
+def platform_create_apitoken(ververica_url: str,
+                             ververica_namespace: str,
+                             apitoken_name: str,
+                             apitoken_role: str):
+    VervericaApiTokenCreateCommand.create_apitoken(ververica_url=ververica_url,
+                                                   ververica_namespace=ververica_namespace,
+                                                   token_name=apitoken_name,
+                                                   token_role=apitoken_role)
+
+
 @project.group()
 def cicd():
     pass
 
 @cicd.command()
 @click.option('--provider', prompt="Provider's name",
-            help="Provider's name", type=click.Choice(['gitlab'], case_sensitive=False))
+              help="Provider's name", type=click.Choice(['gitlab'], case_sensitive=False))
 def cicd_setup(provider: str):
     CICDInitializer.setup_cicd(provider)
 
@@ -121,6 +148,7 @@ project.add_command(project_deploy, "deploy")
 project.add_command(project_build, "build")
 project.add_command(project_publish, "publish")
 platform.add_command(platform_setup, "setup")
+api_token.add_command(platform_create_apitoken, "create")
 cicd.add_command(cicd_setup, "setup")
 
 if __name__ == '__main__':

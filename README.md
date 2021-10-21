@@ -9,15 +9,17 @@ Commands below will help you set up and work with Ververica Platform.
 ```shell
 scli platform api-token create \
   --vvp-url "https://vvp.example.com" \
+  --vvp-namespace "default" \
   --name "cicd" \
   --role "editor"
 ```
 Sample response:
 ```json
 {
-  "token": "x§11d091jd1jd9jasd0j",
+  "namespace": "default",
   "name": "cicd",
-  "role": "editor"
+  "role": "editor",
+  "secret": "x§11d091jd1jd9jasd0j"
 }
 ```
 #### Profiles
