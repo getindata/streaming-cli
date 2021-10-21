@@ -22,6 +22,15 @@ Sample response:
   "secret": "x§11d091jd1jd9jasd0j"
 }
 ```
+
+#### Removing API token
+```shell
+scli platform api-token remove \
+  --vvp-url "https://vvp.example.com" \
+  --vvp-namespace "default" \
+  --name "cicd"
+```
+
 #### Profiles
 You can set up your own profile, which will help you to connect to Ververica. 
 Instead of providing common parameters to each command, you can just pass the profile name with `--profile` 

@@ -30,13 +30,13 @@ class VervericaApiTokenAdapter:
 
             return token_object
         elif response.status_code == 409:
-            raise click.ClickException("Ververica WebToken already exists! Remove it first")
+            raise click.ClickException("Ververica ApiToken already exists! Remove it first")
         else:
-            raise click.ClickException(f"Ververica WebToken generation error: {response.status_code}")
+            raise click.ClickException(f"Ververica ApiToken generation error: {response.status_code}")
 
     @staticmethod
-    def delete_token(ververica_url: str, ververica_namespace: str, apitoken_name: str, ):
+    def remove_token(ververica_url: str, ververica_namespace: str, apitoken_name: str, ):
         apitokens_url = f"{ververica_url}/apitokens/v1/namespaces/{ververica_namespace}/apitokens/{apitoken_name}"
         response = requests.delete(apitokens_url)
         if response.status_code != 200 and response.status_code != 404:
-            raise click.ClickException("Cant remove Ververica WebToken")
+            raise click.ClickException("Cant remove Ververica ApiToken")
