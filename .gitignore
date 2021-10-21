@@ -7,3 +7,4 @@ streamingcli.egg-info/
 tmp_project/
 requirements.txt
 .env
+__pycache__

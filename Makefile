@@ -56,3 +56,6 @@ platform/apitoken/create:
 
 platform/apitoken/remove:
 	export PIPENV_VERBOSITY=-1; pipenv run scli platform api-token remove --vvp-url "http://localhost:8080" --vvp-namespace default --name "test-token"
+
+profile/add:
+	pipenv run scli profile add new_profile --ververica-url "http://localhost:8080" --ververica-namespace default --ververica-deployment-target default --docker-registry-url localhost:5000

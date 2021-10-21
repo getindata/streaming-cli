@@ -4,6 +4,7 @@ from streamingcli.Config import PLATFORM_DEFAULT_DEPLOYMENT_TARGET_NAME
 from streamingcli.platform.setup_command import PlatformSetupCommand
 from streamingcli.platform.apitoken_create_command import VervericaApiTokenCreateCommand
 from streamingcli.platform.apitoken_remove_command import VervericaApiTokenRemoveCommand
+from streamingcli.profile.profile_command import ProfileCommand
 from streamingcli.project.build_command import ProjectBuilder
 from streamingcli.project.cicd_command import CICDInitializer
 from streamingcli.project.deploy_command import ProjectDeployer
@@ -33,7 +34,6 @@ def project_init(project_name: str):
     click.echo(f"Initializing streaming project: {project_name}")
     NewProjectInitializer.createProject(project_name)
     click.echo(f"Project: {project_name} initialized")
-
 
 @project.command()
 @click.option('--profile',
@@ -158,6 +158,36 @@ def cicd():
 def cicd_setup(provider: str):
     CICDInitializer.setup_cicd(provider)
 
+@cli.group()
+def profile():
+    pass
+
+@profile.command()
+@click.argument('profile_name')
+@click.option('--ververica-url', prompt='Ververica URL', required=False,
+                help='URL for Ververica cluster, i.e: "https://vvp.streaming-platform.example.com"')
+@click.option('--ververica-namespace', prompt='Ververica namespace', required=False,
+                help='Ververica namespace')
+@click.option('--ververica-deployment-target', prompt='Ververica deployment target name',
+                required=False, help='Ververica deployment target name')
+@click.option('--vvp-api-token', prompt='Ververica API Token',
+                required=False, help='Ververica API Token')
+@click.option('--docker-registry-url', prompt='Docker registry URL',
+                required=False, help='URL for Docker registry, i.e: "https://hub.docker.com/"')
+def add_profile(profile_name: str, 
+                ververica_url: str,
+                ververica_namespace: str,
+                ververica_deployment_target: str,
+                vvp_api_token: str,
+                docker_registry_url: str):
+    ProfileCommand.create_profile(profile_name=profile_name,
+                                    ververica_url=ververica_url,
+                                    ververica_namespace=ververica_namespace,
+                                    ververica_deployment_target=ververica_deployment_target,
+                                    ververica_api_token= vvp_api_token,
+                                    docker_registry_url=docker_registry_url
+                                    )
+    
 
 project.add_command(project_init, "init")
 project.add_command(project_deploy, "deploy")
@@ -167,6 +197,7 @@ platform.add_command(platform_setup, "setup")
 api_token.add_command(platform_apitoken_create, "create")
 api_token.add_command(platform_apitoken_remove, "remove")
 cicd.add_command(cicd_setup, "setup")
+profile.add_command(add_profile, "add")
 
 if __name__ == '__main__':
     cli()

@@ -57,7 +57,7 @@ class ProjectPublisher:
                 elif(status == 'Pushing' and progress_detail != None):
                     item_total = progress_detail.get('total')
                     item_current = progress_detail.get('current')
-                    if(item_current > item_total):
+                    if(item_total == None or item_current == None or item_current > item_total):
                         continue  
                     elif id in items:
                         diff = (item_current - items[id])
