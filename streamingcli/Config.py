@@ -6,3 +6,5 @@ PLATFORM_K8S_CONFIGMAP_NAME = "streaming-platform-config"
 PLATFORM_K8S_CONFIGMAP_KEY = "platform_config.json"
 PLATFORM_K8S_SECRET_NAME = "streaming-platform-secret"
 PLATFORM_DEFAULT_DEPLOYMENT_TARGET_NAME = "default"
+
+PROFILE_ENV_VARIABLE_NAME = "SCLI_PROFILE"
