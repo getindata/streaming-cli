@@ -15,6 +15,7 @@ class VervericaWebToken:
     secret: str
 
 
+# TODO Delete after refactor
 class VervericaWebTokenFactory:
     @staticmethod
     def create_token(ververica_url: str, ververica_namespace: str) -> Optional[VervericaWebToken]:
@@ -45,6 +46,7 @@ class VervericaWebTokenFactory:
             raise click.ClickException("Cant remove Ververica WebToken")
 
 
+# TODO Delete after refactor
 class VervericaWebTokenLoader:
     @staticmethod
     def load_webtoken(kubernetes_namespace: str) -> VervericaWebToken:

@@ -36,9 +36,6 @@ cli/install/from-pypi:
 project/init:
 	pipenv run scli project init --project_name tmp_project
 
-project/config:
-	cd tmp_project; pipenv run scli project config --profile_name local --ververica_kubernetes_namespace vvp --docker_registry_url http://localhost:5000
-
 project/build:
 	cd tmp_project; pipenv run scli project build
 
@@ -53,3 +50,9 @@ project/deploy/overrides:
 
 platform/setup:
 	pipenv run scli platform setup --ververica_url "http://localhost:8080" --ververica_namespace default --ververica_kubernetes_namespace vvp --ververica_deployment_target default --force
+
+platform/apitoken/create:
+	export PIPENV_VERBOSITY=-1; pipenv run scli platform api-token create --vvp-url "http://localhost:8080" --vvp-namespace default --name "test-token" --role "editor"
+
+platform/apitoken/remove:
+	export PIPENV_VERBOSITY=-1; pipenv run scli platform api-token remove --vvp-url "http://localhost:8080" --vvp-namespace default --name "test-token"
