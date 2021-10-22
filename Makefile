@@ -43,10 +43,10 @@ project/run:
 	cd tmp_project; docker run tmp_project
 
 project/deploy:
-	cd tmp_project; pipenv run scli project deploy
+	cd tmp_project; pipenv run scli project deploy --profile local --docker-image-tag tmp_project:v1.1.22
 
 project/deploy/overrides:
-	cd tmp_project; pipenv run scli project deploy --overrides_from_yaml=./deployment_prod.yml
+	cd tmp_project; pipenv run scli project deploy --profile local --docker-image-tag tmp_project:v1.1.22 --overrides_from_yaml=./deployment_prod.yml
 
 platform/setup:
 	pipenv run scli platform setup --ververica_url "http://localhost:8080" --ververica_namespace default --ververica_kubernetes_namespace vvp --ververica_deployment_target default --force
@@ -58,4 +58,4 @@ platform/apitoken/remove:
 	export PIPENV_VERBOSITY=-1; pipenv run scli platform api-token remove --vvp-url "http://localhost:8080" --vvp-namespace default --name "test-token"
 
 profile/add:
-	pipenv run scli profile add new_profile --ververica-url "http://localhost:8080" --ververica-namespace default --ververica-deployment-target default --docker-registry-url localhost:5000
+	pipenv run scli profile add local --ververica-url "http://localhost:8080" --ververica-namespace default --ververica-deployment-target default --docker-registry-url localhost:5000
