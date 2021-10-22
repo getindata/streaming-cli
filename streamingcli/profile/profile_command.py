@@ -62,7 +62,7 @@ class ProfileCommand:
         profiles_path = Path(DEFAULT_PROFILE_DIR)
 
         if (profiles_path.is_file() is False):
-            return ScliProfiles
+            return ScliProfiles(profiles={})
         
         with open(profiles_path, "r") as file:
             content = file.read()
