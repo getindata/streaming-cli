@@ -36,38 +36,38 @@ def project_init(project_name: str):
     click.echo(f"Project: {project_name} initialized")
 
 @project.command()
-@click.option('--profile',
-              help='Profile name to use')
-@click.option('--vvp-url', 'ververica_url',
-              help='URL for Ververica cluster, i.e: "https://vvp.streaming-platform.example.com"')
-@click.option('--vvp-namespace', 'ververica_namespace',
-              help='Ververica namespace')
-@click.option('--vvp-deployment-target', 'ververica_deployment_target_name',
-              help='Ververica deployment target name')
-@click.option('--token', 'ververica_webtoken_secret',
-              help='Ververica WebToken secret to make API calls')
-@click.option('--docker-registry-url', 'docker_registry_url',
-              help='URL for Docker registry, i.e: "https://hub.docker.com/"')
 @click.option('--docker-image-tag', 'docker_image_tag',
-              help='Docker image tag to deploy')
+                help='Docker image tag to deploy')
+@click.option('--profile',
+                help='Profile name to use')
+@click.option('--vvp-url', 'ververica_url',
+                help='URL for Ververica cluster, i.e: "https://vvp.streaming-platform.example.com"')
+@click.option('--vvp-namespace', 'ververica_namespace',
+                help='Ververica namespace')
+@click.option('--vvp-deployment-target', 'ververica_deployment_target_name',
+                help='Ververica deployment target name')
+@click.option('--token', 'ververica_webtoken_secret',
+                help='Ververica WebToken secret to make API calls')
+@click.option('--docker-registry-url', 'docker_registry_url',
+                help='URL for Docker registry, i.e: "https://hub.docker.com/"')
 @click.option('--overrides_from_yaml',
-              help='Path to additional deployment YAML file to merge with Ververica one')
-def project_deploy(profile: str = None,
-                   ververica_url: str = None,
-                   ververica_namespace: str = None,
-                   ververica_deployment_target_name: str = None,
-                   ververica_webtoken_secret: str = None,
-                   docker_registry_url: str = None,
-                   docker_image_tag: str = None,
-                   overrides_from_yaml: str = None):
-    ProjectDeployer.deploy_project(profile=profile,
-                                   ververica_url=ververica_url,
-                                   ververica_namespace=ververica_namespace,
-                                   ververica_deployment_target_name=ververica_deployment_target_name,
-                                   ververica_webtoken_secret=ververica_webtoken_secret,
-                                   docker_registry_url=docker_registry_url,
-                                   docker_image_tag=docker_image_tag,
-                                   overrides_from_yaml=overrides_from_yaml)
+                help='Path to additional deployment YAML file to merge with Ververica one')
+def project_deploy(docker_image_tag: str,
+                    profile: str = None,
+                    ververica_url: str = None,
+                    ververica_namespace: str = None,
+                    ververica_deployment_target_name: str = None,
+                    ververica_webtoken_secret: str = None,
+                    docker_registry_url: str = None,
+                    overrides_from_yaml: str = None):
+    ProjectDeployer.deploy_project(docker_image_tag=docker_image_tag,
+                                    profile=profile,
+                                    ververica_url=ververica_url,
+                                    ververica_namespace=ververica_namespace,
+                                    ververica_deployment_target_name=ververica_deployment_target_name,
+                                    ververica_webtoken_secret=ververica_webtoken_secret,
+                                    docker_registry_url=docker_registry_url,
+                                    overrides_from_yaml=overrides_from_yaml)
 
 
 @project.command()
