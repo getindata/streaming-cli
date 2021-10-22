@@ -13,6 +13,8 @@ Jinja2 = "*"
 setuptools = "*"
 docker = "*"
 HiYaPyCo = "*"
+marshmallow = "*" 
+marshmallow-dataclass = "*"
 
 [dev-packages]
 pytest = "*"

@@ -1,14 +1,14 @@
+import os
 from typing import Optional
 
 import click
 from jinja2 import Environment
+from streamingcli.Config import PROFILE_ENV_VARIABLE_NAME
 from streamingcli.platform.ververica.deployment_adapter import \
     DeploymentAdapter
 from streamingcli.project.local_project_config import LocalProjectConfigIO
 from streamingcli.project.template_loader import TemplateLoader
 from streamingcli.project.yaml_merger import YamlMerger
-from streamingcli.Config import PROFILE_ENV_VARIABLE_NAME
-import os
 
 
 class ProjectDeployer:
@@ -21,19 +21,21 @@ class ProjectDeployer:
 
     @staticmethod
     def deploy_project(profile: Optional[str] = None,
-                       ververica_url: Optional[str] = None,
-                       ververica_namespace: Optional[str] = None,
-                       ververica_deployment_target_name: Optional[str] = None,
-                       ververica_webtoken_secret: Optional[str] = None,
-                       docker_registry_url: Optional[str] = None,
-                       docker_image_tag: Optional[str] = None,
-                       overrides_from_yaml: Optional[str] = None):
+                        ververica_url: Optional[str] = None,
+                        ververica_namespace: Optional[str] = None,
+                        ververica_deployment_target_name: Optional[str] = None,
+                        ververica_webtoken_secret: Optional[str] = None,
+                        docker_registry_url: Optional[str] = None,
+                        docker_image_tag: Optional[str] = None,
+                        overrides_from_yaml: Optional[str] = None):
         profile_name = ProjectDeployer.get_profile_name(profile_name=profile)
 
         # TODO Use ScliProfile dataclass instead
         profile_data = {}
 
         # TODO Load profile data for {profile_name}
+        # Load platform ConfigMap
+
 
         # Explicitly defined parameters will override profile ones
         if ververica_url is not None:
@@ -70,8 +72,8 @@ class ProjectDeployer:
             auth_token=profile_data["ververica_webtoken_secret"]
         )
         click.echo(f"Created deployment: "
-                   f"{profile_data['ververica_url']}/app/#/namespaces/"
-                   f"{profile_data['ververica_namespace']}/deployments/{deployment_name}")
+                    f"{profile_data['ververica_url']}/app/#/namespaces/"
+                    f"{profile_data['ververica_namespace']}/deployments/{deployment_name}")
 
     @staticmethod
     def generate_project_template(
