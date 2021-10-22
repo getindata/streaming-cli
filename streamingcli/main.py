@@ -37,7 +37,7 @@ def project_init(project_name: str):
 
 
 @project.command()
-@click.argument('--docker-image-tag')
+@click.argument('docker-image-tag')
 @click.option('--profile',
               help='Profile name to use')
 @click.option('--vvp-url', 'ververica_url',

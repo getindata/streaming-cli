@@ -7,7 +7,7 @@ from jinja2 import Environment
 from streamingcli.Config import PROFILE_ENV_VARIABLE_NAME
 from streamingcli.platform.ververica.deployment_adapter import \
     DeploymentAdapter
-from streamingcli.profile.profile_command import ProfileCommand, ScliProfile
+from streamingcli.profile.profile_adapter import ProfileAdapter, ScliProfile
 from streamingcli.project.local_project_config import LocalProjectConfigIO
 from streamingcli.project.template_loader import TemplateLoader
 from streamingcli.project.yaml_merger import YamlMerger
@@ -36,7 +36,7 @@ class ProjectDeployer:
         profile_name = ProjectDeployer.get_profile_name(profile_name=profile)
 
         if profile_name is not None:
-            profile_data = ProfileCommand.get_profile(profile_name=profile_name)
+            profile_data = ProfileAdapter.get_profile(profile_name=profile_name)
         else:
             profile_data = ScliProfile(profile_name="temporary")
 
@@ -87,7 +87,6 @@ class ProjectDeployer:
         }
 
         profile_data = replace(profile_data, **non_empty_deployment_params)
-        click.echo(profile_data)
         return profile_data
 
     @staticmethod
@@ -117,5 +116,5 @@ class ProjectDeployer:
             project_name=project_name,
             docker_registry_url=docker_registry_url,
             docker_image_tag=docker_image_tag,
-            deployment_target_id=deployment_target_name
+            deployment_target_name=deployment_target_name
         )
