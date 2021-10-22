@@ -35,39 +35,39 @@ def project_init(project_name: str):
     NewProjectInitializer.createProject(project_name)
     click.echo(f"Project: {project_name} initialized")
 
+
 @project.command()
-@click.option('--docker-image-tag', 'docker_image_tag',
-                help='Docker image tag to deploy')
+@click.argument('--docker-image-tag')
 @click.option('--profile',
-                help='Profile name to use')
+              help='Profile name to use')
 @click.option('--vvp-url', 'ververica_url',
-                help='URL for Ververica cluster, i.e: "https://vvp.streaming-platform.example.com"')
+              help='URL for Ververica cluster, i.e: "https://vvp.streaming-platform.example.com"')
 @click.option('--vvp-namespace', 'ververica_namespace',
-                help='Ververica namespace')
+              help='Ververica namespace')
 @click.option('--vvp-deployment-target', 'ververica_deployment_target_name',
-                help='Ververica deployment target name')
+              help='Ververica deployment target name')
 @click.option('--token', 'ververica_webtoken_secret',
-                help='Ververica WebToken secret to make API calls')
+              help='Ververica WebToken secret to make API calls')
 @click.option('--docker-registry-url', 'docker_registry_url',
-                help='URL for Docker registry, i.e: "https://hub.docker.com/"')
+              help='URL for Docker registry, i.e: "https://hub.docker.com/"')
 @click.option('--overrides_from_yaml',
-                help='Path to additional deployment YAML file to merge with Ververica one')
+              help='Path to additional deployment YAML file to merge with Ververica one')
 def project_deploy(docker_image_tag: str,
-                    profile: str = None,
-                    ververica_url: str = None,
-                    ververica_namespace: str = None,
-                    ververica_deployment_target_name: str = None,
-                    ververica_webtoken_secret: str = None,
-                    docker_registry_url: str = None,
-                    overrides_from_yaml: str = None):
+                   profile: str = None,
+                   ververica_url: str = None,
+                   ververica_namespace: str = None,
+                   ververica_deployment_target_name: str = None,
+                   ververica_webtoken_secret: str = None,
+                   docker_registry_url: str = None,
+                   overrides_from_yaml: str = None):
     ProjectDeployer.deploy_project(docker_image_tag=docker_image_tag,
-                                    profile=profile,
-                                    ververica_url=ververica_url,
-                                    ververica_namespace=ververica_namespace,
-                                    ververica_deployment_target_name=ververica_deployment_target_name,
-                                    ververica_webtoken_secret=ververica_webtoken_secret,
-                                    docker_registry_url=docker_registry_url,
-                                    overrides_from_yaml=overrides_from_yaml)
+                                   profile=profile,
+                                   ververica_url=ververica_url,
+                                   ververica_namespace=ververica_namespace,
+                                   ververica_deployment_target_name=ververica_deployment_target_name,
+                                   ververica_webtoken_secret=ververica_webtoken_secret,
+                                   docker_registry_url=docker_registry_url,
+                                   overrides_from_yaml=overrides_from_yaml)
 
 
 @project.command()
@@ -77,7 +77,7 @@ def project_build():
 
 @project.command()
 @click.option('--registry_url', prompt='Docker registry URL',
-                help='URL for Docker registry, i.e: "https://hub.docker.com/"')
+              help='URL for Docker registry, i.e: "https://hub.docker.com/"')
 def project_publish(registry_url: str):
     ProjectPublisher.publish(registry_url)
 
@@ -152,42 +152,45 @@ def platform_apitoken_remove(ververica_url: str,
 def cicd():
     pass
 
+
 @cicd.command()
 @click.option('--provider', prompt="Provider's name",
               help="Provider's name", type=click.Choice(['gitlab'], case_sensitive=False))
 def cicd_setup(provider: str):
     CICDInitializer.setup_cicd(provider)
 
+
 @cli.group()
 def profile():
     pass
 
+
 @profile.command()
 @click.argument('profile_name')
 @click.option('--ververica-url', prompt='Ververica URL', required=False,
-                help='URL for Ververica cluster, i.e: "https://vvp.streaming-platform.example.com"')
+              help='URL for Ververica cluster, i.e: "https://vvp.streaming-platform.example.com"')
 @click.option('--ververica-namespace', prompt='Ververica namespace', required=False,
-                help='Ververica namespace')
+              help='Ververica namespace')
 @click.option('--ververica-deployment-target', prompt='Ververica deployment target name',
-                required=False, help='Ververica deployment target name')
+              required=False, help='Ververica deployment target name')
 @click.option('--vvp-api-token', prompt='Ververica API Token',
-                required=False, help='Ververica API Token')
+              required=False, help='Ververica API Token')
 @click.option('--docker-registry-url', prompt='Docker registry URL',
-                required=False, help='URL for Docker registry, i.e: "https://hub.docker.com/"')
-def add_profile(profile_name: str, 
+              required=False, help='URL for Docker registry, i.e: "https://hub.docker.com/"')
+def add_profile(profile_name: str,
                 ververica_url: str,
                 ververica_namespace: str,
                 ververica_deployment_target: str,
                 vvp_api_token: str,
                 docker_registry_url: str):
     ProfileCommand.create_profile(profile_name=profile_name,
-                                    ververica_url=ververica_url,
-                                    ververica_namespace=ververica_namespace,
-                                    ververica_deployment_target=ververica_deployment_target,
-                                    ververica_api_token= vvp_api_token,
-                                    docker_registry_url=docker_registry_url
-                                    )
-    
+                                  ververica_url=ververica_url,
+                                  ververica_namespace=ververica_namespace,
+                                  ververica_deployment_target=ververica_deployment_target,
+                                  ververica_api_token=vvp_api_token,
+                                  docker_registry_url=docker_registry_url
+                                  )
+
 
 project.add_command(project_init, "init")
 project.add_command(project_deploy, "deploy")
