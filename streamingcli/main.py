@@ -1,11 +1,13 @@
 import click
 
 from streamingcli.Config import PLATFORM_DEFAULT_DEPLOYMENT_TARGET_NAME
+from streamingcli.platform.apitoken_create_command import \
+    VervericaApiTokenCreateCommand
+from streamingcli.platform.apitoken_remove_command import \
+    VervericaApiTokenRemoveCommand
+from streamingcli.platform.deployment_target_command import \
+    DeploymentTargetCommand
 from streamingcli.platform.setup_command import PlatformSetupCommand
-from streamingcli.platform.apitoken_create_command import VervericaApiTokenCreateCommand
-from streamingcli.platform.apitoken_remove_command import VervericaApiTokenRemoveCommand
-from streamingcli.platform.deployment_target_command import DeploymentTargetCommand
-
 from streamingcli.profile.profile_command import ProfileCommand
 from streamingcli.project.build_command import ProjectBuilder
 from streamingcli.project.cicd_command import CICDInitializer
@@ -73,15 +75,19 @@ def project_deploy(docker_image_tag: str,
 
 
 @project.command()
-def project_build():
-    ProjectBuilder.build_project()
+@click.option('--docker-image-tag',
+              help='Project image tag')
+def project_build(docker_image_tag: str = None):
+    ProjectBuilder.build_project(docker_image_tag)
 
 
 @project.command()
-@click.option('--registry_url', prompt='Docker registry URL',
+@click.option('--registry-url', prompt='Docker registry URL',
               help='URL for Docker registry, i.e: "https://hub.docker.com/"')
-def project_publish(registry_url: str):
-    ProjectPublisher.publish(registry_url)
+@click.option('--docker-image-tag',
+              help='Project image tag')
+def project_publish(registry_url: str, docker_image_tag: str = None):
+    ProjectPublisher.publish(registry_url, docker_image_tag)
 
 
 @cli.group()

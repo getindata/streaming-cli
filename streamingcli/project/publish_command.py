@@ -13,17 +13,18 @@ from streamingcli.project.local_project_config import LocalProjectConfigIO
 class ProjectPublisher:
 
     @staticmethod
-    def publish(docker_repository_url: str):
+    def publish(docker_repository_url: str, docker_image_tag: str = None):
         local_project_config = LocalProjectConfigIO.load_project_config()
 
         client = docker.from_env()
-        local_image_tag = f"{local_project_config.project_name}:{local_project_config.project_version}"
+        image_tag = docker_image_tag if docker_image_tag is not None else 'latest'
+        local_image_tag = f"{local_project_config.project_name}:{image_tag}"
         repository_name = f"{docker_repository_url}/{local_project_config.project_name}"
-        image_tag = local_project_config.project_version
+        
         image = ProjectPublisher.get_image(client, local_image_tag)
         if image is None:
             raise click.ClickException(
-                "No project image in local registry! "
+                f"No project image {local_image_tag} in local registry! "
                 "Firstly build image with command 'scli project build'"
             )
 
