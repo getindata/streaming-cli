@@ -1,5 +1,4 @@
 import os
-from dataclasses import replace
 from typing import Optional
 
 import click
@@ -40,7 +39,7 @@ class ProjectDeployer:
         else:
             profile_data = ScliProfile(profile_name="temporary")
 
-        profile_data = ProjectDeployer.update_profile_data(
+        profile_data = ProfileAdapter.update_profile_data(
             profile_data=profile_data,
             ververica_url=ververica_url,
             ververica_namespace=ververica_namespace,
@@ -70,24 +69,6 @@ class ProjectDeployer:
         click.echo(f"Created deployment: "
                    f"{profile_data.ververica_url}/app/#/namespaces/"
                    f"{profile_data.ververica_namespace}/deployments/{deployment_name}")
-
-    @staticmethod
-    def update_profile_data(profile_data, ververica_url, ververica_namespace, ververica_deployment_target_name,
-                            ververica_webtoken_secret, docker_registry_url):
-        deployment_params = {
-            'ververica_url': ververica_url,
-            'ververica_namespace': ververica_namespace,
-            'ververica_deployment_target_name': ververica_deployment_target_name,
-            'ververica_api_token': ververica_webtoken_secret,
-            'docker_registry_url': docker_registry_url
-        }
-
-        non_empty_deployment_params = {
-            key: value for (key, value) in deployment_params.items() if value is not None
-        }
-
-        profile_data = replace(profile_data, **non_empty_deployment_params)
-        return profile_data
 
     @staticmethod
     def validate_profile_data(profile_data: ScliProfile, docker_image_tag: str):

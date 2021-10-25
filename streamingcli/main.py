@@ -4,6 +4,8 @@ from streamingcli.Config import PLATFORM_DEFAULT_DEPLOYMENT_TARGET_NAME
 from streamingcli.platform.setup_command import PlatformSetupCommand
 from streamingcli.platform.apitoken_create_command import VervericaApiTokenCreateCommand
 from streamingcli.platform.apitoken_remove_command import VervericaApiTokenRemoveCommand
+from streamingcli.platform.deployment_target_command import DeploymentTargetCommand
+
 from streamingcli.profile.profile_command import ProfileCommand
 from streamingcli.project.build_command import ProjectBuilder
 from streamingcli.project.cicd_command import CICDInitializer
@@ -148,6 +150,35 @@ def platform_apitoken_remove(ververica_url: str,
                                                    token_name=apitoken_name)
 
 
+@platform.group()
+def deployment_target():
+    pass
+
+@deployment_target.command()
+@click.option('--profile',
+              help='Profile name to use', required=False)
+@click.option('--ververica-deployment-target',
+              help='Ververica deployment target name')
+@click.option('--ververica-url', required=False,
+              help='URL for Ververica cluster, i.e: "https://vvp.streaming-platform.example.com"')
+@click.option('--ververica-namespace', required=False,
+              help='Ververica namespace')
+@click.option('--vvp-api-token',
+              required=False, help='Ververica API Token')
+def deployment_target_create(profile: str=None,
+                            ververica_deployment_target: str=None,
+                            ververica_url: str=None,
+                            ververica_namespace: str=None,
+                            vvp_api_token: str=None):
+    DeploymentTargetCommand.create_deployment_target(
+        deployment_target_name=ververica_deployment_target,
+        profile=profile,
+        ververica_url=ververica_url,
+        ververica_namespace=ververica_namespace,
+        vvp_api_token=vvp_api_token
+    )
+
+
 @project.group()
 def cicd():
     pass
@@ -199,6 +230,7 @@ project.add_command(project_publish, "publish")
 platform.add_command(platform_setup, "setup")
 api_token.add_command(platform_apitoken_create, "create")
 api_token.add_command(platform_apitoken_remove, "remove")
+deployment_target.add_command(deployment_target_create, "create")
 cicd.add_command(cicd_setup, "setup")
 profile.add_command(add_profile, "add")
 
