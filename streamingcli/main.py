@@ -43,12 +43,7 @@ def project_init(project_name: str):
 
 
 @project.command()
-@click.option('--docker-image-tag', 
-              help='Docker image tag', default = 'latest')
-@click.option('--docker-image-registry', 'docker_image_registry',
-              help='URL for Docker registry, i.e: "https://hub.docker.com/"')
-@click.option('--docker-image-repository', 'docker_image_repository',
-              help='Docker image repository')
+@click.argument('docker-image-tag')
 @click.option('--profile',
               help='Profile name to use')
 @click.option('--vvp-url', 'ververica_url',
@@ -59,31 +54,31 @@ def project_init(project_name: str):
               help='Ververica deployment target name')
 @click.option('--token', 'ververica_webtoken_secret',
               help='Ververica WebToken secret to make API calls')
+@click.option('--docker-registry-url', 'docker_registry_url',
+              help='URL for Docker registry, i.e: "https://hub.docker.com/"')
 @click.option('--overrides-from-yaml',
               help='Path to additional deployment YAML file to merge with Ververica one')
 def project_deploy(docker_image_tag: str,
-                   docker_image_registry: str = None,
-                   docker_image_repository: str = None,
                    profile: str = None,
                    ververica_url: str = None,
                    ververica_namespace: str = None,
                    ververica_deployment_target_name: str = None,
                    ververica_webtoken_secret: str = None,
+                   docker_registry_url: str = None,
                    overrides_from_yaml: str = None):
     ProjectDeployer.deploy_project(docker_image_tag=docker_image_tag,
-                                   docker_registry_url=docker_image_registry,
-                                   docker_image_repository=docker_image_repository,
                                    profile=profile,
                                    ververica_url=ververica_url,
                                    ververica_namespace=ververica_namespace,
                                    ververica_deployment_target_name=ververica_deployment_target_name,
                                    ververica_webtoken_secret=ververica_webtoken_secret,
+                                   docker_registry_url=docker_registry_url,
                                    overrides_from_yaml=overrides_from_yaml)
 
 
 @project.command()
 @click.option('--docker-image-tag',
-              help='Project image tag', default= 'latest')
+              help='Project image tag')
 def project_build(docker_image_tag: str = None):
     ProjectBuilder.build_project(docker_image_tag)
 

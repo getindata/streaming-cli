@@ -22,21 +22,23 @@ class ProjectDeployer:
 
     @staticmethod
     def deploy_project(docker_image_tag: str,
-                       docker_registry_url: Optional[str] = None,
-                       docker_image_repository: Optional[str] = None,
                        profile: Optional[str] = None,
                        ververica_url: Optional[str] = None,
                        ververica_namespace: Optional[str] = None,
                        ververica_deployment_target_name: Optional[str] = None,
                        ververica_webtoken_secret: Optional[str] = None,
+                       docker_registry_url: Optional[str] = None,
                        overrides_from_yaml: Optional[str] = None):
+
+        local_project_config = LocalProjectConfigIO.load_project_config()
 
         profile_name = ProjectDeployer.get_profile_name(profile_name=profile)
 
-        profile_data = (ProfileAdapter.get_profile(profile_name=profile_name) 
-            or ScliProfile(profile_name="temporary"))
+        if profile_name is not None:
+            profile_data = ProfileAdapter.get_profile(profile_name=profile_name)
+        else:
+            profile_data = ScliProfile(profile_name="temporary")
 
-        project_name = docker_image_repository or LocalProjectConfigIO.load_project_config().project_name
         profile_data = ProfileAdapter.update_profile_data(
             profile_data=profile_data,
             ververica_url=ververica_url,
@@ -49,14 +51,14 @@ class ProjectDeployer:
 
         # Generate deployment YAML
         deployment_yml = ProjectDeployer.generate_project_template(
-            project_name=project_name,
+            project_name=local_project_config.project_name,
             docker_registry_url=profile_data.docker_registry_url,
             docker_image_tag=docker_image_tag,
             deployment_target_name=profile_data.ververica_deployment_target
         )
         if overrides_from_yaml:
             deployment_yml = YamlMerger.merge_two_yaml(deployment_yml, overrides_from_yaml)
-        click.echo(f"Deploying streaming project: {project_name} ...")
+        click.echo(f"Deploying streaming project: {local_project_config.project_name} ...")
 
         deployment_name = DeploymentAdapter.deploy(
             deployment_yml=deployment_yml,

@@ -78,9 +78,8 @@ scli project deploy \
   --vvp-namespace "default" \
   --vvp-api-token "x§11d091jd1jd9jasd0j" \
   --vvp-deployment-target "vvp-team1" \
-  --docker_image_registry "${CI_REGISTRY_IMAGE}" \
+  --docker-registry-url "${CI_REGISTRY_IMAGE}" \
   --docker-image-tag "${CI_COMMIT_TAG}" \
-  --docker-image-repository tmp_project \
   --profile "sandbox"
 ```
 > Parameters `--vvp-url`, `--vvp-namespace`, `--vvp-api-token`, `--vvp-deployment-target` are optional if they can be read from profile.
