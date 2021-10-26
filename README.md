@@ -11,7 +11,8 @@ scli platform api-token create \
   --vvp-url "https://vvp.example.com" \
   --vvp-namespace "default" \
   --name "cicd" \
-  --role "editor"
+  --role "editor" \
+  --save-to-kubernetes-secret "vvp/secret" 
 ```
 Sample response:
 ```json
