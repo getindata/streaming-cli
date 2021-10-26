@@ -5,7 +5,8 @@ from typing import Any, Dict, Optional, Type
 
 from marshmallow import Schema
 from marshmallow_dataclass import class_schema
-from streamingcli.Config import DEFAULT_PROFILE_DIR, PROFILE_ENV_VARIABLE_NAME
+from streamingcli.Config import (DEFAULT_PROFILE_DIR, DEFAULT_PROFILE_PATH,
+                                 PROFILE_ENV_VARIABLE_NAME)
 from yaml import SafeLoader, load, safe_dump
 
 
@@ -26,11 +27,12 @@ class ProfileAdapter:
 
     @staticmethod
     def save_profile(scli_profile: ScliProfile):
+        os.makedirs(DEFAULT_PROFILE_DIR, exist_ok=True)
         profiles = ProfileAdapter.load_profiles()
         profiles_dict = profiles.profiles
         profiles_dict[scli_profile.profile_name] = scli_profile
         content = safe_dump(asdict(replace(profiles, profiles = profiles_dict)))
-        with open(DEFAULT_PROFILE_DIR, "w+") as file:
+        with open(DEFAULT_PROFILE_PATH, "w+") as file:
             file.write(content)
 
     @staticmethod
@@ -50,7 +52,7 @@ class ProfileAdapter:
 
     @staticmethod
     def load_profiles() -> ScliProfiles:
-        profiles_path = Path(DEFAULT_PROFILE_DIR)
+        profiles_path = Path(DEFAULT_PROFILE_PATH)
 
         if (profiles_path.is_file() is False):
             return ScliProfiles(profiles={})

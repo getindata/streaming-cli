@@ -215,15 +215,15 @@ def profile():
 
 @profile.command()
 @click.argument('profile_name')
-@click.option('--vvp-url', prompt='Ververica URL', required=False,
+@click.option('--vvp-url', required=False,
               help='URL for Ververica cluster, i.e: "https://vvp.streaming-platform.example.com"')
-@click.option('--vvp-namespace', prompt='Ververica namespace', required=False,
+@click.option('--vvp-namespace', required=False,
               help='Ververica namespace')
-@click.option('--vvp-deployment-target', prompt='Ververica deployment target name',
+@click.option('--vvp-deployment-target',
               required=False, help='Ververica deployment target name')
-@click.option('--vvp-api-token', prompt='Ververica API Token',
+@click.option('--vvp-api-token',
               required=False, help='Ververica API Token')
-@click.option('--docker-registry-url', prompt='Docker registry URL',
+@click.option('--docker-registry-url',
               required=False, help='URL for Docker registry, i.e: "https://hub.docker.com/"')
 def add_profile(profile_name: str,
                 vvp_url: str,
