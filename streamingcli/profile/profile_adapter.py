@@ -30,7 +30,7 @@ class ProfileAdapter:
         profiles_dict = profiles.profiles
         profiles_dict[scli_profile.profile_name] = scli_profile
         content = safe_dump(asdict(replace(profiles, profiles = profiles_dict)))
-        with open(DEFAULT_PROFILE_DIR, "w") as file:
+        with open(DEFAULT_PROFILE_DIR, "w+") as file:
             file.write(content)
 
     @staticmethod
