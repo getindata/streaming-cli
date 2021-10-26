@@ -1,4 +1,6 @@
+from queue import Empty
 import click
+from markupsafe import re
 
 from streamingcli.Config import PLATFORM_DEFAULT_DEPLOYMENT_TARGET_NAME
 from streamingcli.platform.apitoken_create_command import \
@@ -54,7 +56,7 @@ def project_init(project_name: str):
               help='Ververica WebToken secret to make API calls')
 @click.option('--docker-registry-url', 'docker_registry_url',
               help='URL for Docker registry, i.e: "https://hub.docker.com/"')
-@click.option('--overrides_from_yaml',
+@click.option('--overrides-from-yaml',
               help='Path to additional deployment YAML file to merge with Ververica one')
 def project_deploy(docker_image_tag: str,
                    profile: str = None,
@@ -121,6 +123,11 @@ def platform_setup(ververica_url: str,
 def api_token():
     pass
 
+def validate_k8s_secret(ctx, param, value):
+        if value != None and re.match(r"\w+/\w+", value) == None:
+            raise click.BadParameter(message="K8s secret in incorrect format")
+        else:
+            return value
 
 @api_token.command()
 @click.option('--vvp-url', 'ververica_url', prompt='Ververica URL',
@@ -131,14 +138,18 @@ def api_token():
               help='Ververica ApiToken name')
 @click.option('--role', 'apitoken_role', prompt='Ververica ApiToken role',
               help='Ververica ApiToken role')
+@click.option('--save-to-kubernetes-secret', 'k8s_secret', callback=validate_k8s_secret,
+              help="Save K8s secret in format 'namespace/secret_name' i.e. 'vvp/token")
 def platform_apitoken_create(ververica_url: str,
                              ververica_namespace: str,
                              apitoken_name: str,
-                             apitoken_role: str):
+                             apitoken_role: str,
+                             k8s_secret: str = None):
     VervericaApiTokenCreateCommand.create_apitoken(ververica_url=ververica_url,
                                                    ververica_namespace=ververica_namespace,
                                                    token_name=apitoken_name,
-                                                   token_role=apitoken_role)
+                                                   token_role=apitoken_role,
+                                                   k8s_secret=k8s_secret)
 
 
 @api_token.command()
@@ -163,24 +174,24 @@ def deployment_target():
 @deployment_target.command()
 @click.option('--profile',
               help='Profile name to use', required=False)
-@click.option('--ververica-deployment-target',
+@click.option('--vvp-deployment-target',
               help='Ververica deployment target name')
-@click.option('--ververica-url', required=False,
+@click.option('--vvp-url', required=False,
               help='URL for Ververica cluster, i.e: "https://vvp.streaming-platform.example.com"')
-@click.option('--ververica-namespace', required=False,
+@click.option('--vvp-namespace', required=False,
               help='Ververica namespace')
 @click.option('--vvp-api-token',
               required=False, help='Ververica API Token')
 def deployment_target_create(profile: str=None,
-                            ververica_deployment_target: str=None,
-                            ververica_url: str=None,
-                            ververica_namespace: str=None,
+                            vvp_deployment_target: str=None,
+                            vvp_url: str=None,
+                            vvp_namespace: str=None,
                             vvp_api_token: str=None):
     DeploymentTargetCommand.create_deployment_target(
-        deployment_target_name=ververica_deployment_target,
+        deployment_target_name=vvp_deployment_target,
         profile=profile,
-        ververica_url=ververica_url,
-        ververica_namespace=ververica_namespace,
+        ververica_url=vvp_url,
+        ververica_namespace=vvp_namespace,
         vvp_api_token=vvp_api_token
     )
 
@@ -204,26 +215,26 @@ def profile():
 
 @profile.command()
 @click.argument('profile_name')
-@click.option('--ververica-url', prompt='Ververica URL', required=False,
+@click.option('--vvp-url', prompt='Ververica URL', required=False,
               help='URL for Ververica cluster, i.e: "https://vvp.streaming-platform.example.com"')
-@click.option('--ververica-namespace', prompt='Ververica namespace', required=False,
+@click.option('--vvp-namespace', prompt='Ververica namespace', required=False,
               help='Ververica namespace')
-@click.option('--ververica-deployment-target', prompt='Ververica deployment target name',
+@click.option('--vvp-deployment-target', prompt='Ververica deployment target name',
               required=False, help='Ververica deployment target name')
 @click.option('--vvp-api-token', prompt='Ververica API Token',
               required=False, help='Ververica API Token')
 @click.option('--docker-registry-url', prompt='Docker registry URL',
               required=False, help='URL for Docker registry, i.e: "https://hub.docker.com/"')
 def add_profile(profile_name: str,
-                ververica_url: str,
-                ververica_namespace: str,
-                ververica_deployment_target: str,
+                vvp_url: str,
+                vvp_namespace: str,
+                vvp_deployment_target: str,
                 vvp_api_token: str,
                 docker_registry_url: str):
     ProfileCommand.create_profile(profile_name=profile_name,
-                                  ververica_url=ververica_url,
-                                  ververica_namespace=ververica_namespace,
-                                  ververica_deployment_target=ververica_deployment_target,
+                                  ververica_url=vvp_url,
+                                  ververica_namespace=vvp_namespace,
+                                  ververica_deployment_target=vvp_deployment_target,
                                   ververica_api_token=vvp_api_token,
                                   docker_registry_url=docker_registry_url
                                   )
