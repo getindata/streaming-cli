@@ -43,7 +43,7 @@ project/run:
 	cd tmp_project; docker run tmp_project
 
 project/deploy:
-	cd tmp_project; pipenv run scli project deploy --profile local --docker-image-tag tmp_project:v1.1.22
+	pipenv run scli project deploy --profile local --docker-image-tag local --docker-image-repository tmp_project
 
 project/deploy/overrides:
 	cd tmp_project; pipenv run scli project deploy --profile local --docker-image-tag tmp_project:v1.1.22 --overrides_from_yaml=./deployment_prod.yml
