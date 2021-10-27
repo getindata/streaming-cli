@@ -57,7 +57,7 @@ def project_init(project_name: str):
               help='Ververica namespace')
 @click.option('--vvp-deployment-target', 'ververica_deployment_target_name',
               help='Ververica deployment target name')
-@click.option('--token', 'ververica_webtoken_secret',
+@click.option('--vvp-api-token', 'vvp_api_token',
               help='Ververica WebToken secret to make API calls')
 @click.option('--overrides-from-yaml',
               help='Path to additional deployment YAML file to merge with Ververica one')
@@ -68,7 +68,7 @@ def project_deploy(docker_image_tag: str,
                    ververica_url: str = None,
                    ververica_namespace: str = None,
                    ververica_deployment_target_name: str = None,
-                   ververica_webtoken_secret: str = None,
+                   vvp_api_token: str = None,
                    overrides_from_yaml: str = None):
     ProjectDeployer.deploy_project(docker_image_tag=docker_image_tag,
                                    docker_registry_url=docker_image_registry,
@@ -77,7 +77,7 @@ def project_deploy(docker_image_tag: str,
                                    ververica_url=ververica_url,
                                    ververica_namespace=ververica_namespace,
                                    ververica_deployment_target_name=ververica_deployment_target_name,
-                                   ververica_webtoken_secret=ververica_webtoken_secret,
+                                   ververica_webtoken_secret=vvp_api_token,
                                    overrides_from_yaml=overrides_from_yaml)
 
 
@@ -129,7 +129,7 @@ def api_token():
     pass
 
 def validate_k8s_secret(ctx, param, value):
-        if value != None and re.match(r"\w+/\w+", value) == None:
+        if value != None and re.match(r"^[\w\-\_]+\/[\w\-\_]+$", value) == None:
             raise click.BadParameter(message="K8s secret in incorrect format")
         else:
             return value
@@ -179,7 +179,7 @@ def deployment_target():
 @deployment_target.command()
 @click.option('--profile',
               help='Profile name to use', required=False)
-@click.option('--vvp-deployment-target',
+@click.option('--name',
               help='Ververica deployment target name')
 @click.option('--vvp-url', required=False,
               help='URL for Ververica cluster, i.e: "https://vvp.streaming-platform.example.com"')
@@ -188,12 +188,12 @@ def deployment_target():
 @click.option('--vvp-api-token',
               required=False, help='Ververica API Token')
 def deployment_target_create(profile: str=None,
-                            vvp_deployment_target: str=None,
+                            name: str=None,
                             vvp_url: str=None,
                             vvp_namespace: str=None,
                             vvp_api_token: str=None):
     DeploymentTargetCommand.create_deployment_target(
-        deployment_target_name=vvp_deployment_target,
+        deployment_target_name=name,
         profile=profile,
         ververica_url=vvp_url,
         ververica_namespace=vvp_namespace,
