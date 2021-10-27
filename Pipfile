@@ -15,6 +15,7 @@ docker = "*"
 HiYaPyCo = "*"
 marshmallow = "*" 
 marshmallow-dataclass = "*"
+ipython = "*"
 
 [dev-packages]
 pytest = "*"
