@@ -6,7 +6,8 @@ from streamingcli.profile.profile_adapter import ProfileAdapter, ScliProfile
 
 class DeploymentTargetCommand:
 
-    def create_deployment_target(deployment_target_name: str=None,
+    def create_deployment_target(kubernetes_namespace: str,
+                            deployment_target_name: str=None,
                             profile: str=None,
                             ververica_url: str=None,
                             ververica_namespace: str=None,
@@ -21,15 +22,13 @@ class DeploymentTargetCommand:
             ververica_webtoken_secret=vvp_api_token
         )
         DeploymentTargetCommand.validate_scli_profile(profile)
-        deployment_target_id = VervericaDeploymentTargetFactory.create_deployment_target(
+        VervericaDeploymentTargetFactory.create_deployment_target(
             ververica_url=profile.ververica_url,
             ververica_namespace=profile.ververica_namespace,
-            ververica_kubernetes_namespace=profile.ververica_namespace,
+            ververica_kubernetes_namespace=kubernetes_namespace,
             ververica_webtoken_secret=profile.ververica_api_token,
             ververica_deployment_target_name=profile.ververica_deployment_target
         )
-
-        click.echo(f"Created deployment target {profile.ververica_deployment_target} with id {deployment_target_id}")
         
     @staticmethod
     def validate_scli_profile(profile_data: ScliProfile):

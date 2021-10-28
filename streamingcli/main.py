@@ -177,6 +177,8 @@ def deployment_target():
     pass
 
 @deployment_target.command()
+@click.option('--kubernetes-namespace', prompt='Kubernetes namespace name',
+             help='Kubernetes namespace name', required=True)
 @click.option('--profile',
               help='Profile name to use', required=False)
 @click.option('--name',
@@ -187,12 +189,14 @@ def deployment_target():
               help='Ververica namespace')
 @click.option('--vvp-api-token',
               required=False, help='Ververica API Token')
-def deployment_target_create(profile: str=None,
+def deployment_target_create(kubernetes_namespace: str,
+                            profile: str=None,
                             name: str=None,
                             vvp_url: str=None,
                             vvp_namespace: str=None,
                             vvp_api_token: str=None):
     DeploymentTargetCommand.create_deployment_target(
+        kubernetes_namespace=kubernetes_namespace,
         deployment_target_name=name,
         profile=profile,
         ververica_url=vvp_url,
