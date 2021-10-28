@@ -60,6 +60,7 @@ scli platform deployment-target create \
   --vvp-namespace "default" \
   --vvp-api-token "x§11d091jd1jd9jasd0j" \
   --name "vvp-team1" \
+  --kubernetes-namespace "vvp" \
   --profile "sandbox"
 ```
 > Parameters `--vvp-url`, `--vvp-namespace`, `--vvp-api-token`, `--vvp-deployment-target` are optional if they can be read from profile.

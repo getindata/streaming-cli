@@ -58,7 +58,7 @@ platform/apitoken/remove:
 	export PIPENV_VERBOSITY=-1; pipenv run scli platform api-token remove --vvp-url "http://localhost:8080" --vvp-namespace default --name "test-token" 
 
 platform/target/add:
-	export PIPENV_VERBOSITY=-1; pipenv run scli scli platform deployment-target create --profile local
+	export PIPENV_VERBOSITY=-1; pipenv run scli scli platform deployment-target create --profile local --kubernetes-namespace vvp
 
 profile/add:
 	pipenv run scli profile add local --vvp-url "http://localhost:8080" --vvp-namespace default --vvp-deployment-target default --docker-registry-url localhost:5000
