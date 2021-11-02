@@ -42,9 +42,9 @@ setup(
     long_description=long_description,
     url="https://gitlab.com/getindata/streaming-labs/streaming-cli",
     packages=find_packages(),
-    python_requires='>=3.9',
+    python_requires='>=3.8',
     classifiers=[
-        "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3.8",
         "Operating System :: OS Independent",
     ],
     install_requires=get_requirements('requirements.txt'),
