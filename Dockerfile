@@ -1,7 +1,11 @@
-FROM python:3.8-alpine
+FROM python:3.8-buster
 
 RUN set -ex && \
-    apk add --no-cache git
+    apt-get install -y --no-install-recommends git
+
+RUN set -ex && \
+    python3 -m pip install --upgrade pip \
+    && python3 -m pip install --upgrade setuptools
 
 COPY ./dist/*.whl .
 
