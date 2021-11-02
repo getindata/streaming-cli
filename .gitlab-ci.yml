@@ -8,7 +8,7 @@ stages:
   - package
   - ship
 
-image: python:3.9
+image: python:3.8
 
 whl:
   stage: build
