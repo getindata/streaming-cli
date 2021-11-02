@@ -13,12 +13,14 @@ Jinja2 = "*"
 setuptools = "*"
 docker = "*"
 HiYaPyCo = "*"
-marshmallow = "*" 
+marshmallow = "*"
 marshmallow-dataclass = "*"
 ipython = "*"
+apache-flink = "*"
+wheel = "*"
 
 [dev-packages]
 pytest = "*"
 
 [requires]
-python_version = "3.9"
+python_version = "3.8"
