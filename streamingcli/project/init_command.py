@@ -29,7 +29,7 @@ class NewProjectInitializer:
             git.Repo.clone_from(ProjectType.to_template_repository(project_type), f"./{project_name}",
                                 progress=CloneProgress())
 
-        LocalProjectConfigFactory.generate_initial_project_config(project_name)
+        LocalProjectConfigFactory.generate_initial_project_config(project_name, project_type)
         LocalProjectConfigIO.create_template_directory(project_name=project_name)
         NewProjectInitializer.generate_dockerfile_template(project_name=project_name)
         TemplateLoader.copy_binary("flink-python-loader.jar",
