@@ -15,6 +15,7 @@ from streamingcli.project.build_command import ProjectBuilder
 from streamingcli.project.cicd_command import CICDInitializer
 from streamingcli.project.deploy_command import ProjectDeployer
 from streamingcli.project.init_command import NewProjectInitializer
+from streamingcli.project.project_type import ProjectType
 from streamingcli.project.publish_command import ProjectPublisher
 
 
@@ -36,9 +37,11 @@ def project():
 @project.command()
 @click.option('--project_name', prompt='Project name',
               help='Project name which will become Flink job name in Ververica platform')
-def project_init(project_name: str):
+@click.option('--project_type', prompt='Project type', required=False,
+              help='Project type', type=click.Choice(['python', 'jupyter']), default='python')
+def project_init(project_name: str, project_type: str = None):
     click.echo(f"Initializing streaming project: {project_name}")
-    NewProjectInitializer.createProject(project_name)
+    NewProjectInitializer.createProject(project_name, ProjectType(project_type))
     click.echo(f"Project: {project_name} initialized")
 
 
