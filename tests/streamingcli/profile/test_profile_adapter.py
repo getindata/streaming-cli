@@ -42,3 +42,13 @@ class TestProfileAdapter:
         updated_ververica_url = "updated_ververica_url"
         updated_profile = ProfileAdapter.update_profile_data(TEST_PROFILE, ververica_url=updated_ververica_url)
         assert updated_profile.ververica_url == updated_ververica_url
+        assert updated_profile.ververica_deployment_target == TEST_PROFILE.ververica_deployment_target
+
+    """Test creating temporary profile"""
+    def test_getting_temporary_profile(self):
+        ProfileAdapter.save_profile(TEST_PROFILE)
+        empty_profile = ProfileAdapter.load_profiles(default_profile_path="~/aaa.json")
+        assert len(empty_profile.profiles) == 0
+
+        existing_profile = ProfileAdapter.load_profiles()
+        assert len(existing_profile.profiles) > 0
