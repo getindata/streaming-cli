@@ -2,8 +2,6 @@ import os
 from dataclasses import asdict, dataclass, field, replace
 from pathlib import Path
 from typing import Any, Dict, Optional, Type
-
-from marshmallow import Schema
 from marshmallow_dataclass import class_schema
 from streamingcli.Config import (DEFAULT_PROFILE_DIR, DEFAULT_PROFILE_PATH,
                                  PROFILE_ENV_VARIABLE_NAME)
@@ -18,10 +16,12 @@ class ScliProfile:
     ververica_deployment_target: Optional[str] = field(default=None)
     ververica_api_token: Optional[str] = field(default=None)
     docker_registry_url: Optional[str] = field(default=None)        
-    
+
+
 @dataclass
 class ScliProfiles:    
     profiles: Dict[str, ScliProfile] = field(default_factory=dict)
+
 
 class ProfileAdapter:
 
