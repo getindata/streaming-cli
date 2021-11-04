@@ -31,7 +31,7 @@ class ProfileAdapter:
         profiles = ProfileAdapter.load_profiles()
         profiles_dict = profiles.profiles
         profiles_dict[scli_profile.profile_name] = scli_profile
-        content = safe_dump(asdict(replace(profiles, profiles = profiles_dict)))
+        content = safe_dump(asdict(replace(profiles, profiles=profiles_dict)))
         with open(DEFAULT_PROFILE_PATH, "w+") as file:
             file.write(content)
 
@@ -51,8 +51,8 @@ class ProfileAdapter:
             return ScliProfile(profile_name="temporary")
 
     @staticmethod
-    def load_profiles() -> ScliProfiles:
-        profiles_path = Path(DEFAULT_PROFILE_PATH)
+    def load_profiles(default_profile_path: str = DEFAULT_PROFILE_PATH) -> ScliProfiles:
+        profiles_path = Path(default_profile_path)
 
         if (profiles_path.is_file() is False):
             return ScliProfiles(profiles={})
