@@ -19,4 +19,5 @@ TEMPLATE_PROJECT_REPOSITORIES = {
 }
 DEFAULT_FLINK_APP_NAME = "flink_app.py"
 DEFAULT_NOTEBOOK_NAME = "notebook.ipynb"
-JUPYTER_TAGS = ["%%execute_flink_sql_local_cluster"]
+JUPYTER_SQL_TAGS = ["%%flink_execute_sql", "%%flink_query_sql"]
+JUPYTER_UDF_TAGS = ["%%flink_register_function"]
