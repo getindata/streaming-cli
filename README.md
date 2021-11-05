@@ -86,6 +86,14 @@ scli project deploy \
 ```
 > Parameters `--vvp-url`, `--vvp-namespace`, `--vvp-api-token`, `--vvp-deployment-target` are optional if they can be read from profile.
 
+#### Building job Docker image 
+```
+scli project build \
+  --docker-image-tag "latest"
+```
+
+> Parameters`--docker-image-tag` is optional and has default value `latest`.
+
 ### Project operations
 
 ## SCLI Development

@@ -18,9 +18,11 @@ marshmallow-dataclass = "*"
 ipython = "*"
 apache-flink = "*"
 wheel = "*"
+nbformat = "*"
 
 [dev-packages]
 pytest = "*"
+ipykernel = "*"
 
 [requires]
 python_version = "3.8"

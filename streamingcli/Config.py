@@ -17,3 +17,6 @@ TEMPLATE_PROJECT_REPOSITORIES = {
     PYTHON_TEMPLATE_PROJECT: "git@gitlab.com:getindata/streaming-labs/flink-sandbox-python.git",
     JUPYTER_TEMPLATE_PROJECT: "git@gitlab.com:getindata/streaming-labs/flink-sandbox-jupyter.git"
 }
+DEFAULT_FLINK_APP_NAME = "flink_app.py"
+DEFAULT_NOTEBOOK_NAME = "notebook.ipynb"
+JUPYTER_TAGS = ["%%execute_flink_sql_local_cluster"]
