@@ -1,24 +1,59 @@
+import argparse
+import shlex
 import sys
+from dataclasses import dataclass, field
 
 import click
 import nbformat
 from jinja2 import Environment
-from streamingcli.Config import JUPYTER_SQL_TAGS
+from streamingcli.Config import JUPYTER_SQL_MAGICS, JUPYTER_UDF_MAGICS
 from streamingcli.project.template_loader import TemplateLoader
+import autopep8
+
+
+@dataclass
+class NotebookEntry:
+    type: str
+
+
+@dataclass
+class Sql(NotebookEntry):
+    value: str = ""
+    type: str = "SQL"
+
+
+@dataclass
+class RegisterUdf(NotebookEntry):
+    function_name: str = ""
+    object_name: str = ""
+    type: str = "REGISTER_UDF"
+
+
+@dataclass
+class Code(NotebookEntry):
+    value: str = ""
+    type: str = "CODE"
 
 
 class NotebookConverter:
+    _register_udf_parser = argparse.ArgumentParser()
+    _register_udf_parser.add_argument("--function_name")
+    _register_udf_parser.add_argument("--object_name")
 
     @staticmethod
     def convert_notebook(notebook_path: str) -> str:
         try:
-            notebook = NotebookConverter.load_notebook(notebook_path=notebook_path)
-            sql_queries = NotebookConverter.get_sql_queries(notebook=notebook)
-            return NotebookConverter.render_flink_app(sql_queries=sql_queries)
+            notebook = NotebookConverter.load_notebook(notebook_path)
+            code_cells = filter(lambda _: _.cell_type == 'code', notebook.cells)
+            script_entries = []
+            for cell in code_cells:
+                script_entries.append(NotebookConverter.get_notebook_entry(cell))
+            return NotebookConverter.render_flink_app(script_entries)
         except IOError:
             raise click.ClickException(f"Could not open file: {notebook_path}")
         except:
-            raise click.ClickException(f"Unexpected exception: {sys.exc_info()}")
+            raise click.ClickException(
+                f"Unexpected exception: {sys.exc_info()}")
 
     @staticmethod
     def load_notebook(notebook_path: str) -> nbformat.NotebookNode:
@@ -26,18 +61,19 @@ class NotebookConverter:
             return nbformat.reads(notebook_file.read(), as_version=4)
 
     @staticmethod
-    def filter_code_cells(notebook: nbformat.NotebookNode):
-        return filter(lambda cell: cell.cell_type == 'code' and cell.source.split('\n')[0] in JUPYTER_SQL_TAGS, notebook.cells)
+    def get_notebook_entry(cell: {}) -> NotebookEntry:
+        if cell.source.startswith(tuple(JUPYTER_SQL_MAGICS)):
+            return Sql(value='\n'.join(cell.source.split('\n')[1:]))
+        if cell.source.startswith(tuple(JUPYTER_UDF_MAGICS)):
+            args = NotebookConverter._register_udf_parser.parse_args(shlex.split(cell.source)[1:])
+            return RegisterUdf(function_name=args.function_name, object_name=args.object_name)
+        elif not cell.source.startswith(('%reload_ext', '##')):
+            return Code(value=cell.source)
 
     @staticmethod
-    def get_sql_queries(notebook: nbformat.NotebookNode):
-        code_cells = NotebookConverter.filter_code_cells(notebook=notebook)
-        return map(lambda cell: '\n'.join(cell.source.split('\n')[1:]) , code_cells)
-
-    @staticmethod
-    def render_flink_app(sql_queries) -> str:
+    def render_flink_app(notebook_entries: list) -> str:
         flink_app_template = TemplateLoader.load_project_template("flink_app.py.template")
         flink_app_script = Environment().from_string(flink_app_template).render(
-            sqls=sql_queries
+            notebook_entries=notebook_entries
         )
-        return flink_app_script
+        return autopep8.fix_code(flink_app_script)
