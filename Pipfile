@@ -19,6 +19,7 @@ ipython = "*"
 apache-flink = "*"
 wheel = "*"
 nbformat = "*"
+jupyter-core = "*"
 
 [dev-packages]
 pytest = "*"
