@@ -7,6 +7,7 @@ stages:
   - test
   - package
   - ship
+  - run-downstreams
 
 image: python:3.8
 
@@ -74,5 +75,19 @@ pypi:
       python -m twine upload --repository-url ${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/pypi dist/*
   needs:
     - whl
+  rules:
+    - if: "$CI_COMMIT_TAG"
+
+release-jupyterlab-streaming:
+  stage: run-downstreams
+  inherit:
+    variables: false
+  variables:
+    STREAMING_CLI_VERSION: "${CI_COMMIT_TAG}"
+  trigger:
+    project: 'getindata/streaming-labs/docker-images/jupyterlab-streaming'
+    branch: 'main'
+  needs:
+    - pypi
   rules:
     - if: "$CI_COMMIT_TAG"
