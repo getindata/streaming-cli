@@ -20,6 +20,8 @@ apache-flink = "*"
 wheel = "*"
 nbformat = "*"
 jupyter-core = "*"
+ipywidgets = "*"
+nest-asyncio = "*"
 
 [dev-packages]
 pytest = "*"
