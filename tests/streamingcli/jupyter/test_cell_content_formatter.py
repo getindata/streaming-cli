@@ -1,4 +1,4 @@
-from streamingcli.jupyter.variablesubstitution import CellContentFormatter, NonExistentVariableException, VariableSyntaxException
+from streamingcli.jupyter.variable_substitution import CellContentFormatter, NonExistentVariableException, VariableSyntaxException
 import pytest
 
 
