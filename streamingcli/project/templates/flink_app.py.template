@@ -1,11 +1,18 @@
 from pyflink.datastream import StreamExecutionEnvironment
 from pyflink.table import StreamTableEnvironment, DataTypes
-from pyflink.table.descriptors import Schema, OldCsv, FileSystem
 from pyflink.table.udf import udf
 
 env = StreamExecutionEnvironment.get_execution_environment()
 env.set_parallelism(1)
 t_env = StreamTableEnvironment.create(env)
-{% for sql in sqls %}
-t_env.execute_sql("""{{sql}}""")
+{% for entry in notebook_entries %}
+{% if entry.type == 'SQL' %}
+t_env.execute_sql(f"""{{entry.value}}""")
+{% endif %}
+{% if entry.type == 'REGISTER_UDF' %}
+t_env.create_temporary_function("{{entry.function_name}}", {{entry.object_name}})
+{% endif %}
+{% if entry.type == 'CODE' %}
+{{entry.value}}
+{% endif %}
 {% endfor %}
