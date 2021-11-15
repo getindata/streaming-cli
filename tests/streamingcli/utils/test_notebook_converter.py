@@ -22,11 +22,14 @@ env.set_parallelism(1)
 t_env = StreamTableEnvironment.create(env)
 
 
+number_of_rows = 10
+
+
 t_env.execute_sql(f"""CREATE TABLE datagen (
     id INT
 ) WITH (
     'connector' = 'datagen',
-    'number-of-rows' = '10'
+    'number-of-rows' = '{number_of_rows}'
 )""")
 
 
