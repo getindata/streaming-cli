@@ -1,6 +1,7 @@
 from __future__ import print_function
 
 import asyncio
+import os
 import signal
 import os
 
@@ -23,6 +24,7 @@ from pyflink.table import StreamTableEnvironment, EnvironmentSettings, ResultKin
 
 from streamingcli.jupyter.deployment_bar import DeploymentBar
 from streamingcli.jupyter.display import pyflink_result_kind_to_string
+from streamingcli.jupyter.jar_handler import JarHandler
 from streamingcli.jupyter.reflection import get_method_names_for
 from streamingcli.jupyter.sql_syntax_highlighting import SQLSyntaxHighlighting
 from streamingcli.jupyter.sql_utils import inline_sql_in_cell, is_dml, is_query
@@ -55,6 +57,7 @@ class Integrations(Magics):
         self.deployment_bar = DeploymentBar(interrupt_callback=self.__interrupt_execute)
         # Indicates whether a job is executing on the Flink cluster in the background
         self.background_execution_in_progress = False
+        self.jar_handler = JarHandler(project_root_dir=os.getcwd())
         # Enables nesting blocking async tasks
         nest_asyncio.apply()
 
@@ -171,19 +174,66 @@ class Integrations(Magics):
 
     @line_magic
     @magic_arguments()
+    @argument('-p', '--local_path', type=str,
+              help='A path to a local jar to include in the deployment',
+              required=False)
+    @argument('-r', '--remote_path', type=str,
+              help='A path to a remote jar to include in the deployment',
+              required=False)
+    def flink_register_jar(self, line):
+        args = parse_argstring(self.flink_register_jar, line)
+        local_path = args.local_path
+        remote_path = args.remote_path
+        classpath_to_add = None
+        if local_path and remote_path:
+            raise ValueError('Cannot specify both local and remote path, please use two consecutive magics.')
+
+        if local_path:
+            # Locally copy the file from the source to a local jar storage.
+            # This is done to ensure that we can copy the local jars to the remote flink cluster.
+            # (Jupyter executes in memory and can definitely access the file,
+            # however, the deployment might not be able to)
+            classpath_to_add = self.jar_handler.local_copy(local_path)
+        elif remote_path:
+            # Remotely just copy the file to a local folder and run the same.
+            # The decision is to copy file rather than keep it as an URL - the deployment might
+            # be cut off the internet completely so it does make sense. If in the future
+            # it is deemed feasible to keep the URL and let flink pull the jars then it can be extended.
+            classpath_to_add = self.jar_handler.remote_copy(remote_path)
+        else:
+            raise ValueError('Please specify either a local or remote path, use `%flink_register_jar?` for help.')
+
+        pipeline_classpaths = "pipeline.classpaths"
+        current_classpaths = self.st_env.get_config().get_configuration().get_string(pipeline_classpaths, '')
+        new_classpath = f"{current_classpaths};{classpath_to_add}" if len(current_classpaths) > 0 else classpath_to_add
+        self.st_env.get_config().get_configuration().set_string(pipeline_classpaths, new_classpath)
+        print(f'Jar {classpath_to_add} registered')
+
+    @line_magic
+    @magic_arguments()
     @argument('-n', '--function_name', type=str,
               help='A function name which will be used in SQL eg. MY_COUNTER',
               required=True)
     @argument('-u', '--object_name', type=str,
               help='A created udf object eg. my_counter',
               required=True)
+    @argument('-l', '--language', type=str,
+              help='A language that the UDF was written in, for now we support python and java. Defaults to python.',
+              default='python',
+              required=False)
     def flink_register_function(self, line):
         args = parse_argstring(self.flink_register_function, line)
         shell = self.shell
         function_name = args.function_name
-        udf_obj = shell.user_ns[args.object_name]
-        self.st_env.create_temporary_function(function_name, udf_obj)
-        print(f'Function {function_name} registered')
+        language = args.language if args.language else 'python'
+        if language == 'python':
+            udf_obj = shell.user_ns[args.object_name]
+            self.st_env.create_temporary_function(function_name, udf_obj)
+        elif language == 'java':
+            self.st_env.create_java_temporary_function(function_name, args.object_name)
+        else:
+            raise ValueError('Supported languages are: java, python.')
+        print(f'Function {function_name} registered [{language}]')
 
     @staticmethod
     def __enable_sql_syntax_highlighting():

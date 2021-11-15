@@ -23,6 +23,8 @@ jupyter-core = "*"
 ipywidgets = "*"
 nest-asyncio = "*"
 autopep8 = "*"
+wget = "*"
+requests = "*"
 
 [dev-packages]
 pytest = "*"
