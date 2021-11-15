@@ -144,15 +144,15 @@ class Integrations(Magics):
             with execution_result.collect() as results:
                 print('Results will be pulled from the job. You can interrupt any time to show partial results.')
                 print('Execution result will bind to `execution_result` variable.')
-                progress_bar = IntText(value=0, description='Loaded rows: ')
-                core_display(progress_bar)
+                rows_counter = IntText(value=0, description='Loaded rows: ')
+                core_display(rows_counter)
                 for result in results:
                     # Explicit await for the same reason as in `__internal_execute_sql`
                     await asyncio.sleep(self.async_wait_s)
                     res = [cell for cell in result]
                     a_series = pd.Series(res, index=df.columns)
                     df = df.append(a_series, ignore_index=True)
-                    progress_bar.value += 1
+                    rows_counter.value += 1
 
                     if self.interrupted:
                         print('Query interrupted')
