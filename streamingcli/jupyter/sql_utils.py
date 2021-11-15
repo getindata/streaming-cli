@@ -12,3 +12,8 @@ def is_dml(sql: str) -> bool:
         if dml in sql.lower():
             return True
     return False
+
+
+def is_query(sql: str) -> bool:
+    return (not is_dml(sql)) and 'select' in sql.lower()
+

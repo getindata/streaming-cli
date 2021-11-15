@@ -4,23 +4,27 @@ import asyncio
 import signal
 
 import nest_asyncio
+import pandas as pd
+from IPython import display
+from IPython.core.display import display as core_display
 from IPython.core.magic import (
     Magics, magics_class, line_magic,
     cell_magic
 )
 from IPython.core.magic_arguments import argument, parse_argstring, magic_arguments
+from ipywidgets import FloatProgress, IntText
 from jupyter_core.paths import jupyter_config_dir
 from py4j.protocol import Py4JJavaError
 from pyflink.common import Configuration
 from pyflink.datastream import StreamExecutionEnvironment
 from pyflink.java_gateway import get_gateway
-from pyflink.table import StreamTableEnvironment, EnvironmentSettings
+from pyflink.table import StreamTableEnvironment, EnvironmentSettings, ResultKind
 
 from streamingcli.jupyter.deployment_bar import DeploymentBar
-from streamingcli.jupyter.display import display_execution_result
+from streamingcli.jupyter.display import pyflink_result_kind_to_string
 from streamingcli.jupyter.reflection import get_method_names_for
 from streamingcli.jupyter.sql_syntax_highlighting import SQLSyntaxHighlighting
-from streamingcli.jupyter.sql_utils import inline_sql_in_cell, is_dml
+from streamingcli.jupyter.sql_utils import inline_sql_in_cell, is_dml, is_query
 from streamingcli.jupyter.variable_substitution import CellContentFormatter
 
 
@@ -42,18 +46,19 @@ class Integrations(Magics):
                                                     .build())
         self.interrupted = False
         self.polling_ms = 100
-        self.async_wait_s = 1
+        # 20ms
+        self.async_wait_s = 2e-2
         Integrations.__enable_sql_syntax_highlighting()
         self.deployment_bar = DeploymentBar(interrupt_callback=self.__interrupt_execute)
-        # Indicates whether an DML statement is executing on the Flink cluster in the background
-        self.dml_executing = False
+        # Indicates whether a job is executing on the Flink cluster in the background
+        self.background_execution_in_progress = False
         # Enables nesting blocking async tasks
         nest_asyncio.apply()
 
     @cell_magic
     def flink_execute_sql(self, line, cell):
-        if self.dml_executing:
-            self.__retract_user_as_dml_is_executing()
+        if self.background_execution_in_progress:
+            self.__retract_user_as_something_is_executing_in_background()
             return
 
         # override SIGINT handlers so that they are not propagated
@@ -66,11 +71,11 @@ class Integrations(Magics):
         try:
             cell = self.__enrich_cell(cell)
             task = self.__internal_execute_sql(line, cell)
-            if is_dml(cell):
+            if is_dml(cell) or is_query(cell):
                 self.deployment_bar.show_deployment_bar()
                 asyncio.create_task(task).add_done_callback(self.__handle_done)
             else:
-                # if not DML then the operation is synchronous
+                # if not DML or SELECT then the operation is synchronous
                 # synchronous operations are not interactive, one cannot cancel them
                 # and hence showing the deployment bar does not make sense
                 asyncio.run(task)
@@ -80,9 +85,9 @@ class Integrations(Magics):
     # a workaround for https://issues.apache.org/jira/browse/FLINK-23020
     async def __internal_execute_sql(self, _line, cell):
         signal.signal(signal.SIGINT, self.__interrupt_execute)
-        if is_dml(cell):
+        if is_dml(cell) or is_query(cell):
             print('This job runs in a background, please either wait or interrupt its execution before continuing')
-            self.dml_executing = True
+            self.background_execution_in_progress = True
         print('Job starting...')
         execution_result = self.st_env.execute_sql(cell)
         print('Job started')
@@ -95,10 +100,17 @@ class Integrations(Magics):
                 # In Jupyter's main execution pool there is only one worker thread.
                 await asyncio.sleep(self.async_wait_s)
                 execution_result.wait(self.polling_ms)
-                # if finished then return early even if the user interrupts after this
-                # the actual invocation has already finished
-                print(successful_execution_msg)
-                return
+                if is_query(cell):
+                    # if a select query has been executing then `wait` returns as soon as the first
+                    # row is available. To display the results
+                    print('Pulling query results...')
+                    await self.display_execution_result(execution_result)
+                    return
+                else:
+                    # if finished then return early even if the user interrupts after this
+                    # the actual invocation has already finished
+                    print(successful_execution_msg)
+                    return
             except Py4JJavaError as err:
                 # consume timeout error or rethrow any other
                 if 'java.util.concurrent.TimeoutException' not in str(err.java_exception):
@@ -118,20 +130,41 @@ class Integrations(Magics):
         # usual happy path
         print(successful_execution_msg)
 
-    @cell_magic
-    def flink_query_sql(self, _line, cell):
-        if self.dml_executing:
-            self.__retract_user_as_dml_is_executing()
-            return
+    async def display_execution_result(self, execution_result):
+        """
+         Displays the execution result and returns a dataframe containing all the results.
+         Display is done in a stream-like fashion displaying the results as they come.
+        """
 
-        cell = self.__enrich_cell(cell)
-        try:
-            print('Query starting...')
-            execution_result = self.st_env.execute_sql(cell)
-            print('Query started')
-            display_execution_result(execution_result)
-        except KeyboardInterrupt:
-            print('Query cancelled')
+        columns = execution_result.get_table_schema().get_field_names()
+        df = pd.DataFrame(columns=columns)
+        result_kind = execution_result.get_result_kind()
+
+        if result_kind == ResultKind.SUCCESS_WITH_CONTENT:
+            with execution_result.collect() as results:
+                print('Results will be pulled from the job. You can interrupt any time to show partial results.')
+                print('Execution result will bind to `execution_result` variable.')
+                progress_bar = IntText(value=0, description='Loaded rows: ')
+                core_display(progress_bar)
+                for result in results:
+                    # Explicit await for the same reason as in `__internal_execute_sql`
+                    await asyncio.sleep(self.async_wait_s)
+                    res = [cell for cell in result]
+                    a_series = pd.Series(res, index=df.columns)
+                    df = df.append(a_series, ignore_index=True)
+                    progress_bar.value += 1
+
+                    if self.interrupted:
+                        print('Query interrupted')
+                        break
+        else:
+            series = pd.Series([pyflink_result_kind_to_string(result_kind)], index=df.columns)
+            df = df.append(series, ignore_index=True)
+
+        display.display(df)
+        self.shell.user_ns['execution_result'] = df
+
+        return df
 
     @line_magic
     @magic_arguments()
@@ -159,7 +192,7 @@ class Integrations(Magics):
         self.interrupted = True
 
     def __handle_done(self, fut):
-        self.dml_executing = False
+        self.background_execution_in_progress = False
         print('Execution done')
         # https://stackoverflow.com/questions/48161387/python-how-to-print-the-stacktrace-of-an-exception-object-without-a-currently
         # will raise an exception to the main thread
@@ -172,7 +205,7 @@ class Integrations(Magics):
         return joined_cell
 
     @staticmethod
-    def __retract_user_as_dml_is_executing():
+    def __retract_user_as_something_is_executing_in_background():
         print('Please wait for the previously submitted task to finish or cancel it.')
 
 
