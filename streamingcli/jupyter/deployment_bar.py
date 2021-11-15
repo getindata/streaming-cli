@@ -14,7 +14,7 @@ class DeploymentBar:
 
     def __cancel_deployment_button(self):
         button = widgets.Button(
-            description="Cancel",
+            description="Interrupt",
             disabled=False,
             button_style="warning",
             tooltip='Cancel the deployment',
