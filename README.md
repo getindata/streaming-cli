@@ -3,9 +3,11 @@
 ## Usage
 
 ### Platform operations
+
 Commands below will help you set up and work with Ververica Platform.
 
 #### Generating API token
+
 ```shell
 scli platform api-token create \
   --vvp-url "https://vvp.example.com" \
@@ -14,7 +16,9 @@ scli platform api-token create \
   --role "editor" \
   --save-to-kubernetes-secret "vvp/secret" 
 ```
+
 Sample response:
+
 ```json
 {
   "namespace": "default",
@@ -25,6 +29,7 @@ Sample response:
 ```
 
 #### Removing API token
+
 ```shell
 scli platform api-token remove \
   --vvp-url "https://vvp.example.com" \
@@ -33,17 +38,21 @@ scli platform api-token remove \
 ```
 
 #### Profiles
-You can set up your own profile, which will help you to connect to Ververica. 
-Instead of providing common parameters to each command, you can just pass the profile name with `--profile` 
+
+You can set up your own profile, which will help you to connect to Ververica. Instead of providing common parameters to
+each command, you can just pass the profile name with `--profile`
 or export environmental variable as `SCLI_PROFILE`.
 
 ##### Creating a profile
+
 The command below will walk you through an interactive way of setting up a profile:
+
 ```shell
 scli profile add sandbox
 ```
 
 You can also set up a profile in a non-interactive way by providing all required parameters as arguments:
+
 ```shell
 scli profile add sandbox \
   --vvp-url "https://vvp.streaming-platform.getindata.dev" \
@@ -54,6 +63,7 @@ scli profile add sandbox \
 ```
 
 #### Creating Deployment target
+
 ```shell
 scli platform deployment-target create \
   --vvp-url "https://vvp.example.com" \
@@ -63,9 +73,11 @@ scli platform deployment-target create \
   --kubernetes-namespace "vvp" \
   --profile "sandbox"
 ```
+
 > Parameters `--vvp-url`, `--vvp-namespace`, `--vvp-api-token`, `--vvp-deployment-target` are optional if they can be read from profile.
 
 Sample response:
+
 ```json
 {
   "name": "vvp-team1"
@@ -73,7 +85,8 @@ Sample response:
 ```
 
 #### Deploying job
-```
+
+```shell
 scli project deploy \
   --vvp-url "https://vvp.example.com" \
   --vvp-namespace "default" \
@@ -84,12 +97,23 @@ scli project deploy \
   --docker-image-repository tmp_project \
   --profile "sandbox"
 ```
+
 > Parameters `--vvp-url`, `--vvp-namespace`, `--vvp-api-token`, `--vvp-deployment-target` are optional if they can be read from profile.
 
-#### Building job Docker image 
-```
+#### Building job Docker image
+
+```shell
 scli project build \
   --docker-image-tag "latest"
+```
+
+#### Logging to Docker repository
+
+```shell
+scli docker login \
+  --username "user" \
+  --password "password" \
+  --docker-registry-url registry.gitlab.com/getindata/
 ```
 
 > Parameters`--docker-image-tag` is optional and has default value `latest`.
@@ -97,21 +121,24 @@ scli project build \
 ### Project operations
 
 ## SCLI Development
+
 ### Prerequisities ##
+
 * `pipenv`
 
 ### Build
+
 * `make setup` - Install dependencies required to build a wheel package
 * `make package` - Create a wheel package
 
 ### Install
+
 * `make install` - Install a wheel package
 * `make install/force` - Reinstall a wheel package
 
-
 ## Jupyter notebook integration
 
-In order to actually use these magics, you must install our PIP package: 
+In order to actually use these magics, you must install our PIP package:
 
 ```shell
 python3 -m pip install streamingcli --extra-index-url https://__token__:<your_personal_token>@gitlab.com/api/v4/projects/29597698/packages/pypi/simple

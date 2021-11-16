@@ -3,6 +3,7 @@ import click
 from markupsafe import re
 
 from streamingcli.Config import PLATFORM_DEFAULT_DEPLOYMENT_TARGET_NAME
+from streamingcli.docker.login_command import LoginCommand
 from streamingcli.platform.apitoken_create_command import \
     VervericaApiTokenCreateCommand
 from streamingcli.platform.apitoken_remove_command import \
@@ -46,8 +47,8 @@ def project_init(project_name: str, project_type: str = None):
 
 
 @project.command()
-@click.option('--docker-image-tag', 
-              help='Docker image tag', default = 'latest')
+@click.option('--docker-image-tag',
+              help='Docker image tag', default='latest')
 @click.option('--docker-image-registry', 'docker_image_registry',
               help='URL for Docker registry, i.e: "https://hub.docker.com/"')
 @click.option('--docker-image-repository', 'docker_image_repository',
@@ -86,7 +87,7 @@ def project_deploy(docker_image_tag: str,
 
 @project.command()
 @click.option('--docker-image-tag',
-              help='Project image tag', default= 'latest')
+              help='Project image tag', default='latest')
 def project_build(docker_image_tag: str = None):
     ProjectBuilder.build_project(docker_image_tag)
 
@@ -131,11 +132,13 @@ def platform_setup(ververica_url: str,
 def api_token():
     pass
 
+
 def validate_k8s_secret(ctx, param, value):
-        if value != None and re.match(r"^[\w\-\_]+\/[\w\-\_]+$", value) == None:
-            raise click.BadParameter(message="K8s secret in incorrect format")
-        else:
-            return value
+    if value != None and re.match(r"^[\w\-\_]+\/[\w\-\_]+$", value) == None:
+        raise click.BadParameter(message="K8s secret in incorrect format")
+    else:
+        return value
+
 
 @api_token.command()
 @click.option('--vvp-url', 'ververica_url', prompt='Ververica URL',
@@ -179,9 +182,10 @@ def platform_apitoken_remove(ververica_url: str,
 def deployment_target():
     pass
 
+
 @deployment_target.command()
 @click.option('--kubernetes-namespace', prompt='Kubernetes namespace name',
-             help='Kubernetes namespace name', required=True)
+              help='Kubernetes namespace name', required=True)
 @click.option('--profile',
               help='Profile name to use', required=False)
 @click.option('--name',
@@ -193,11 +197,11 @@ def deployment_target():
 @click.option('--vvp-api-token',
               required=False, help='Ververica API Token')
 def deployment_target_create(kubernetes_namespace: str,
-                            profile: str=None,
-                            name: str=None,
-                            vvp_url: str=None,
-                            vvp_namespace: str=None,
-                            vvp_api_token: str=None):
+                             profile: str = None,
+                             name: str = None,
+                             vvp_url: str = None,
+                             vvp_namespace: str = None,
+                             vvp_api_token: str = None):
     DeploymentTargetCommand.create_deployment_target(
         kubernetes_namespace=kubernetes_namespace,
         deployment_target_name=name,
@@ -252,6 +256,19 @@ def add_profile(profile_name: str,
                                   )
 
 
+@cli.group()
+def docker():
+    pass
+
+
+@docker.command()
+@click.option('--username', required=True, help='The registry username')
+@click.option('--password', required=True, help='The plaintext password')
+@click.option('--docker-registry-url', required=True, help='URL to the registry. E.g. https://index.docker.io/v1/')
+def docker_login(username: str, password: str, docker_registry_url: str):
+    LoginCommand.docker_login(username, password, docker_registry_url)
+
+
 project.add_command(project_init, "init")
 project.add_command(project_deploy, "deploy")
 project.add_command(project_build, "build")
@@ -262,6 +279,7 @@ api_token.add_command(platform_apitoken_remove, "remove")
 deployment_target.add_command(deployment_target_create, "create")
 cicd.add_command(cicd_setup, "setup")
 profile.add_command(add_profile, "add")
+docker.add_command(docker_login, "login")
 
 if __name__ == '__main__':
     cli()
