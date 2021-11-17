@@ -2,6 +2,7 @@ from __future__ import print_function
 
 import asyncio
 import signal
+import os
 
 import nest_asyncio
 import pandas as pd
@@ -33,6 +34,8 @@ class Integrations(Magics):
 
     def __init__(self, shell):
         super(Integrations, self).__init__(shell)
+        print("Set env variable JAVA_TOOL_OPTIONS='--illegal-access=permit'")
+        os.environ['JAVA_TOOL_OPTIONS'] = "--illegal-access=permit"
         conf = Configuration()
         conf.set_integer("rest.port", 8099)
         conf.set_integer("parallelism.default", 1)
