@@ -1,34 +1,53 @@
 variables:
   DOCKER_TAG: "{{project_version}}"
 
+image: registry.gitlab.com/getindata/streaming-labs/streaming-cli:latest
+
 stages:
   - package
+  - promote-sandbox
+  - deploy-sandbox
 
-.dockerize:
+scli-build:
+  environment:
+    name: sandbox-aws
   stage: package
   services:
     - docker:19.03.13-dind
-  image: docker:19.03.13
-
-dockerize:
-  extends:
-    .dockerize
   script:
-    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
-    - docker build --pull -t "$CI_REGISTRY_IMAGE:$DOCKER_TAG" .
-    - docker push "$CI_REGISTRY_IMAGE:$DOCKER_TAG"
-  only:
-    - branches
+    - mkdir -p "$HOME/.docker" && echo "{}" >> "$HOME/.docker/config.json"
+    - scli docker login --username "$CI_REGISTRY_USER" --password "$CI_REGISTRY_PASSWORD" --docker-registry-url "$CI_REGISTRY"
+    - scli project build --docker-image-tag "$DOCKER_TAG"
+    - scli project publish --docker-image-tag "$DOCKER_TAG" --registry-url "$CI_REGISTRY/$CI_PROJECT_ROOT_NAMESPACE/streaming-labs"
 
-docker-sign:
-  extends:
-    .dockerize
+aws-promote.sandbox:
+  image: registry.gitlab.com/getindata/streaming-labs/image-importer
+  environment:
+    name: sandbox-aws
+  stage: promote-sandbox
+  services:
+    - docker:19.03.13-dind
+  before_script:
+    - |
+      for i in $(seq 1 30)
+      do
+          docker info && break
+          echo "Waiting for docker to start"
+          sleep 1s
+      done
+    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
+    - aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $DOCKER_REGISTRY_URL
   script:
-    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
     - docker pull "$CI_REGISTRY_IMAGE:$DOCKER_TAG"
-    - docker tag "$CI_REGISTRY_IMAGE:$DOCKER_TAG" "$CI_REGISTRY_IMAGE:${CI_COMMIT_TAG#v}"
-    - docker push "$CI_REGISTRY_IMAGE:${CI_COMMIT_TAG#v}"
-    - docker tag "$CI_REGISTRY_IMAGE:$DOCKER_TAG" "$CI_REGISTRY_IMAGE:latest"
-    - docker push "$CI_REGISTRY_IMAGE:latest"
-  only:
-    - tags
+    - docker tag "$CI_REGISTRY_IMAGE:$DOCKER_TAG" "$DOCKER_REGISTRY_URL/$CI_PROJECT_PATH:$DOCKER_TAG"
+    - docker push "$DOCKER_REGISTRY_URL/$CI_PROJECT_PATH:$DOCKER_TAG"
+
+aws-deploy.sandbox:
+  environment:
+    name: sandbox-aws
+  stage: deploy-sandbox
+  script:
+    - |
+      scli project deploy --vvp-url "$VVP_URL" --vvp-namespace "$VVP_NAMESPACE" --vvp-api-token "$VVP_API_TOKEN" \
+      --vvp-deployment-target "$VVP_DEPLOYMENT_TARGET" --docker-image-registry "$DOCKER_REGISTRY_URL" \
+      --docker-image-tag "$DOCKER_TAG" --docker-image-repository "$CI_PROJECT_PATH"
