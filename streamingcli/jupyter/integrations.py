@@ -29,6 +29,7 @@ from streamingcli.jupyter.reflection import get_method_names_for
 from streamingcli.jupyter.sql_syntax_highlighting import SQLSyntaxHighlighting
 from streamingcli.jupyter.sql_utils import inline_sql_in_cell, is_dml, is_query
 from streamingcli.jupyter.variable_substitution import CellContentFormatter
+from streamingcli.jupyter.config_file_loader import ConfigFileLoader
 
 
 @magics_class
@@ -60,6 +61,19 @@ class Integrations(Magics):
         self.jar_handler = JarHandler(project_root_dir=os.getcwd())
         # Enables nesting blocking async tasks
         nest_asyncio.apply()
+
+    @line_magic
+    @magic_arguments()
+    @argument("-p", "--path", type=str,
+              help="A path to a local config file",
+              required=True)
+    def load_config_file(self, line):
+        args = parse_argstring(self.load_config_file, line)
+        path = args.path
+        loaded_variables = ConfigFileLoader.load_config_file(path)
+        self.shell.user_ns.update(loaded_variables)
+        print("Config file loaded")
+
 
     @cell_magic
     def flink_execute_sql(self, line, cell):
