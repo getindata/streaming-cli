@@ -1,12 +1,12 @@
 import argparse
 import shlex
 import sys
-from dataclasses import dataclass, field
+from dataclasses import dataclass
+from typing import Optional
 
 import click
 import nbformat
 from jinja2 import Environment
-from streamingcli.Config import JUPYTER_SQL_MAGICS, JUPYTER_UDF_MAGICS
 from streamingcli.project.template_loader import TemplateLoader
 import autopep8
 
@@ -30,6 +30,11 @@ class RegisterUdf(NotebookEntry):
 
 
 @dataclass
+class RegisterJavaUdf(RegisterUdf):
+    type: str = "REGISTER_JAVA_UDF"
+
+
+@dataclass
 class Code(NotebookEntry):
     value: str = ""
     type: str = "CODE"
@@ -39,6 +44,7 @@ class NotebookConverter:
     _register_udf_parser = argparse.ArgumentParser()
     _register_udf_parser.add_argument("--function_name")
     _register_udf_parser.add_argument("--object_name")
+    _register_udf_parser.add_argument("--language")
 
     @staticmethod
     def convert_notebook(notebook_path: str) -> str:
@@ -47,7 +53,9 @@ class NotebookConverter:
             code_cells = filter(lambda _: _.cell_type == 'code', notebook.cells)
             script_entries = []
             for cell in code_cells:
-                script_entries.append(NotebookConverter.get_notebook_entry(cell))
+                entry = NotebookConverter.get_notebook_entry(cell)
+                if entry is not None:
+                    script_entries.append(entry)
             return NotebookConverter.render_flink_app(script_entries)
         except IOError:
             raise click.ClickException(f"Could not open file: {notebook_path}")
@@ -61,14 +69,24 @@ class NotebookConverter:
             return nbformat.reads(notebook_file.read(), as_version=4)
 
     @staticmethod
-    def get_notebook_entry(cell: {}) -> NotebookEntry:
-        if cell.source.startswith(tuple(JUPYTER_SQL_MAGICS)):
-            return Sql(value='\n'.join(cell.source.split('\n')[1:]))
-        if cell.source.startswith(tuple(JUPYTER_UDF_MAGICS)):
-            args = NotebookConverter._register_udf_parser.parse_args(shlex.split(cell.source)[1:])
-            return RegisterUdf(function_name=args.function_name, object_name=args.object_name)
-        elif not cell.source.startswith(('%reload_ext', '##')):
+    def get_notebook_entry(cell) -> Optional[NotebookEntry]:
+        if cell.source.startswith('%'):
+            return NotebookConverter.handle_magic_cell(cell)
+        elif not cell.source.startswith('##'):
             return Code(value=cell.source)
+
+    @staticmethod
+    def handle_magic_cell(cell) -> Optional[NotebookEntry]:
+        if cell.source.startswith('%%flink_execute_sql'):
+            return Sql(value='\n'.join(cell.source.split('\n')[1:]))
+        if cell.source.startswith('%flink_register_function'):
+            args = NotebookConverter._register_udf_parser.parse_args(shlex.split(cell.source)[1:])
+            return RegisterJavaUdf(function_name=args.function_name,
+                                   object_name=args.object_name,
+                                   ) if args.language == 'java' else \
+                RegisterUdf(function_name=args.function_name,
+                            object_name=args.object_name)
+        return None
 
     @staticmethod
     def render_flink_app(notebook_entries: list) -> str:

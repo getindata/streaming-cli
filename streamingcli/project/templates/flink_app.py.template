@@ -12,6 +12,9 @@ t_env.execute_sql(f"""{{entry.value}}""")
 {% if entry.type == 'REGISTER_UDF' %}
 t_env.create_temporary_function("{{entry.function_name}}", {{entry.object_name}})
 {% endif %}
+{% if entry.type == 'REGISTER_JAVA_UDF' %}
+t_env.create_java_temporary_function("{{entry.function_name}}", "{{entry.object_name}}")
+{% endif %}
 {% if entry.type == 'CODE' %}
 {{entry.value}}
 {% endif %}
