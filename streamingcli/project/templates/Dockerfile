@@ -10,3 +10,4 @@ RUN set -ex && \
     pip install -r requirements.txt
 
 COPY ./src /app/src
+COPY .streaming_config.yml ./jars/* /app/lib/
