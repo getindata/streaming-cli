@@ -67,6 +67,19 @@ class NotebookConverter:
         if cell.source.startswith(tuple(JUPYTER_UDF_MAGICS)):
             args = NotebookConverter._register_udf_parser.parse_args(shlex.split(cell.source)[1:])
             return RegisterUdf(function_name=args.function_name, object_name=args.object_name)
+        if cell.source.startswith(('%load_config_file', '##')):
+            loaded_variables = {
+                "ddd": 1,
+                "aaa": "xxx"
+            }
+            variable_strings = []
+            for v in loaded_variables:
+                if isinstance(loaded_variables[v], str):
+                    variable_strings.append(f"{v}=\"{loaded_variables[v]}\"")
+                else:
+                    variable_strings.append(f"{v}={loaded_variables[v]}")
+            all_variable_strings = "\n".join(variable_strings)
+            return Code(value=f"{all_variable_strings}\n{cell.source}")
         elif not cell.source.startswith(('%reload_ext', '##')):
             return Code(value=cell.source)
 

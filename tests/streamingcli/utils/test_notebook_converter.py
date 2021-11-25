@@ -22,6 +22,10 @@ env.set_parallelism(1)
 t_env = StreamTableEnvironment.create(env)
 
 
+maximum_number_of_rows = 10
+some_text_variable = "some_text_value"
+
+
 number_of_rows = 10
 
 

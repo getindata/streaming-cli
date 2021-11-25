@@ -24,3 +24,4 @@ DEFAULT_FLINK_APP_NAME = "flink_app.py"
 DEFAULT_NOTEBOOK_NAME = "notebook.ipynb"
 JUPYTER_SQL_MAGICS = list(map(lambda magic: f"%%{magic}", get_method_names_for(Integrations, 'cell_magic')))
 JUPYTER_UDF_MAGICS = list(map(lambda magic: f"%{magic}", get_method_names_for(Integrations, 'line_magic')))
+JUPYTER_LOAD_CONFIG_MAGICS = list(map(lambda magic: f"%{magic}", get_method_names_for(Integrations, 'line_magic')))
