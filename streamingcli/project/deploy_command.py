@@ -33,10 +33,11 @@ class ProjectDeployer:
 
         profile_name = ProjectDeployer.get_profile_name(profile_name=profile)
 
-        profile_data = (ProfileAdapter.get_profile(profile_name=profile_name) 
-            or ScliProfile(profile_name="temporary"))
+        profile_data = (ProfileAdapter.get_profile(profile_name=profile_name)
+                        or ScliProfile(profile_name="temporary"))
 
-        project_name = docker_image_repository or LocalProjectConfigIO.load_project_config().project_name
+        local_project_config = LocalProjectConfigIO.load_project_config()
+        project_name = docker_image_repository or local_project_config.project_name
         profile_data = ProfileAdapter.update_profile_data(
             profile_data=profile_data,
             ververica_url=ververica_url,
@@ -52,7 +53,8 @@ class ProjectDeployer:
             project_name=project_name,
             docker_registry_url=profile_data.docker_registry_url,
             docker_image_tag=docker_image_tag,
-            deployment_target_name=profile_data.ververica_deployment_target
+            deployment_target_name=profile_data.ververica_deployment_target,
+            dependencies=local_project_config.dependencies
         )
         if overrides_from_yaml:
             deployment_yml = YamlMerger.merge_two_yaml(deployment_yml, overrides_from_yaml)
@@ -88,12 +90,14 @@ class ProjectDeployer:
             project_name: str,
             docker_registry_url: str,
             docker_image_tag: str,
-            deployment_target_name: str
+            deployment_target_name: str,
+            dependencies: list
     ) -> str:
         template = TemplateLoader.load_project_template("flink_deployment.yml")
         return Environment().from_string(template).render(
             project_name=project_name,
             docker_registry_url=docker_registry_url,
             docker_image_tag=docker_image_tag,
-            deployment_target_name=deployment_target_name
+            deployment_target_name=deployment_target_name,
+            dependencies=dependencies
         )

@@ -9,9 +9,8 @@ class TestNotebookConverter:
         # given
         file_path = 'tests/streamingcli/utils/jupyter/notebook1.ipynb'
         # expect
-        x = NotebookConverter.convert_notebook(file_path)
-        print(x)
-        assert x == '''import sys
+        converted_notebook = NotebookConverter.convert_notebook(file_path)
+        assert converted_notebook.content == '''import sys
 from pyflink.table import DataTypes
 from pyflink.datastream import StreamExecutionEnvironment
 from pyflink.table import StreamTableEnvironment, DataTypes
@@ -48,4 +47,33 @@ t_env.create_temporary_function("filter_print", filter_print)
 
 
 t_env.execute_sql(f"""select * from datagen WHERE filter_print(true, id)""")
+'''
+
+    def test_notebook_with_java_udf_conversion(self):
+        # given
+        file_path = 'tests/streamingcli/utils/jupyter/notebook2.ipynb'
+        # expect
+        converted_notebook = NotebookConverter.convert_notebook(file_path)
+        assert converted_notebook.content == '''from pyflink.datastream import StreamExecutionEnvironment
+from pyflink.table import StreamTableEnvironment, DataTypes
+from pyflink.table.udf import udf
+
+env = StreamExecutionEnvironment.get_execution_environment()
+env.set_parallelism(1)
+t_env = StreamTableEnvironment.create(env)
+
+
+t_env.create_java_temporary_function("remote_trace", "com.getindata.TraceUDF")
+
+
+t_env.execute_sql(f"""CREATE TABLE datagen (
+    id INT
+) WITH (
+    'connector' = 'datagen',
+    'number-of-rows' = '100'
+)""")
+
+
+t_env.execute_sql(
+    f"""select * from datagen WHERE remote_trace(true, 'TRACE_ME', id)""")
 '''
