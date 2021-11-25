@@ -8,6 +8,7 @@ import click
 import nbformat
 from jinja2 import Environment
 from streamingcli.project.template_loader import TemplateLoader
+from streamingcli.jupyter.config_file_loader import ConfigFileLoader
 import autopep8
 
 
@@ -66,6 +67,9 @@ class NotebookConverter:
     _register_udf_parser.add_argument("--remote_path")
     _register_udf_parser.add_argument("--local_path")
 
+    _register_loadconfig_parser = argparse.ArgumentParser()
+    _register_loadconfig_parser.add_argument("--path")
+
     @staticmethod
     def convert_notebook(notebook_path: str) -> ConvertedNotebook:
         try:
@@ -107,6 +111,17 @@ class NotebookConverter:
                                    ) if args.language == 'java' else \
                 RegisterUdf(function_name=args.function_name,
                             object_name=args.object_name)
+        if cell.source.startswith(('%load_config_file', '##')):
+            args = NotebookConverter._register_loadconfig_parser.parse_args(shlex.split(source)[1:])
+            loaded_variables = ConfigFileLoader.load_config_file(path=args.path)
+            variable_strings = []
+            for v in loaded_variables:
+                if isinstance(loaded_variables[v], str):
+                    variable_strings.append(f"{v}=\"{loaded_variables[v]}\"")
+                else:
+                    variable_strings.append(f"{v}={loaded_variables[v]}")
+            all_variable_strings = "\n".join(variable_strings)
+            return Code(value=f"{all_variable_strings}")
         if source.startswith('%flink_register_jar'):
             args = NotebookConverter._register_udf_parser.parse_args(shlex.split(source)[1:])
             return RegisterJar(url=args.remote_path) if args.remote_path is not None else \
