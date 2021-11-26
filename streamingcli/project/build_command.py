@@ -6,7 +6,7 @@ import docker
 import click
 from streamingcli.Config import DEFAULT_NOTEBOOK_NAME, DEFAULT_FLINK_APP_NAME, ADDITIONAL_DEPENDENCIES_DIR
 from streamingcli.project.project_type import ProjectType
-from streamingcli.utils.notebook_converter import NotebookConverter, ConvertedNotebook
+from streamingcli.jupyter.notebook_converter import NotebookConverter, ConvertedNotebook
 
 
 class ProjectBuilder:

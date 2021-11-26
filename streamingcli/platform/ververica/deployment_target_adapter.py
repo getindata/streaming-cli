@@ -6,7 +6,7 @@ import yaml
 import click
 
 
-class VervericaDeploymentTargetFactory:
+class VervericaDeploymentTargetAdapter:
 
     @staticmethod
     def get_existing_deployment_target_id_by_name(ververica_url: str,
@@ -45,7 +45,7 @@ class VervericaDeploymentTargetFactory:
                                  ververica_kubernetes_namespace: str,
                                  ververica_webtoken_secret: str,
                                  ververica_deployment_target_name: str):
-        deployment_target_id = VervericaDeploymentTargetFactory.get_existing_deployment_target_id_by_name(
+        deployment_target_id = VervericaDeploymentTargetAdapter.get_existing_deployment_target_id_by_name(
             ververica_url=ververica_url,
             ververica_namespace=ververica_namespace,
             ververica_webtoken_secret=ververica_webtoken_secret,
@@ -56,7 +56,7 @@ class VervericaDeploymentTargetFactory:
                 f"Reused existing Ververica deployment target: {ververica_deployment_target_name} with ID: {deployment_target_id}")
             return deployment_target_id
 
-        deployment_target_yaml = VervericaDeploymentTargetFactory.format_template(
+        deployment_target_yaml = VervericaDeploymentTargetAdapter.format_template(
             ververica_deployment_target_name=ververica_deployment_target_name,
             ververica_namespace=ververica_namespace,
             ververica_kubernetes_namespace=ververica_kubernetes_namespace

@@ -1,6 +1,6 @@
 import click
-from streamingcli.platform.ververica.deployment_target_factory import \
-    VervericaDeploymentTargetFactory
+from streamingcli.platform.ververica.deployment_target_adapter import \
+    VervericaDeploymentTargetAdapter
 from streamingcli.profile.profile_adapter import ProfileAdapter, ScliProfile
 
 
@@ -22,7 +22,7 @@ class DeploymentTargetCommand:
             ververica_webtoken_secret=vvp_api_token
         )
         DeploymentTargetCommand.validate_scli_profile(profile)
-        VervericaDeploymentTargetFactory.create_deployment_target(
+        VervericaDeploymentTargetAdapter.create_deployment_target(
             ververica_url=profile.ververica_url,
             ververica_namespace=profile.ververica_namespace,
             ververica_kubernetes_namespace=kubernetes_namespace,

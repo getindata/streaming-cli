@@ -1,5 +1,4 @@
-import pytest
-from streamingcli.utils.notebook_converter import NotebookConverter
+from streamingcli.jupyter.notebook_converter import NotebookConverter
 
 
 class TestNotebookConverter:

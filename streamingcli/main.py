@@ -1,8 +1,6 @@
-from queue import Empty
 import click
 from markupsafe import re
 
-from streamingcli.Config import PLATFORM_DEFAULT_DEPLOYMENT_TARGET_NAME
 from streamingcli.docker.login_command import LoginCommand
 from streamingcli.platform.apitoken_create_command import \
     VervericaApiTokenCreateCommand
@@ -10,7 +8,6 @@ from streamingcli.platform.apitoken_remove_command import \
     VervericaApiTokenRemoveCommand
 from streamingcli.platform.deployment_target_command import \
     DeploymentTargetCommand
-from streamingcli.platform.setup_command import PlatformSetupCommand
 from streamingcli.profile.profile_command import ProfileCommand
 from streamingcli.project.build_command import ProjectBuilder
 from streamingcli.project.cicd_command import CICDInitializer
@@ -104,28 +101,6 @@ def project_publish(registry_url: str, docker_image_tag: str = None):
 @cli.group()
 def platform():
     pass
-
-
-@platform.command()
-@click.option('--ververica_url', prompt='Ververica URL',
-              help='URL for Ververica cluster, i.e: "https://vvp.streaming-platform.example.com"')
-@click.option('--ververica_namespace', prompt='Ververica namespace',
-              help='Ververica namespace')
-@click.option('--ververica_deployment_target', prompt='Ververica deployment target name',
-              help='Ververica deployment target name')
-@click.option('--ververica_kubernetes_namespace', prompt='Kubernetes namespace where Ververica is deployed',
-              help='Kubernetes namespace where Ververica is deployed')
-@click.option('--force', help='Force recreate tokens and secrets', is_flag=True)
-def platform_setup(ververica_url: str,
-                   ververica_namespace: str,
-                   ververica_kubernetes_namespace: str,
-                   force: bool,
-                   ververica_deployment_target: str = PLATFORM_DEFAULT_DEPLOYMENT_TARGET_NAME):
-    PlatformSetupCommand.setup_ververica(ververica_url=ververica_url,
-                                         ververica_namespace=ververica_namespace,
-                                         ververica_kubernetes_namespace=ververica_kubernetes_namespace,
-                                         ververica_deployment_target_name=ververica_deployment_target,
-                                         force=force)
 
 
 @platform.group("api-token")
@@ -273,7 +248,6 @@ project.add_command(project_init, "init")
 project.add_command(project_deploy, "deploy")
 project.add_command(project_build, "build")
 project.add_command(project_publish, "publish")
-platform.add_command(platform_setup, "setup")
 api_token.add_command(platform_apitoken_create, "create")
 api_token.add_command(platform_apitoken_remove, "remove")
 deployment_target.add_command(deployment_target_create, "create")

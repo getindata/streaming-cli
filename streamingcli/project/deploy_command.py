@@ -1,11 +1,10 @@
 import os
 from typing import Optional
-
 import click
 from jinja2 import Environment
 from streamingcli.Config import PROFILE_ENV_VARIABLE_NAME
 from streamingcli.platform.ververica.deployment_adapter import \
-    DeploymentAdapter
+    VervericaDeploymentAdapter
 from streamingcli.profile.profile_adapter import ProfileAdapter, ScliProfile
 from streamingcli.project.local_project_config import LocalProjectConfigIO
 from streamingcli.project.template_loader import TemplateLoader
@@ -60,7 +59,7 @@ class ProjectDeployer:
             deployment_yml = YamlMerger.merge_two_yaml(deployment_yml, overrides_from_yaml)
         click.echo(f"Deploying streaming project: {project_name} ...")
 
-        deployment_name = DeploymentAdapter.deploy(
+        deployment_name = VervericaDeploymentAdapter.deploy(
             deployment_yml=deployment_yml,
             ververica_url=profile_data.ververica_url,
             ververica_namespace=profile_data.ververica_namespace,
