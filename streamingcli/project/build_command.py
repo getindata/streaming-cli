@@ -36,14 +36,18 @@ class ProjectBuilder:
         notebook_path = notebooks[0] if len(notebooks) == 1 else f"{notebook_dir}/{DEFAULT_NOTEBOOK_NAME}"
         converted_notebook = ProjectBuilder.convert_notebook(notebook_path)
         ProjectBuilder.write_notebook(converted_notebook.content)
-        if converted_notebook.jars:
+        if converted_notebook.remote_jars or converted_notebook.local_jars:
             ProjectBuilder.get_jars(converted_notebook, local_project_config)
 
     @staticmethod
     def get_jars(converted_notebook, local_project_config):
         jar_handler = JarHandler(project_root_dir=os.getcwd())
-        for jar in converted_notebook.jars:
+        for jar in converted_notebook.remote_jars:
             local_path = jar_handler.remote_copy(jar)
+            image_path = f"{ADDITIONAL_DEPENDENCIES_DIR}/{os.path.basename(local_path)}"
+            local_project_config.add_dependency(image_path)
+        for jar in converted_notebook.local_jars:
+            local_path = jar_handler.local_copy(jar)
             image_path = f"{ADDITIONAL_DEPENDENCIES_DIR}/{os.path.basename(local_path)}"
             local_project_config.add_dependency(image_path)
         LocalProjectConfigIO.update_project_config(local_project_config)
