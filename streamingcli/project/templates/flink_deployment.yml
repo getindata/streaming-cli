@@ -24,7 +24,7 @@ spec:
           - file:///app/lib/flink-python_2.12-1.13.1.jar
           {% for dependency in dependencies -%}
           - file://{{dependency}}
-          {% endfor -%}
+          {% endfor %}
         jarUri: file:///app/lib/flink-python-loader-1.0-SNAPSHOT.jar
         entryClass: com.getindata.streaming.FlinkPythonLoader
         kind: JAR
