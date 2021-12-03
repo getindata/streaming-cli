@@ -4,7 +4,6 @@ import copier
 from streamingcli.Config import (
     TEMPLATE_PROJECT_REPOSITORIES,
     PYTHON_TEMPLATE_PROJECT,
-    PROJECT_LOCAL_TEMPLATE_DIR_NAME
 )
 from streamingcli.project.local_project_config import LocalProjectConfigFactory, LocalProjectConfigIO
 from streamingcli.project.project_type import ProjectType
@@ -26,10 +25,7 @@ class PythonProjectFactory:
 
         copier.copy(src_path=TEMPLATE_PROJECT_REPOSITORIES[PYTHON_TEMPLATE_PROJECT], dst_path=project_path)
         LocalProjectConfigFactory.generate_initial_project_config(project_name, ProjectType.PYTHON)
-        LocalProjectConfigIO.create_template_directory(project_name=project_name)
         PythonProjectFactory.generate_dockerfile_template(project_name=project_name)
-        TemplateLoader.copy_binary("flink-python-loader.jar",
-                                   f"{project_path}/{PROJECT_LOCAL_TEMPLATE_DIR_NAME}/flink-python-loader.jar")
 
     @staticmethod
     def generate_dockerfile_template(project_name: str):

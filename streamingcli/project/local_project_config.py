@@ -5,8 +5,7 @@ from typing import Any, Optional, Type
 
 import click
 from marshmallow_dataclass import class_schema
-from streamingcli.Config import (PROJECT_LOCAL_CONFIG_FILE_NAME,
-                                 PROJECT_LOCAL_TEMPLATE_DIR_NAME)
+from streamingcli.Config import PROJECT_LOCAL_CONFIG_FILE_NAME
 from streamingcli.project.project_type import ProjectType
 from yaml import SafeLoader, load, safe_dump
 
@@ -55,15 +54,14 @@ class LocalProjectConfigFactory:
         project_name = config_yaml["project_name"]
         project_version = config_yaml["project_version"]
         project_configmap_name = config_yaml["project_configmap_name"]
+        project_type = config_yaml["project_type"]
 
         return LocalProjectConfig(project_name=project_name, project_version=project_version,
-                                  project_configmap_name=project_configmap_name)
+                                  project_configmap_name=project_configmap_name,
+                                  project_type=project_type)
 
 
 class LocalProjectConfigIO:
-    @staticmethod
-    def create_template_directory(project_name: str):
-        os.makedirs(f"{project_name}/{PROJECT_LOCAL_TEMPLATE_DIR_NAME}")
 
     @staticmethod
     def project_config_default_path():
