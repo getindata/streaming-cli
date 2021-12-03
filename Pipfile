@@ -25,6 +25,7 @@ nest-asyncio = "*"
 autopep8 = "*"
 wget = "*"
 requests = "*"
+copier = "*"
 
 [dev-packages]
 pytest = "*"
