@@ -1,7 +1,6 @@
-import os
 from dataclasses import asdict, dataclass, field
 from enum import Enum
-from typing import Any, Optional, Type
+from typing import Any, Type
 
 import click
 from marshmallow_dataclass import class_schema
@@ -15,7 +14,6 @@ class LocalProjectConfig:
     project_name: str
     project_version: str
     project_type: ProjectType = field(metadata={"by_value": True})
-    project_configmap_name: Optional[str] = field(default=None)
     dependencies: list = field(default_factory=lambda: [])
 
     def add_dependency(self, dependency_path):
@@ -33,31 +31,14 @@ def custom_asdict_factory(data):
 
 
 class LocalProjectConfigFactory:
-    DEFAULT_PROJECT_VERSION = "v1.0"
-
-    @staticmethod
-    def generate_initial_project_config(project_name: str, project_type: ProjectType):
-        configmap_name = LocalProjectConfigFactory.format_project_configmap_name(project_name)
-        config = LocalProjectConfig(project_name=project_name,
-                                    project_version=LocalProjectConfigFactory.DEFAULT_PROJECT_VERSION,
-                                    project_type=project_type,
-                                    project_configmap_name=configmap_name)
-        LocalProjectConfigIO.save_project_config(config)
-
-    @staticmethod
-    def format_project_configmap_name(project_name: str):
-        formatted_project_name = project_name.replace("_", "-")
-        return f"{formatted_project_name}-configmap"
-
     @staticmethod
     def from_yaml_object(config_yaml) -> LocalProjectConfig:
         project_name = config_yaml["project_name"]
         project_version = config_yaml["project_version"]
-        project_configmap_name = config_yaml["project_configmap_name"]
         project_type = config_yaml["project_type"]
 
-        return LocalProjectConfig(project_name=project_name, project_version=project_version,
-                                  project_configmap_name=project_configmap_name,
+        return LocalProjectConfig(project_name=project_name,
+                                  project_version=project_version,
                                   project_type=project_type)
 
 
