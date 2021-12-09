@@ -7,7 +7,7 @@ def inline_sql_in_cell(cell_contents) -> str:
 
 
 def is_dml(sql: str) -> bool:
-    valid_dml_statements = ['insert', 'update', 'delete', 'lock', 'call', 'explain']
+    valid_dml_statements = ['insert', 'update', 'delete', 'lock', 'call', 'explain', 'create']
     for dml in valid_dml_statements:
         if dml in sql.lower():
             return True

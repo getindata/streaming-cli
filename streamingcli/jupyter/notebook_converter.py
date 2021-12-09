@@ -3,7 +3,7 @@ import shlex
 import sys
 from dataclasses import dataclass, field
 from typing import Optional
-
+import os
 import click
 import nbformat
 from jinja2 import Environment
@@ -78,11 +78,12 @@ class NotebookConverter:
             code_cells = filter(lambda _: _.cell_type == 'code', notebook.cells)
             script_entries = []
             for cell in code_cells:
-                entry = NotebookConverter.get_notebook_entry(cell)
+                entry = NotebookConverter.get_notebook_entry(cell, os.path.dirname(notebook_path))
                 if entry is not None:
                     script_entries.append(entry)
             return NotebookConverter.render_flink_app(script_entries)
-        except IOError:
+        except IOError as err:
+            print(err)
             raise click.ClickException(f"Could not open file: {notebook_path}")
         except:
             raise click.ClickException(
@@ -94,14 +95,14 @@ class NotebookConverter:
             return nbformat.reads(notebook_file.read(), as_version=4)
 
     @staticmethod
-    def get_notebook_entry(cell) -> Optional[NotebookEntry]:
+    def get_notebook_entry(cell, notebook_dir: str) -> Optional[NotebookEntry]:
         if cell.source.startswith('%'):
-            return NotebookConverter.handle_magic_cell(cell)
+            return NotebookConverter.handle_magic_cell(cell, notebook_dir)
         elif not cell.source.startswith('##'):
             return Code(value=cell.source)
 
     @staticmethod
-    def handle_magic_cell(cell) -> Optional[NotebookEntry]:
+    def handle_magic_cell(cell, notebook_dir: str) -> Optional[NotebookEntry]:
         source = cell.source
         if source.startswith('%%flink_execute_sql'):
             return Sql(value='\n'.join(source.split('\n')[1:]))
@@ -112,22 +113,27 @@ class NotebookConverter:
                                    ) if args.language == 'java' else \
                 RegisterUdf(function_name=args.function_name,
                             object_name=args.object_name)
-        if cell.source.startswith(('%load_config_file', '##')):
-            args = NotebookConverter._register_loadconfig_parser.parse_args(shlex.split(source)[1:])
-            loaded_variables = ConfigFileLoader.load_config_file(path=args.path)
-            variable_strings = []
-            for v in loaded_variables:
-                if isinstance(loaded_variables[v], str):
-                    variable_strings.append(f"{v}=\"{loaded_variables[v]}\"")
-                else:
-                    variable_strings.append(f"{v}={loaded_variables[v]}")
-            all_variable_strings = "\n".join(variable_strings)
-            return Code(value=f"{all_variable_strings}")
+        if cell.source.startswith('%load_config_file'):
+            return NotebookConverter.__get_variables_from_file(source, notebook_dir)
         if source.startswith('%flink_register_jar'):
             args = NotebookConverter._register_udf_parser.parse_args(shlex.split(source)[1:])
             return RegisterJar(url=args.remote_path) if args.remote_path is not None else \
                 RegisterLocalJar(local_path=args.local_path)
         return None
+
+    @staticmethod
+    def __get_variables_from_file(source, notebook_dir):
+        args = NotebookConverter._register_loadconfig_parser.parse_args(shlex.split(source)[1:])
+        file_path = args.path if os.path.isabs(args.path) else f"{notebook_dir}/{args.path}"
+        loaded_variables = ConfigFileLoader.load_config_file(path=file_path)
+        variable_strings = []
+        for v in loaded_variables:
+            if isinstance(loaded_variables[v], str):
+                variable_strings.append(f"{v}=\"{loaded_variables[v]}\"")
+            else:
+                variable_strings.append(f"{v}={loaded_variables[v]}")
+        all_variable_strings = "\n".join(variable_strings)
+        return Code(value=f"{all_variable_strings}")
 
     @staticmethod
     def render_flink_app(notebook_entries: list) -> ConvertedNotebook:
