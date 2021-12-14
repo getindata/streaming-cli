@@ -105,7 +105,10 @@ class NotebookConverter:
     def handle_magic_cell(cell, notebook_dir: str) -> Optional[NotebookEntry]:
         source = cell.source
         if source.startswith('%%flink_execute_sql'):
-            return Sql(value='\n'.join(source.split('\n')[1:]))
+            sql_statement = '\n'.join(source.split('\n')[1:])
+            if sql_statement.lower().startswith('select'):
+                return None
+            return Sql(value=sql_statement)
         if source.startswith('%flink_register_function'):
             args = NotebookConverter._register_udf_parser.parse_args(shlex.split(source)[1:])
             return RegisterJavaUdf(function_name=args.function_name,

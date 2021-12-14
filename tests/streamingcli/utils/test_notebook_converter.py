@@ -43,9 +43,6 @@ def filter_print(condition, message):
 
 
 t_env.create_temporary_function("filter_print", filter_print)
-
-
-t_env.execute_sql(f"""select * from datagen WHERE filter_print(true, id)""")
 '''
 
     def test_notebook_with_remote_java_udf_conversion(self):
@@ -71,10 +68,6 @@ t_env.execute_sql(f"""CREATE TABLE datagen (
     'connector' = 'datagen',
     'number-of-rows' = '100'
 )""")
-
-
-t_env.execute_sql(
-    f"""select * from datagen WHERE remote_trace(true, 'TRACE_ME', id)""")
 '''
 
     def test_notebook_with_local_java_udf_conversion(self):
@@ -100,8 +93,4 @@ t_env.execute_sql(f"""CREATE TABLE datagen (
     'connector' = 'datagen',
     'number-of-rows' = '100'
 )""")
-
-
-t_env.execute_sql(
-    f"""select * from datagen WHERE local_trace(true, 'TRACE_ME', id)""")
 '''
