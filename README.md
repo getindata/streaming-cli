@@ -92,7 +92,7 @@ scli project deploy \
   --vvp-namespace "default" \
   --vvp-api-token "x§11d091jd1jd9jasd0j" \
   --vvp-deployment-target "vvp-team1" \
-  --docker_image_registry "${CI_REGISTRY_IMAGE}" \
+  --docker-image-registry "${CI_REGISTRY_IMAGE}" \
   --docker-image-tag "${CI_COMMIT_TAG}" \
   --docker-image-repository tmp_project \
   --profile "sandbox"
@@ -129,12 +129,12 @@ scli docker login \
 ### Build
 
 * `make setup` - Install dependencies required to build a wheel package
-* `make package` - Create a wheel package
+* `make cli/package` - Create a wheel package
 
 ### Install
 
-* `make install` - Install a wheel package
-* `make install/force` - Reinstall a wheel package
+* `make cli/install` - Install a wheel package
+* `make cli/install/force` - Reinstall a wheel package
 
 ## Jupyter notebook integration
 
