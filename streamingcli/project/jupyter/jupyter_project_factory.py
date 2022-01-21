@@ -18,4 +18,8 @@ class JupyterProjectFactory:
         if JupyterProjectFactory.check_if_directory_exists(project_path=project_path):
             raise click.ClickException("Project directory already exists!")
 
-        copier.copy(src_path=JUPYTER_TEMPLATE_PROJECT, dst_path=project_path)
+        template_data = {
+            "project_name": project_name
+        }
+
+        copier.copy(src_path=JUPYTER_TEMPLATE_PROJECT, dst_path=project_path, data=template_data)
