@@ -1,15 +1,20 @@
 import argparse
+import json
 import shlex
 import sys
-from dataclasses import dataclass, field
+from dataclasses import dataclass
+from dataclasses import field
+from typing import List
 from typing import Optional
 import os
-import click
+
 import nbformat
 from jinja2 import Environment
-from streamingcli.project.template_loader import TemplateLoader
-from streamingcli.jupyter.config_file_loader import ConfigFileLoader
 import autopep8
+
+from ..error import FailedToOpenNotebookFile
+from ..error import StreamingCliError
+from ..project.template_loader import TemplateLoader
 
 
 @dataclass
@@ -61,48 +66,64 @@ class RegisterLocalJar(NotebookEntry):
 
 
 class NotebookConverter:
-    _register_udf_parser = argparse.ArgumentParser()
-    _register_udf_parser.add_argument("--function_name")
-    _register_udf_parser.add_argument("--object_name")
-    _register_udf_parser.add_argument("--language")
-    _register_udf_parser.add_argument("--remote_path")
-    _register_udf_parser.add_argument("--local_path")
+    """
+    Read Jupyter Notebook .ipynb file and convert it to Python script.
+    """
 
-    _register_loadconfig_parser = argparse.ArgumentParser()
-    _register_loadconfig_parser.add_argument("--path")
+    notebook_path: str
+    """String representing path to .ipynb file"""
+    _udf_parser = argparse.ArgumentParser()
+    """Argument parser for %register_udf magic"""
+    _udf_parser.add_argument("--function_name")
+    _udf_parser.add_argument("--object_name")
+    _udf_parser.add_argument("--language")
+    _udf_parser.add_argument("--remote_path")
+    _udf_parser.add_argument("--local_path")
+    _load_config_parser = argparse.ArgumentParser()
+    """Argument parser for %load_config magic"""
+    _load_config_parser.add_argument("--path")
 
-    @staticmethod
-    def convert_notebook(notebook_path: str) -> ConvertedNotebook:
+    def __init__(self, notebook_path: str):
+        self.notebook_path = notebook_path
+
+    """
+    Read and convert Jupyter Notebook
+    
+    :return: object representing converted Jupyter Notebook
+    :rtype: ConvertedNotebook
+    """
+
+    def convert_notebook(self) -> ConvertedNotebook:
         try:
-            notebook = NotebookConverter.load_notebook(notebook_path)
+            notebook = self._load_notebook(self.notebook_path)
             code_cells = filter(lambda _: _.cell_type == 'code', notebook.cells)
             script_entries = []
             for cell in code_cells:
-                entry = NotebookConverter.get_notebook_entry(cell, os.path.dirname(notebook_path))
+                entry = self._get_notebook_entry(cell, os.path.dirname(self.notebook_path))
                 if entry is not None:
                     script_entries.append(entry)
-            return NotebookConverter.render_flink_app(script_entries)
-        except IOError as err:
-            print(err)
-            raise click.ClickException(f"Could not open file: {notebook_path}")
+            return self._render_flink_app(script_entries)
+        except IOError:
+            raise FailedToOpenNotebookFile(self.notebook_path)
         except:
-            raise click.ClickException(
-                f"Unexpected exception: {sys.exc_info()}")
+            raise StreamingCliError(
+                f"Unexpected exception while converting notebook file: {sys.exc_info()}"
+            )
 
     @staticmethod
-    def load_notebook(notebook_path: str) -> nbformat.NotebookNode:
+    def _load_notebook(notebook_path: str) -> nbformat.NotebookNode:
         with open(notebook_path, 'r+') as notebook_file:
             return nbformat.reads(notebook_file.read(), as_version=4)
 
     @staticmethod
-    def get_notebook_entry(cell, notebook_dir: str) -> Optional[NotebookEntry]:
+    def _get_notebook_entry(cell: nbformat.NotebookNode, notebook_dir: str) -> Optional[NotebookEntry]:
         if cell.source.startswith('%'):
-            return NotebookConverter.handle_magic_cell(cell, notebook_dir)
+            return NotebookConverter._handle_magic_cell(cell, notebook_dir)
         elif not cell.source.startswith('##'):
             return Code(value=cell.source)
 
     @staticmethod
-    def handle_magic_cell(cell, notebook_dir: str) -> Optional[NotebookEntry]:
+    def _handle_magic_cell(cell: nbformat.NotebookNode, notebook_dir: str) -> Optional[NotebookEntry]:
         source = cell.source
         if source.startswith('%%flink_execute_sql'):
             sql_statement = '\n'.join(source.split('\n')[1:])
@@ -110,25 +131,25 @@ class NotebookConverter:
                 return None
             return Sql(value=sql_statement)
         if source.startswith('%flink_register_function'):
-            args = NotebookConverter._register_udf_parser.parse_args(shlex.split(source)[1:])
+            args = NotebookConverter._udf_parser.parse_args(shlex.split(source)[1:])
             return RegisterJavaUdf(function_name=args.function_name,
                                    object_name=args.object_name,
                                    ) if args.language == 'java' else \
                 RegisterUdf(function_name=args.function_name,
                             object_name=args.object_name)
-        if cell.source.startswith('%load_config_file'):
-            return NotebookConverter.__get_variables_from_file(source, notebook_dir)
+        if source.startswith('%load_config_file'):
+            return NotebookConverter._get_variables_from_file(source, notebook_dir)
         if source.startswith('%flink_register_jar'):
-            args = NotebookConverter._register_udf_parser.parse_args(shlex.split(source)[1:])
+            args = NotebookConverter._udf_parser.parse_args(shlex.split(source)[1:])
             return RegisterJar(url=args.remote_path) if args.remote_path is not None else \
                 RegisterLocalJar(local_path=args.local_path)
         return None
 
     @staticmethod
-    def __get_variables_from_file(source, notebook_dir):
-        args = NotebookConverter._register_loadconfig_parser.parse_args(shlex.split(source)[1:])
+    def _get_variables_from_file(source: str, notebook_dir: str):
+        args = NotebookConverter._load_config_parser.parse_args(shlex.split(source)[1:])
         file_path = args.path if os.path.isabs(args.path) else f"{notebook_dir}/{args.path}"
-        loaded_variables = ConfigFileLoader.load_config_file(path=file_path)
+        loaded_variables = NotebookConverter._load_config_file(path=file_path)
         variable_strings = []
         for v in loaded_variables:
             if isinstance(loaded_variables[v], str):
@@ -139,7 +160,12 @@ class NotebookConverter:
         return Code(value=f"{all_variable_strings}")
 
     @staticmethod
-    def render_flink_app(notebook_entries: list) -> ConvertedNotebook:
+    def _load_config_file(path: str):
+        with open(path, "r") as json_file:
+            return json.load(json_file)
+
+    @staticmethod
+    def _render_flink_app(notebook_entries: List[NotebookEntry]) -> ConvertedNotebook:
         flink_app_template = TemplateLoader.load_project_template("flink_app.py.template")
         flink_app_script = Environment().from_string(flink_app_template).render(
             notebook_entries=notebook_entries
@@ -150,3 +176,7 @@ class NotebookConverter:
                          filter(lambda entry: isinstance(entry, RegisterLocalJar), notebook_entries))
         return ConvertedNotebook(content=autopep8.fix_code(flink_app_script), remote_jars=list(remote_jars),
                                  local_jars=list(local_jars))
+
+
+def convert_notebook(notebook_path: str) -> ConvertedNotebook:
+    return NotebookConverter(notebook_path).convert_notebook()

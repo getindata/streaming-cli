@@ -1,14 +1,17 @@
-from streamingcli.jupyter.notebook_converter import NotebookConverter
+import unittest
+
+from streamingcli.error import FailedToOpenNotebookFile
+from streamingcli.jupyter.notebook_converter import convert_notebook
 
 
-class TestNotebookConverter:
+class TestNotebookConverter(unittest.TestCase):
     """Test converting full Jupyter Notebook with udf to Python class"""
 
     def test_converter(self):
         # given
-        file_path = 'tests/streamingcli/utils/jupyter/notebook1.ipynb'
+        file_path = 'tests/streamingcli/resources/jupyter/notebook1.ipynb'
         # expect
-        converted_notebook = NotebookConverter.convert_notebook(file_path)
+        converted_notebook = convert_notebook(file_path)
         assert converted_notebook.content == '''import sys
 from pyflink.table import DataTypes
 from pyflink.datastream import StreamExecutionEnvironment
@@ -47,9 +50,9 @@ t_env.create_temporary_function("filter_print", filter_print)
 
     def test_notebook_with_remote_java_udf_conversion(self):
         # given
-        file_path = 'tests/streamingcli/utils/jupyter/notebook2.ipynb'
+        file_path = 'tests/streamingcli/resources/jupyter/notebook2.ipynb'
         # expect
-        converted_notebook = NotebookConverter.convert_notebook(file_path)
+        converted_notebook = convert_notebook(file_path)
         assert converted_notebook.content == '''from pyflink.datastream import StreamExecutionEnvironment
 from pyflink.table import StreamTableEnvironment, DataTypes
 from pyflink.table.udf import udf
@@ -72,9 +75,9 @@ t_env.execute_sql(f"""CREATE TABLE datagen (
 
     def test_notebook_with_local_java_udf_conversion(self):
         # given
-        file_path = 'tests/streamingcli/utils/jupyter/notebook3.ipynb'
+        file_path = 'tests/streamingcli/resources/jupyter/notebook3.ipynb'
         # expect
-        converted_notebook = NotebookConverter.convert_notebook(file_path)
+        converted_notebook = convert_notebook(file_path)
         assert converted_notebook.content == '''from pyflink.datastream import StreamExecutionEnvironment
 from pyflink.table import StreamTableEnvironment, DataTypes
 from pyflink.table.udf import udf
@@ -94,3 +97,7 @@ t_env.execute_sql(f"""CREATE TABLE datagen (
     'number-of-rows' = '100'
 )""")
 '''
+
+    def test_error_raised(self):
+        with self.assertRaises(FailedToOpenNotebookFile):
+            converted_notebook = convert_notebook("not/existing/path")

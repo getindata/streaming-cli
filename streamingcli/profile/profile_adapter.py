@@ -3,7 +3,7 @@ from dataclasses import asdict, dataclass, field, replace
 from pathlib import Path
 from typing import Any, Dict, Optional, Type
 from marshmallow_dataclass import class_schema
-from streamingcli.Config import (DEFAULT_PROFILE_DIR, DEFAULT_PROFILE_PATH,
+from streamingcli.config import (DEFAULT_PROFILE_DIR, DEFAULT_PROFILE_PATH,
                                  PROFILE_ENV_VARIABLE_NAME)
 from yaml import SafeLoader, load, safe_dump
 

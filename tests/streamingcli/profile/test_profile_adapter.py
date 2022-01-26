@@ -4,7 +4,7 @@ import pytest
 
 
 from streamingcli.profile.profile_adapter import ProfileAdapter, ScliProfile
-from streamingcli.Config import DEFAULT_PROFILE_PATH, PROFILE_ENV_VARIABLE_NAME
+from streamingcli.config import DEFAULT_PROFILE_PATH, PROFILE_ENV_VARIABLE_NAME
 
 
 TEST_PROFILE = ScliProfile(

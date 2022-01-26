@@ -2,7 +2,7 @@ import os
 from typing import Optional
 import click
 from jinja2 import Environment
-from streamingcli.Config import PROFILE_ENV_VARIABLE_NAME
+from streamingcli.config import PROFILE_ENV_VARIABLE_NAME
 from streamingcli.platform.ververica.deployment_adapter import \
     VervericaDeploymentAdapter
 from streamingcli.profile.profile_adapter import ProfileAdapter, ScliProfile

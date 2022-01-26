@@ -1,34 +1,45 @@
+import sys
+
 import click
 from markupsafe import re
 
-from streamingcli.docker.login_command import LoginCommand
-from streamingcli.platform.apitoken_create_command import \
+from .error import StreamingCliError
+from .docker.login_command import LoginCommand
+from .platform.apitoken_create_command import \
     VervericaApiTokenCreateCommand
-from streamingcli.platform.apitoken_remove_command import \
+from .platform.apitoken_remove_command import \
     VervericaApiTokenRemoveCommand
-from streamingcli.platform.deployment_target_command import \
+from .platform.deployment_target_command import \
     DeploymentTargetCommand
-from streamingcli.profile.profile_command import ProfileCommand
-from streamingcli.project.build_command import ProjectBuilder
-from streamingcli.project.cicd_command import CICDInitializer
-from streamingcli.project.deploy_command import ProjectDeployer
-from streamingcli.project.python.python_project_factory import PythonProjectFactory
-from streamingcli.project.jupyter.jupyter_project_factory import JupyterProjectFactory
-from streamingcli.project.project_type import ProjectType
-from streamingcli.project.publish_command import ProjectPublisher
+from .profile.profile_command import ProfileCommand
+from .project.build_command import ProjectBuilder
+from .project.cicd_command import CICDInitializer
+from .project.deploy_command import ProjectDeployer
+from .project.python.python_project_factory import PythonProjectFactory
+from .project.jupyter.jupyter_project_factory import JupyterProjectFactory
+from .project.project_type import ProjectType
+from .project.publish_command import ProjectPublisher
 
 
 @click.group(invoke_without_command=True)
 @click.pass_context
 @click.version_option()
-def cli(ctx):
+def _cli(ctx):
     if ctx.invoked_subcommand is None:
         click.echo(ctx.get_help())
         ctx.exit()
     pass
 
 
-@cli.group()
+def cli() -> None:
+    try:
+        _cli()
+    except StreamingCliError as err:
+        click.secho(err.message, file=sys.stderr, fg="red")
+        sys.exit(1)
+
+
+@_cli.group()
 def project():
     pass
 
@@ -104,7 +115,7 @@ def project_publish(registry_url: str, docker_image_tag: str = None):
     ProjectPublisher.publish(registry_url, docker_image_tag)
 
 
-@cli.group()
+@_cli.group()
 def platform():
     pass
 
@@ -205,7 +216,7 @@ def cicd_setup(provider: str):
     CICDInitializer.setup_cicd(provider)
 
 
-@cli.group()
+@_cli.group()
 def profile():
     pass
 
@@ -237,7 +248,7 @@ def add_profile(profile_name: str,
                                   )
 
 
-@cli.group()
+@_cli.group()
 def docker():
     pass
 

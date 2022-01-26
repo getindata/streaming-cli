@@ -1,12 +1,11 @@
 import os
-
-from streamingcli.jupyter.jar_handler import JarHandler
-from streamingcli.project.local_project_config import LocalProjectConfigIO
 import docker
 import click
-from streamingcli.Config import DEFAULT_NOTEBOOK_NAME, DEFAULT_FLINK_APP_NAME, ADDITIONAL_DEPENDENCIES_DIR
-from streamingcli.project.project_type import ProjectType
-from streamingcli.jupyter.notebook_converter import NotebookConverter, ConvertedNotebook
+from ..jupyter.jar_handler import JarHandler
+from ..project.local_project_config import LocalProjectConfigIO
+from ..config import DEFAULT_NOTEBOOK_NAME, DEFAULT_FLINK_APP_NAME, ADDITIONAL_DEPENDENCIES_DIR
+from ..project.project_type import ProjectType
+from ..jupyter.notebook_converter import convert_notebook, ConvertedNotebook
 
 
 class ProjectBuilder:
@@ -56,7 +55,7 @@ class ProjectBuilder:
     @staticmethod
     def convert_notebook(notebook_path: str = None) -> ConvertedNotebook:
         file_path = notebook_path if notebook_path is not None else f"./src/{DEFAULT_NOTEBOOK_NAME}"
-        return NotebookConverter.convert_notebook(file_path)
+        return convert_notebook(file_path)
 
     @staticmethod
     def write_notebook(notebook_content: str):
