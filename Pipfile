@@ -20,6 +20,7 @@ autopep8 = "*"
 wget = "*"
 requests = "*"
 copier = "*"
+sqlparse = "*"
 
 [dev-packages]
 pytest = "*"

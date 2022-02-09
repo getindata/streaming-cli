@@ -9,6 +9,7 @@ from typing import Optional
 import os
 
 import nbformat
+import sqlparse
 from jinja2 import Environment
 import autopep8
 
@@ -82,6 +83,9 @@ class NotebookConverter:
     _load_config_parser = argparse.ArgumentParser()
     """Argument parser for %load_config magic"""
     _load_config_parser.add_argument("--path")
+    _flink_execute_sql_file_parser = argparse.ArgumentParser()
+    """Argument parser for %flink_execute_sql_file magic"""
+    _flink_execute_sql_file_parser.add_argument("--path")
 
     def __init__(self, notebook_path: str):
         self.notebook_path = notebook_path
@@ -99,9 +103,9 @@ class NotebookConverter:
             code_cells = filter(lambda _: _.cell_type == 'code', notebook.cells)
             script_entries = []
             for cell in code_cells:
-                entry = self._get_notebook_entry(cell, os.path.dirname(self.notebook_path))
-                if entry is not None:
-                    script_entries.append(entry)
+                entries = self._get_notebook_entry(cell, os.path.dirname(self.notebook_path))
+                if entries:
+                    script_entries += entries
             return self._render_flink_app(script_entries)
         except IOError:
             raise FailedToOpenNotebookFile(self.notebook_path)
@@ -116,34 +120,36 @@ class NotebookConverter:
             return nbformat.reads(notebook_file.read(), as_version=4)
 
     @staticmethod
-    def _get_notebook_entry(cell: nbformat.NotebookNode, notebook_dir: str) -> Optional[NotebookEntry]:
+    def _get_notebook_entry(cell: nbformat.NotebookNode, notebook_dir: str) -> List[NotebookEntry]:
         if cell.source.startswith('%'):
             return NotebookConverter._handle_magic_cell(cell, notebook_dir)
         elif not cell.source.startswith('##'):
-            return Code(value=cell.source)
+            return [Code(value=cell.source)]
 
     @staticmethod
-    def _handle_magic_cell(cell: nbformat.NotebookNode, notebook_dir: str) -> Optional[NotebookEntry]:
+    def _handle_magic_cell(cell: nbformat.NotebookNode, notebook_dir: str) -> List[NotebookEntry]:
         source = cell.source
         if source.startswith('%%flink_execute_sql'):
             sql_statement = '\n'.join(source.split('\n')[1:])
             if sql_statement.lower().startswith('select'):
-                return None
-            return Sql(value=sql_statement)
+                return []
+            return [Sql(value=sql_statement)]
+        if source.startswith('%flink_execute_sql_file'):
+            return NotebookConverter._get_statements_from_file(source, notebook_dir)
         if source.startswith('%flink_register_function'):
             args = NotebookConverter._udf_parser.parse_args(shlex.split(source)[1:])
-            return RegisterJavaUdf(function_name=args.function_name,
-                                   object_name=args.object_name,
-                                   ) if args.language == 'java' else \
-                RegisterUdf(function_name=args.function_name,
-                            object_name=args.object_name)
+            return [RegisterJavaUdf(function_name=args.function_name,
+                                    object_name=args.object_name,
+                                    ) if args.language == 'java' else
+                    RegisterUdf(function_name=args.function_name,
+                                object_name=args.object_name)]
         if source.startswith('%load_config_file'):
-            return NotebookConverter._get_variables_from_file(source, notebook_dir)
+            return [NotebookConverter._get_variables_from_file(source, notebook_dir)]
         if source.startswith('%flink_register_jar'):
             args = NotebookConverter._udf_parser.parse_args(shlex.split(source)[1:])
-            return RegisterJar(url=args.remote_path) if args.remote_path is not None else \
-                RegisterLocalJar(local_path=args.local_path)
-        return None
+            return [RegisterJar(url=args.remote_path) if args.remote_path is not None else
+                    RegisterLocalJar(local_path=args.local_path)]
+        return []
 
     @staticmethod
     def _get_variables_from_file(source: str, notebook_dir: str):
@@ -158,6 +164,14 @@ class NotebookConverter:
                 variable_strings.append(f"{v}={loaded_variables[v]}")
         all_variable_strings = "\n".join(variable_strings)
         return Code(value=f"{all_variable_strings}")
+
+    @staticmethod
+    def _get_statements_from_file(source: str, notebook_dir: str) -> List[Sql]:
+        args = NotebookConverter._flink_execute_sql_file_parser.parse_args(shlex.split(source)[1:])
+        file_path = args.path if os.path.isabs(args.path) else f"{notebook_dir}/{args.path}"
+        with open(file_path, "r") as f:
+            statements = map(lambda s: Sql(value=s.rstrip(';')), sqlparse.split(f.read()))
+        return statements
 
     @staticmethod
     def _load_config_file(path: str):
