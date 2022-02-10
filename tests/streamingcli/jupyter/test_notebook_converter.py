@@ -62,7 +62,14 @@ env.set_parallelism(1)
 t_env = StreamTableEnvironment.create(env)
 
 
+maximum_number_of_rows = 10
+some_text_variable = "some_text_value"
+
+
 t_env.create_java_temporary_function("remote_trace", "com.getindata.TraceUDF")
+
+
+t_env.create_java_temporary_function("other_function", "com.getindata.Other")
 
 
 t_env.execute_sql(f"""CREATE TABLE datagen (
@@ -127,4 +134,7 @@ t_env.execute_sql(f"""CREATE TABLE datagen (
 
 t_env.execute_sql(
     f"""select * from datagen WHERE remote_trace(true, 'TRACE_ME', id)""")
+
+
+t_env.execute_sql(f"""select * from other""")
 '''

@@ -75,17 +75,17 @@ class NotebookConverter:
     """String representing path to .ipynb file"""
     _udf_parser = argparse.ArgumentParser()
     """Argument parser for %register_udf magic"""
-    _udf_parser.add_argument("--function_name")
-    _udf_parser.add_argument("--object_name")
-    _udf_parser.add_argument("--language")
-    _udf_parser.add_argument("--remote_path")
-    _udf_parser.add_argument("--local_path")
+    _udf_parser.add_argument("--function_name", "-n")
+    _udf_parser.add_argument("--object_name", "-u")
+    _udf_parser.add_argument("--language", "-l")
+    _udf_parser.add_argument("--remote_path", "-r")
+    _udf_parser.add_argument("--local_path", "-p")
     _load_config_parser = argparse.ArgumentParser()
     """Argument parser for %load_config magic"""
-    _load_config_parser.add_argument("--path")
+    _load_config_parser.add_argument("--path", "-p")
     _flink_execute_sql_file_parser = argparse.ArgumentParser()
     """Argument parser for %flink_execute_sql_file magic"""
-    _flink_execute_sql_file_parser.add_argument("--path")
+    _flink_execute_sql_file_parser.add_argument("--path", "-p")
 
     def __init__(self, notebook_path: str):
         self.notebook_path = notebook_path
