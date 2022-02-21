@@ -2,7 +2,6 @@ from typing import Optional
 
 from kubernetes import client, config
 
-
 k8s_api_client: Optional[client.CoreV1Api] = None
 
 
@@ -21,4 +20,3 @@ class KubernetesConfigLoader:
 
             k8s_api_client = client.CoreV1Api()
         return k8s_api_client
-

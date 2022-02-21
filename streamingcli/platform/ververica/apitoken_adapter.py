@@ -1,13 +1,16 @@
+import json
 from typing import Dict
 
-import requests
-import json
 import click
+import requests
 
 
 class VervericaApiTokenAdapter:
     @staticmethod
-    def create_token(ververica_url: str, ververica_namespace: str, apitoken_name: str, apitoken_role: str) -> Dict:
+    def create_token(ververica_url: str,
+                     ververica_namespace: str,
+                     apitoken_name: str,
+                     apitoken_role: str) -> Dict[str, str]:
         apitokens_url = f"{ververica_url}/apitokens/v1/namespaces/{ververica_namespace}/apitokens"
         webtoken_name = f"namespaces/{ververica_namespace}/apitokens/{apitoken_name}"
         request_body = {
@@ -35,7 +38,7 @@ class VervericaApiTokenAdapter:
             raise click.ClickException(f"Ververica ApiToken generation error: {response.status_code}")
 
     @staticmethod
-    def remove_token(ververica_url: str, ververica_namespace: str, apitoken_name: str, ):
+    def remove_token(ververica_url: str, ververica_namespace: str, apitoken_name: str) -> None:
         apitokens_url = f"{ververica_url}/apitokens/v1/namespaces/{ververica_namespace}/apitokens/{apitoken_name}"
         response = requests.delete(apitokens_url)
         if response.status_code != 200 and response.status_code != 404:

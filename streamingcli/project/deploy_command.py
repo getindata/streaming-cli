@@ -1,7 +1,9 @@
 import os
-from typing import Optional
+from typing import List, Optional
+
 import click
 from jinja2 import Environment
+
 from streamingcli.config import PROFILE_ENV_VARIABLE_NAME
 from streamingcli.platform.ververica.deployment_adapter import \
     VervericaDeploymentAdapter
@@ -28,12 +30,14 @@ class ProjectDeployer:
                        ververica_namespace: Optional[str] = None,
                        ververica_deployment_target_name: Optional[str] = None,
                        ververica_webtoken_secret: Optional[str] = None,
-                       overrides_from_yaml: Optional[str] = None):
+                       overrides_from_yaml: Optional[str] = None) -> None:
 
         profile_name = ProjectDeployer.get_profile_name(profile_name=profile)
-
-        profile_data = (ProfileAdapter.get_profile(profile_name=profile_name)
-                        or ScliProfile(profile_name="temporary"))
+        if profile_name is None:
+            profile_data = ScliProfile(profile_name="temporary")
+        else:
+            profile_data = (ProfileAdapter.get_profile(profile_name=profile_name)
+                            or ScliProfile(profile_name="temporary"))
 
         local_project_config = LocalProjectConfigIO.load_project_config()
         project_name = docker_image_repository or local_project_config.project_name
@@ -59,18 +63,25 @@ class ProjectDeployer:
             deployment_yml = YamlMerger.merge_two_yaml(deployment_yml, overrides_from_yaml)
         click.echo(f"Deploying streaming project: {project_name} ...")
 
-        deployment_name = VervericaDeploymentAdapter.deploy(
-            deployment_yml=deployment_yml,
-            ververica_url=profile_data.ververica_url,
-            ververica_namespace=profile_data.ververica_namespace,
-            auth_token=profile_data.ververica_api_token
-        )
-        click.echo(f"Created deployment: "
-                   f"{profile_data.ververica_url}/app/#/namespaces/"
-                   f"{profile_data.ververica_namespace}/deployments/{deployment_name}")
+        if deployment_yml is not None and profile_data.ververica_url is not None \
+                and profile_data.ververica_namespace is not None and profile_data.ververica_api_token:
+            deployment_name = VervericaDeploymentAdapter.deploy(
+                deployment_yml=deployment_yml,
+                ververica_url=profile_data.ververica_url,
+                ververica_namespace=profile_data.ververica_namespace,
+                auth_token=profile_data.ververica_api_token
+            )
+            click.echo(
+                f"Created deployment: "
+                f"{profile_data.ververica_url}/app/#/namespaces/"
+                f"{profile_data.ververica_namespace}/deployments/{deployment_name}"
+            )
+        else:
+            raise click.ClickException("Missing one of deployment attribute: "
+                                       "ververica_url, ververica_namespace, ververica_api_token")
 
     @staticmethod
-    def validate_profile_data(profile_data: ScliProfile, docker_image_tag: str):
+    def validate_profile_data(profile_data: ScliProfile, docker_image_tag: str) -> None:
         if profile_data.ververica_url is None:
             raise click.ClickException("Missing Ververica URL attribute or profile")
         if profile_data.ververica_namespace is None:
@@ -87,10 +98,10 @@ class ProjectDeployer:
     @staticmethod
     def generate_project_template(
             project_name: str,
-            docker_registry_url: str,
-            docker_image_tag: str,
-            deployment_target_name: str,
-            dependencies: list
+            docker_registry_url: Optional[str],
+            docker_image_tag: Optional[str],
+            deployment_target_name: Optional[str],
+            dependencies: List[str]
     ) -> str:
         template = TemplateLoader.load_project_template("flink_deployment.yml")
         return Environment().from_string(template).render(

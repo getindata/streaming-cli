@@ -1,12 +1,13 @@
 import json
 from dataclasses import dataclass, field
-from typing import Generator, Optional
+from typing import Any, Dict, Generator, Optional
 
 import click
 import docker
 from docker.client import DockerClient
 from docker.errors import DockerException
 from docker.models.images import Image
+
 from streamingcli.project.local_project_config import LocalProjectConfigIO
 
 
@@ -19,7 +20,9 @@ class UserCredentials:
 class ProjectPublisher:
 
     @staticmethod
-    def publish(docker_repository_url: str, docker_image_tag: str = None, docker_credentials: UserCredentials = None):
+    def publish(docker_repository_url: str,
+                docker_image_tag: Optional[str] = None,
+                docker_credentials: Optional[UserCredentials] = None) -> None:
         local_project_config = LocalProjectConfigIO.load_project_config()
 
         client = docker.from_env()
@@ -47,21 +50,21 @@ class ProjectPublisher:
         try:
             image = client.images.get(image_tag)
             return image
-        except DockerException as e:
+        except DockerException:
             return None
 
     @staticmethod
-    def authenticate(client: DockerClient, credentials: UserCredentials, docker_registry_url):
+    def authenticate(client: DockerClient, credentials: UserCredentials, docker_registry_url: str) -> None:
         client.login(credentials.username, credentials.password, registry=docker_registry_url)
         click.echo(f"Successfully logged in to {docker_registry_url}")
 
     @staticmethod
-    def show_progressbar(data: Generator, image_tag: str):
+    def show_progressbar(data: Generator[Any, Any, Any], image_tag: str) -> None:
         with click.progressbar(label=f"Publishing docker image {image_tag}",
                                length=100) as bar:
             total = 0
             pushed = 0
-            items = {}
+            items: Dict[str, int] = {}
             for item in map(lambda item: json.loads(json.dumps(item)), data):
                 status = item.get('status')
                 id = item.get('id')
@@ -71,10 +74,10 @@ class ProjectPublisher:
                 if item.get('aux') is not None:
                     bar.update(100)
                     pass
-                elif status == 'Pushing' and progress_detail != None:
+                elif status == 'Pushing' and progress_detail is not None:
                     item_total = progress_detail.get('total')
                     item_current = progress_detail.get('current')
-                    if (item_total == None or item_current == None or item_current > item_total):
+                    if item_total is None or item_current is None or item_current > item_total:
                         continue
                     elif id in items:
                         diff = (item_current - items[id])

@@ -55,10 +55,16 @@ platform/apitoken/create:
 	export PIPENV_VERBOSITY=-1; pipenv run scli platform api-token create --vvp-url "http://localhost:8080" --vvp-namespace default --name "test-token" --role "editor" --save-to-kubernetes-secret "vvp/secret"
 
 platform/apitoken/remove:
-	export PIPENV_VERBOSITY=-1; pipenv run scli platform api-token remove --vvp-url "http://localhost:8080" --vvp-namespace default --name "test-token" 
+	export PIPENV_VERBOSITY=-1; pipenv run scli platform api-token remove --vvp-url "http://localhost:8080" --vvp-namespace default --name "test-token"
 
 platform/target/add:
 	export PIPENV_VERBOSITY=-1; pipenv run scli platform deployment-target create --profile local --kubernetes-namespace vvp
 
 profile/add:
 	pipenv run scli profile add local --vvp-url "http://localhost:8080" --vvp-namespace default --vvp-deployment-target default --docker-registry-url localhost:5000
+
+project/linter:
+	pipenv run pre-commit run --all-files
+
+project/linter/install-stubs:
+	pipenv run mypy --install-types

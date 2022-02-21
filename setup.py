@@ -1,10 +1,9 @@
 import os
 import sys
+from typing import List
 
-from setuptools import setup
-from setuptools import find_packages
+from setuptools import find_packages, setup
 from setuptools.command.install import install
-
 
 __version__ = "1.1.41"
 
@@ -12,7 +11,7 @@ with open("README.md", "r") as fh:
     long_description = fh.read()
 
 
-def get_requirements(filename):
+def get_requirements(filename: str) -> List[str]:
     with open(filename, "r", encoding="utf-8") as fp:
         reqs = [x.strip() for x in fp.read().splitlines()
                 if not x.strip().startswith('#') and not x.strip().startswith('-i')]
@@ -23,7 +22,7 @@ class VerifyVersionCommand(install):
     """Custom command to verify that the git tag matches our version"""
     description = 'verify that the git tag matches our version'
 
-    def run(self):
+    def run(self) -> None:
         tag = os.getenv('CI_COMMIT_TAG')
 
         if tag != f"v{__version__}":
@@ -31,6 +30,16 @@ class VerifyVersionCommand(install):
                 tag, __version__
             )
             sys.exit(info)
+
+
+EXTRAS_REQUIRE = {
+    "tests": [
+        "pytest>=6.2.2, <7.0.0",
+        "pytest-cov>=2.8.0, <3.0.0",
+        "pre-commit==2.15.0",
+        "tox==3.21.1",
+    ]
+}
 
 
 setup(
@@ -48,6 +57,7 @@ setup(
         "Operating System :: OS Independent",
     ],
     install_requires=get_requirements('requirements.txt'),
+    extras_require=EXTRAS_REQUIRE,
     py_modules=['streamingcli'],
     entry_points={
         'console_scripts': [

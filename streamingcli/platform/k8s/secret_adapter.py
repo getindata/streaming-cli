@@ -1,14 +1,16 @@
-from typing import Dict
-from base64 import b64encode, b64decode
-from streamingcli.platform.k8s.config_loader import KubernetesConfigLoader
+from base64 import b64decode, b64encode
+from typing import Any, Dict, Optional
+
+from kubernetes.client import V1ObjectMeta, V1Secret
 from kubernetes.client.exceptions import ApiException
-from kubernetes.client import V1Secret, V1ObjectMeta
+
+from streamingcli.platform.k8s.config_loader import KubernetesConfigLoader
 
 
 class KubernetesSecretAdapter:
 
     @staticmethod
-    def load_k8s_secret(secret_name: str, namespace: str):
+    def load_k8s_secret(secret_name: str, namespace: str) -> Optional[Dict[Any, Any]]:
         k8s_api_client = KubernetesConfigLoader.get_client()
         try:
             secret = k8s_api_client.read_namespaced_secret(name=secret_name, namespace=namespace)
@@ -26,7 +28,7 @@ class KubernetesSecretAdapter:
                 raise e
 
     @staticmethod
-    def save_k8s_secret(secret_name: str, namespace: str, secret_data: Dict):
+    def save_k8s_secret(secret_name: str, namespace: str, secret_data: Dict[Any, Any]) -> None:
         k8s_api_client = KubernetesConfigLoader.get_client()
 
         serialized_secret_data = {}
@@ -58,7 +60,7 @@ class KubernetesSecretAdapter:
                 raise e
 
     @staticmethod
-    def delete_k8s_configmap(configmap_name: str, namespace: str):
+    def delete_k8s_configmap(configmap_name: str, namespace: str) -> None:
         k8s_api_client = KubernetesConfigLoader.get_client()
         try:
             k8s_api_client.delete_namespaced_config_map(name=configmap_name, namespace=namespace)

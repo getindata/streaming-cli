@@ -1,3 +1,3 @@
-from .main import cli
+from .main import cli  # noqa
 
 __all__ = ["main"]

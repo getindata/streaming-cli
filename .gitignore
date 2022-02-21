@@ -8,3 +8,6 @@ tmp_project/
 requirements.txt
 .env
 __pycache__
+
+# mypy
+.mypy_cache/

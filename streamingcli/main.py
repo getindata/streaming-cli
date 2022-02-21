@@ -1,30 +1,28 @@
 import sys
+from typing import Optional
 
 import click
 from markupsafe import re
 
-from .error import StreamingCliError
 from .docker.login_command import LoginCommand
-from .platform.apitoken_create_command import \
-    VervericaApiTokenCreateCommand
-from .platform.apitoken_remove_command import \
-    VervericaApiTokenRemoveCommand
-from .platform.deployment_target_command import \
-    DeploymentTargetCommand
+from .error import StreamingCliError
+from .platform.apitoken_create_command import VervericaApiTokenCreateCommand
+from .platform.apitoken_remove_command import VervericaApiTokenRemoveCommand
+from .platform.deployment_target_command import DeploymentTargetCommand
 from .profile.profile_command import ProfileCommand
 from .project.build_command import ProjectBuilder
 from .project.cicd_command import CICDInitializer
 from .project.deploy_command import ProjectDeployer
-from .project.python.python_project_factory import PythonProjectFactory
 from .project.jupyter.jupyter_project_factory import JupyterProjectFactory
 from .project.project_type import ProjectType
 from .project.publish_command import ProjectPublisher
+from .project.python.python_project_factory import PythonProjectFactory
 
 
 @click.group(invoke_without_command=True)
 @click.pass_context
 @click.version_option()
-def _cli(ctx):
+def _cli(ctx: click.Context) -> None:
     if ctx.invoked_subcommand is None:
         click.echo(ctx.get_help())
         ctx.exit()
@@ -40,7 +38,7 @@ def cli() -> None:
 
 
 @_cli.group()
-def project():
+def project() -> None:
     pass
 
 
@@ -49,7 +47,7 @@ def project():
               help='Project name which will become Flink job name in Ververica platform')
 @click.option('--project_type', prompt='Project type', required=False,
               help='Project type', type=click.Choice(['python', 'jupyter']), default='python')
-def project_init(project_name: str, project_type: str = None):
+def project_init(project_name: str, project_type: Optional[str] = None) -> None:
     click.echo(f"Initializing streaming project: {project_name}")
     if ProjectType(project_type) == ProjectType.PYTHON:
         PythonProjectFactory.create(project_name)
@@ -80,14 +78,14 @@ def project_init(project_name: str, project_type: str = None):
 @click.option('--overrides-from-yaml',
               help='Path to additional deployment YAML file to merge with Ververica one')
 def project_deploy(docker_image_tag: str,
-                   docker_image_registry: str = None,
-                   docker_image_repository: str = None,
-                   profile: str = None,
-                   ververica_url: str = None,
-                   ververica_namespace: str = None,
-                   ververica_deployment_target_name: str = None,
-                   vvp_api_token: str = None,
-                   overrides_from_yaml: str = None):
+                   docker_image_registry: Optional[str] = None,
+                   docker_image_repository: Optional[str] = None,
+                   profile: Optional[str] = None,
+                   ververica_url: Optional[str] = None,
+                   ververica_namespace: Optional[str] = None,
+                   ververica_deployment_target_name: Optional[str] = None,
+                   vvp_api_token: Optional[str] = None,
+                   overrides_from_yaml: Optional[str] = None) -> None:
     ProjectDeployer.deploy_project(docker_image_tag=docker_image_tag,
                                    docker_registry_url=docker_image_registry,
                                    docker_image_repository=docker_image_repository,
@@ -102,7 +100,7 @@ def project_deploy(docker_image_tag: str,
 @project.command()
 @click.option('--docker-image-tag',
               help='Project image tag', default='latest')
-def project_build(docker_image_tag: str = None):
+def project_build(docker_image_tag: str) -> None:
     ProjectBuilder.build_project(docker_image_tag)
 
 
@@ -111,22 +109,22 @@ def project_build(docker_image_tag: str = None):
               help='URL for Docker registry, i.e: "https://hub.docker.com/"')
 @click.option('--docker-image-tag',
               help='Project image tag')
-def project_publish(registry_url: str, docker_image_tag: str = None):
+def project_publish(registry_url: str, docker_image_tag: Optional[str] = None) -> None:
     ProjectPublisher.publish(registry_url, docker_image_tag)
 
 
 @_cli.group()
-def platform():
+def platform() -> None:
     pass
 
 
 @platform.group("api-token")
-def api_token():
+def api_token() -> None:
     pass
 
 
-def validate_k8s_secret(ctx, param, value):
-    if value != None and re.match(r"^[\w\-\_]+\/[\w\-\_]+$", value) == None:
+def validate_k8s_secret(ctx: click.Context, param: click.Parameter, value: str) -> str:
+    if value is not None and re.match(r"^[\w\-\_]+\/[\w\-\_]+$", value) is None:
         raise click.BadParameter(message="K8s secret in incorrect format")
     else:
         return value
@@ -147,7 +145,7 @@ def platform_apitoken_create(ververica_url: str,
                              ververica_namespace: str,
                              apitoken_name: str,
                              apitoken_role: str,
-                             k8s_secret: str = None):
+                             k8s_secret: Optional[str] = None) -> None:
     VervericaApiTokenCreateCommand.create_apitoken(ververica_url=ververica_url,
                                                    ververica_namespace=ververica_namespace,
                                                    token_name=apitoken_name,
@@ -164,14 +162,14 @@ def platform_apitoken_create(ververica_url: str,
               help='Ververica ApiToken name')
 def platform_apitoken_remove(ververica_url: str,
                              ververica_namespace: str,
-                             apitoken_name: str):
+                             apitoken_name: str) -> None:
     VervericaApiTokenRemoveCommand.remove_apitoken(ververica_url=ververica_url,
                                                    ververica_namespace=ververica_namespace,
                                                    token_name=apitoken_name)
 
 
 @platform.group()
-def deployment_target():
+def deployment_target() -> None:
     pass
 
 
@@ -179,7 +177,7 @@ def deployment_target():
 @click.option('--kubernetes-namespace', prompt='Kubernetes namespace name',
               help='Kubernetes namespace name', required=True)
 @click.option('--profile',
-              help='Profile name to use', required=False)
+              help='Profile name to use', required=True)
 @click.option('--name',
               help='Ververica deployment target name')
 @click.option('--vvp-url', required=False,
@@ -188,36 +186,40 @@ def deployment_target():
               help='Ververica namespace')
 @click.option('--vvp-api-token',
               required=False, help='Ververica API Token')
+@click.option('--registry-url', prompt='Docker registry URL',
+              help='URL for Docker registry, i.e: "https://hub.docker.com/"')
 def deployment_target_create(kubernetes_namespace: str,
-                             profile: str = None,
-                             name: str = None,
-                             vvp_url: str = None,
-                             vvp_namespace: str = None,
-                             vvp_api_token: str = None):
+                             profile: str,
+                             name: Optional[str] = None,
+                             vvp_url: Optional[str] = None,
+                             vvp_namespace: Optional[str] = None,
+                             vvp_api_token: Optional[str] = None,
+                             registry_url: Optional[str] = None) -> None:
     DeploymentTargetCommand.create_deployment_target(
         kubernetes_namespace=kubernetes_namespace,
         deployment_target_name=name,
-        profile=profile,
+        profile_name=profile,
         ververica_url=vvp_url,
         ververica_namespace=vvp_namespace,
-        vvp_api_token=vvp_api_token
+        vvp_api_token=vvp_api_token,
+        registry_url=registry_url
     )
 
 
 @project.group()
-def cicd():
+def cicd() -> None:
     pass
 
 
 @cicd.command()
 @click.option('--provider', prompt="Provider's name",
               help="Provider's name", type=click.Choice(['gitlab'], case_sensitive=False))
-def cicd_setup(provider: str):
+def cicd_setup(provider: str) -> None:
     CICDInitializer.setup_cicd(provider)
 
 
 @_cli.group()
-def profile():
+def profile() -> None:
     pass
 
 
@@ -234,11 +236,11 @@ def profile():
 @click.option('--docker-registry-url',
               required=False, help='URL for Docker registry, i.e: "https://hub.docker.com/"')
 def add_profile(profile_name: str,
-                vvp_url: str,
-                vvp_namespace: str,
-                vvp_deployment_target: str,
-                vvp_api_token: str,
-                docker_registry_url: str):
+                vvp_url: Optional[str],
+                vvp_namespace: Optional[str],
+                vvp_deployment_target: Optional[str],
+                vvp_api_token: Optional[str],
+                docker_registry_url: Optional[str]) -> None:
     ProfileCommand.create_profile(profile_name=profile_name,
                                   ververica_url=vvp_url,
                                   ververica_namespace=vvp_namespace,
@@ -249,7 +251,7 @@ def add_profile(profile_name: str,
 
 
 @_cli.group()
-def docker():
+def docker() -> None:
     pass
 
 
@@ -257,7 +259,7 @@ def docker():
 @click.option('--username', required=True, help='The registry username')
 @click.option('--password', required=True, help='The plaintext password')
 @click.option('--docker-registry-url', required=True, help='URL to the registry. E.g. https://index.docker.io/v1/')
-def docker_login(username: str, password: str, docker_registry_url: str):
+def docker_login(username: str, password: str, docker_registry_url: str) -> None:
     LoginCommand.docker_login(username, password, docker_registry_url)
 
 
