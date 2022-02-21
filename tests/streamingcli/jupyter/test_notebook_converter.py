@@ -100,4 +100,4 @@ t_env.execute_sql(f"""CREATE TABLE datagen (
 
     def test_error_raised(self):
         with self.assertRaises(FailedToOpenNotebookFile):
-            converted_notebook = convert_notebook("not/existing/path")
+            convert_notebook("not/existing/path")

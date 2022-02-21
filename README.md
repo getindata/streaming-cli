@@ -14,7 +14,7 @@ scli platform api-token create \
   --vvp-namespace "default" \
   --name "cicd" \
   --role "editor" \
-  --save-to-kubernetes-secret "vvp/secret" 
+  --save-to-kubernetes-secret "vvp/secret"
 ```
 
 Sample response:

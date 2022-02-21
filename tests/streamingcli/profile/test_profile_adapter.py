@@ -1,11 +1,8 @@
 import os
 from unittest import mock
-import pytest
 
-
-from streamingcli.profile.profile_adapter import ProfileAdapter, ScliProfile
 from streamingcli.config import DEFAULT_PROFILE_PATH, PROFILE_ENV_VARIABLE_NAME
-
+from streamingcli.profile.profile_adapter import ProfileAdapter, ScliProfile
 
 TEST_PROFILE = ScliProfile(
     profile_name="test_profile",

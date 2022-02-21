@@ -1,4 +1,5 @@
 import importlib.resources as pkg_resources
+
 from streamingcli.project import templates
 
 
@@ -9,7 +10,7 @@ class TemplateLoader:
         return template
 
     @staticmethod
-    def copy_binary(file_name: str, target_path: str):
+    def copy_binary(file_name: str, target_path: str) -> None:
         file_content = pkg_resources.read_binary(templates, file_name)
         with open(target_path, "wb") as target_file:
             target_file.write(file_content)

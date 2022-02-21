@@ -1,27 +1,24 @@
 import argparse
 import json
+import os
 import shlex
 import sys
-from dataclasses import dataclass
-from dataclasses import field
-from typing import List
-from typing import Optional
-import os
+from dataclasses import asdict, dataclass, field
+from typing import Any, Dict, List, Optional
 
+import autopep8
 import nbformat
 from jinja2 import Environment
-import autopep8
 
-from ..error import FailedToOpenNotebookFile
-from ..error import StreamingCliError
+from ..error import FailedToOpenNotebookFile, StreamingCliError
 from ..project.template_loader import TemplateLoader
 
 
 @dataclass
 class ConvertedNotebook:
     content: str
-    remote_jars: list = field(default_factory=lambda: [])
-    local_jars: list = field(default_factory=lambda: [])
+    remote_jars: List[str] = field(default_factory=lambda: [])
+    local_jars: List[str] = field(default_factory=lambda: [])
 
 
 @dataclass
@@ -88,7 +85,7 @@ class NotebookConverter:
 
     """
     Read and convert Jupyter Notebook
-    
+
     :return: object representing converted Jupyter Notebook
     :rtype: ConvertedNotebook
     """
@@ -105,7 +102,7 @@ class NotebookConverter:
             return self._render_flink_app(script_entries)
         except IOError:
             raise FailedToOpenNotebookFile(self.notebook_path)
-        except:
+        except Exception:  # noqa
             raise StreamingCliError(
                 f"Unexpected exception while converting notebook file: {sys.exc_info()}"
             )
@@ -121,6 +118,8 @@ class NotebookConverter:
             return NotebookConverter._handle_magic_cell(cell, notebook_dir)
         elif not cell.source.startswith('##'):
             return Code(value=cell.source)
+        else:
+            return None
 
     @staticmethod
     def _handle_magic_cell(cell: nbformat.NotebookNode, notebook_dir: str) -> Optional[NotebookEntry]:
@@ -146,7 +145,7 @@ class NotebookConverter:
         return None
 
     @staticmethod
-    def _get_variables_from_file(source: str, notebook_dir: str):
+    def _get_variables_from_file(source: str, notebook_dir: str) -> Code:
         args = NotebookConverter._load_config_parser.parse_args(shlex.split(source)[1:])
         file_path = args.path if os.path.isabs(args.path) else f"{notebook_dir}/{args.path}"
         loaded_variables = NotebookConverter._load_config_file(path=file_path)
@@ -160,7 +159,7 @@ class NotebookConverter:
         return Code(value=f"{all_variable_strings}")
 
     @staticmethod
-    def _load_config_file(path: str):
+    def _load_config_file(path: str) -> Dict[str, Any]:
         with open(path, "r") as json_file:
             return json.load(json_file)
 
@@ -170,9 +169,10 @@ class NotebookConverter:
         flink_app_script = Environment().from_string(flink_app_template).render(
             notebook_entries=notebook_entries
         )
-        remote_jars = map(lambda entry: entry.url,
+
+        remote_jars = map(lambda entry: asdict(entry)["url"],
                           filter(lambda entry: isinstance(entry, RegisterJar), notebook_entries))
-        local_jars = map(lambda entry: entry.local_path,
+        local_jars = map(lambda entry: asdict(entry)["local_path"],
                          filter(lambda entry: isinstance(entry, RegisterLocalJar), notebook_entries))
         return ConvertedNotebook(content=autopep8.fix_code(flink_app_script), remote_jars=list(remote_jars),
                                  local_jars=list(local_jars))

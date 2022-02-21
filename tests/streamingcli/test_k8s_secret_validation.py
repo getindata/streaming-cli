@@ -1,6 +1,7 @@
-from streamingcli.main import validate_k8s_secret
-import pytest
 import click
+import pytest
+
+from streamingcli.main import validate_k8s_secret
 
 
 class TestK8SSecretValidator:

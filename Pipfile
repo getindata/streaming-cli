@@ -23,6 +23,10 @@ copier = "*"
 
 [dev-packages]
 pytest = "*"
+pre-commit = "2.15.0"
+types-PyYAML = "*"
+mypy = "*"
+types-requests = "*"
 
 [requires]
 python_version = "3.8"

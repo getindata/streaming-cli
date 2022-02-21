@@ -1,4 +1,7 @@
+from typing import Optional
+
 import click
+
 from streamingcli.profile.profile_adapter import ProfileAdapter, ScliProfile
 
 
@@ -6,11 +9,11 @@ class ProfileCommand:
 
     @staticmethod
     def create_profile(profile_name: str,
-                        ververica_url: str=None,
-                        ververica_namespace: str=None,
-                        ververica_deployment_target: str=None,
-                        ververica_api_token: str=None,
-                        docker_registry_url: str=None):
+                       ververica_url: Optional[str] = None,
+                       ververica_namespace: Optional[str] = None,
+                       ververica_deployment_target: Optional[str] = None,
+                       ververica_api_token: Optional[str] = None,
+                       docker_registry_url: Optional[str] = None) -> None:
         scli_profile = ScliProfile(
             profile_name=profile_name,
             ververica_url=ververica_url,

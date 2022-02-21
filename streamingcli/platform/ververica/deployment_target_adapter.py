@@ -1,9 +1,11 @@
 from typing import Optional
-from streamingcli.project.template_loader import TemplateLoader
-from jinja2 import Environment
-import requests
-import yaml
+
 import click
+import requests
+import yaml  # type: ignore
+from jinja2 import Environment
+
+from streamingcli.project.template_loader import TemplateLoader
 
 
 class VervericaDeploymentTargetAdapter:
@@ -24,14 +26,15 @@ class VervericaDeploymentTargetAdapter:
             if item["metadata"]["name"] == ververica_deployment_target_name:
                 deployment_target_id = item["metadata"]["id"]
                 click.echo(
-                    f"Reused existing Ververica deployment target: {ververica_deployment_target_name} with ID: {deployment_target_id}")
+                    f"Reused existing Ververica deployment target: {ververica_deployment_target_name}" +
+                    f" with ID: {deployment_target_id}")
                 return deployment_target_id
         return None
 
     @staticmethod
     def format_template(ververica_kubernetes_namespace: str,
                         ververica_namespace: str,
-                        ververica_deployment_target_name: str):
+                        ververica_deployment_target_name: str) -> str:
         deployment_target_template = TemplateLoader.load_project_template("deployment_target.yml")
         return Environment().from_string(deployment_target_template).render(
             ververica_deployment_target_name=ververica_deployment_target_name,
@@ -44,7 +47,7 @@ class VervericaDeploymentTargetAdapter:
                                  ververica_namespace: str,
                                  ververica_kubernetes_namespace: str,
                                  ververica_webtoken_secret: str,
-                                 ververica_deployment_target_name: str):
+                                 ververica_deployment_target_name: str) -> str:
         deployment_target_id = VervericaDeploymentTargetAdapter.get_existing_deployment_target_id_by_name(
             ververica_url=ververica_url,
             ververica_namespace=ververica_namespace,
@@ -53,10 +56,11 @@ class VervericaDeploymentTargetAdapter:
         )
         if deployment_target_id is not None:
             click.echo(
-                f"Reused existing Ververica deployment target: {ververica_deployment_target_name} with ID: {deployment_target_id}")
+                f"Reused existing Ververica deployment target: {ververica_deployment_target_name}" +
+                f" with ID: {deployment_target_id}")
             return deployment_target_id
 
-        deployment_target_yaml = VervericaDeploymentTargetAdapter.format_template(
+        deployment_target_yaml: str = VervericaDeploymentTargetAdapter.format_template(
             ververica_deployment_target_name=ververica_deployment_target_name,
             ververica_namespace=ververica_namespace,
             ververica_kubernetes_namespace=ververica_kubernetes_namespace
@@ -70,7 +74,7 @@ class VervericaDeploymentTargetAdapter:
         })
 
         if response.status_code != 201:
-            raise click.ClickException(f"Ververica DeploymentTarget creation error: {response.content}")
+            raise click.ClickException(f"Ververica DeploymentTarget creation error: {response.text}")
         deployment_target = yaml.safe_load(response.content)
         deployment_target_id = deployment_target["metadata"]["id"]
 

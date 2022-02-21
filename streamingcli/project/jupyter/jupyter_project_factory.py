@@ -1,7 +1,7 @@
 import pathlib
+
 import click
 import copier
-
 
 JUPYTER_TEMPLATE_PROJECT = "git@gitlab.com:getindata/streaming-labs/flink-sandbox-jupyter.git"
 
@@ -12,7 +12,7 @@ class JupyterProjectFactory:
         return pathlib.Path(project_path).exists()
 
     @staticmethod
-    def create(project_name: str):
+    def create(project_name: str) -> None:
         project_path = f"./{project_name}"
 
         if JupyterProjectFactory.check_if_directory_exists(project_path=project_path):

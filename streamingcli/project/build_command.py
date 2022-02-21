@@ -1,17 +1,22 @@
 import os
-import docker
+from typing import Optional
+
 import click
+import docker
+
+from ..config import (ADDITIONAL_DEPENDENCIES_DIR, DEFAULT_FLINK_APP_NAME,
+                      DEFAULT_NOTEBOOK_NAME)
 from ..jupyter.jar_handler import JarHandler
-from ..project.local_project_config import LocalProjectConfigIO
-from ..config import DEFAULT_NOTEBOOK_NAME, DEFAULT_FLINK_APP_NAME, ADDITIONAL_DEPENDENCIES_DIR
+from ..jupyter.notebook_converter import ConvertedNotebook, convert_notebook
+from ..project.local_project_config import (LocalProjectConfig,
+                                            LocalProjectConfigIO)
 from ..project.project_type import ProjectType
-from ..jupyter.notebook_converter import convert_notebook, ConvertedNotebook
 
 
 class ProjectBuilder:
 
     @staticmethod
-    def build_project(tag_name: str):
+    def build_project(tag_name: str) -> str:
         # Load local project config
         local_project_config = LocalProjectConfigIO.load_project_config()
         client = docker.from_env()
@@ -27,7 +32,7 @@ class ProjectBuilder:
         return image.tags[0]
 
     @staticmethod
-    def convert_jupyter_notebook(local_project_config):
+    def convert_jupyter_notebook(local_project_config: LocalProjectConfig) -> None:
         notebook_dir = './src'
         notebooks = [os.path.join(notebook_dir, _) for _ in os.listdir(notebook_dir) if _.endswith(".ipynb")]
         if len(notebooks) > 1:
@@ -39,7 +44,9 @@ class ProjectBuilder:
             ProjectBuilder.get_jars(converted_notebook, local_project_config, notebook_dir)
 
     @staticmethod
-    def get_jars(converted_notebook, local_project_config, notebook_dir: str):
+    def get_jars(converted_notebook: ConvertedNotebook,
+                 local_project_config: LocalProjectConfig,
+                 notebook_dir: str) -> None:
         jar_handler = JarHandler(project_root_dir=os.getcwd())
         for jar in converted_notebook.remote_jars:
             local_path = jar_handler.remote_copy(jar)
@@ -53,11 +60,11 @@ class ProjectBuilder:
         LocalProjectConfigIO.update_project_config(local_project_config)
 
     @staticmethod
-    def convert_notebook(notebook_path: str = None) -> ConvertedNotebook:
+    def convert_notebook(notebook_path: Optional[str] = None) -> ConvertedNotebook:
         file_path = notebook_path if notebook_path is not None else f"./src/{DEFAULT_NOTEBOOK_NAME}"
         return convert_notebook(file_path)
 
     @staticmethod
-    def write_notebook(notebook_content: str):
+    def write_notebook(notebook_content: str) -> None:
         with open(f"./src/{DEFAULT_FLINK_APP_NAME}", "w+") as script_file:
             script_file.write(notebook_content)

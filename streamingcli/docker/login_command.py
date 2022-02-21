@@ -1,15 +1,17 @@
+import base64
+import json
+from typing import Any, Dict
+
 import click
 import docker
 from docker import auth
 from docker.utils import config
-import json
-import base64
 
 
 class LoginCommand:
 
     @staticmethod
-    def docker_login(username: str, password: str, docker_registry_url: str):
+    def docker_login(username: str, password: str, docker_registry_url: str) -> None:
         client = docker.from_env()
         client.login(username, password, registry=docker_registry_url, reauth=True)
         click.echo(f"Successfully logged in to {docker_registry_url}")
@@ -17,7 +19,7 @@ class LoginCommand:
         LoginCommand.update_docker_auths_config(username, password, docker_registry_url)
 
     @staticmethod
-    def update_docker_auths_config(username: str, password: str, docker_registry_url: str):
+    def update_docker_auths_config(username: str, password: str, docker_registry_url: str) -> None:
         config_file = config.find_config_file()
         with open(config_file, "r+") as f:
             config_dict = json.loads(f.read())
@@ -30,7 +32,7 @@ class LoginCommand:
             f.truncate()
 
     @staticmethod
-    def build_auth_entry(username: str, password: str, docker_registry_url: str):
+    def build_auth_entry(username: str, password: str, docker_registry_url: str) -> Dict[Any, Any]:
         registry_index = auth.resolve_index_name(docker_registry_url)
         user_pwd = f'{username}:{password}'.encode('ascii')
         return {
