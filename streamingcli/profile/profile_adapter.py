@@ -68,11 +68,11 @@ class ProfileAdapter:
 
     @staticmethod
     def update_profile_data(profile_data: ScliProfile,
-                            ververica_url: Optional[str],
-                            ververica_namespace: Optional[str],
-                            ververica_deployment_target_name: Optional[str],
-                            ververica_webtoken_secret: Optional[str],
-                            docker_registry_url: Optional[str]) -> ScliProfile:
+                            ververica_url: Optional[str] = None,
+                            ververica_namespace: Optional[str] = None,
+                            ververica_deployment_target_name: Optional[str] = None,
+                            ververica_webtoken_secret: Optional[str] = None,
+                            docker_registry_url: Optional[str] = None) -> ScliProfile:
         params = {}
         if ververica_url is not None:
             params['ververica_url'] = ververica_url
