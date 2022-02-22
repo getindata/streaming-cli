@@ -65,6 +65,3 @@ profile/add:
 
 project/linter:
 	pipenv run pre-commit run --all-files
-
-project/linter/install-stubs:
-	pipenv run mypy --install-types
