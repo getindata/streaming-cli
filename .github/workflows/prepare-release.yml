@@ -25,7 +25,7 @@ jobs:
         uses: actions/setup-python@v1
         with:
           python-version: ${{ matrix.python-version }}
-       - name: Bump the version number  # bump2version is a maintained fork of original bumpversion
+      - name: Bump the version number  # bump2version is a maintained fork of original bumpversion
         id: bump_version
         run: |
           pip install bump2version
