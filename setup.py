@@ -5,7 +5,7 @@ from typing import List
 from setuptools import find_packages, setup
 from setuptools.command.install import install
 
-__version__ = "1.2.3"
+__version__ = "1.3.0"
 
 with open("README.md", "r") as fh:
     long_description = fh.read()
@@ -49,6 +49,7 @@ setup(
     author_email="office@getindata.com",
     description="Streaming platform CLI",
     long_description=long_description,
+    long_description_content_type="text/markdown",
     url="https://github.com/getindata/streaming-cli",
     packages=find_packages(),
     python_requires='>=3.8',
