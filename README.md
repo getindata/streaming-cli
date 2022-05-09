@@ -1,3 +1,9 @@
+[![Python Version](https://img.shields.io/badge/python-3.8-blue.svg)](https://github.com/getindata/streaming-cli)
+[![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+[![SemVer](https://img.shields.io/badge/semver-2.0.0-green)](https://semver.org/)
+[![PyPI version](https://badge.fury.io/py/streamingcli.svg)](https://pypi.org/project/streamingcli/)
+[![Downloads](https://pepy.tech/badge/streamingcli)](https://pepy.tech/badge/streamingcli)
+
 # Streaming platform CLI
 
 ## Usage
