@@ -49,7 +49,7 @@ setup(
     author_email="office@getindata.com",
     description="Streaming platform CLI",
     long_description=long_description,
-    url="https://gitlab.com/getindata/streaming-labs/streaming-cli",
+    url="https://github.com/getindata/streaming-cli",
     packages=find_packages(),
     python_requires='>=3.8',
     classifiers=[
