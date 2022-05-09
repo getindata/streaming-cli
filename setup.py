@@ -49,6 +49,7 @@ setup(
     author_email="office@getindata.com",
     description="Streaming platform CLI",
     long_description=long_description,
+    long_description_content_type="text/markdown",
     url="https://github.com/getindata/streaming-cli",
     packages=find_packages(),
     python_requires='>=3.8',
