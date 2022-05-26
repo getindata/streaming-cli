@@ -47,12 +47,14 @@ def project() -> None:
               help='Project name which will become Flink job name in Ververica platform')
 @click.option('--project_type', prompt='Project type', required=False,
               help='Project type', type=click.Choice(['python', 'jupyter']), default='python')
-def project_init(project_name: str, project_type: Optional[str] = None) -> None:
+@click.option('--template_url', prompt='Template URL', prompt_required=False,
+              help='Project template url', required=False)
+def project_init(project_name: str, project_type: Optional[str] = None, template_url: Optional[str] = None) -> None:
     click.echo(f"Initializing streaming project: {project_name}")
     if ProjectType(project_type) == ProjectType.PYTHON:
-        PythonProjectFactory.create(project_name)
+        PythonProjectFactory.create(project_name, template_url)
     elif ProjectType(project_type) == ProjectType.JUPYTER:
-        JupyterProjectFactory.create(project_name=project_name)
+        JupyterProjectFactory.create(project_name=project_name, template_url=template_url)
     else:
         raise click.exceptions.ClickException(f"Unknown project type: {project_type}")
     click.echo(f"Project: {project_name} initialized")

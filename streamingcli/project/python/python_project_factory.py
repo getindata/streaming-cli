@@ -1,9 +1,10 @@
 import pathlib
+from typing import Optional
 
 import click
 import copier
 
-PYTHON_TEMPLATE_PROJECT = "git@gitlab.com:getindata/streaming-labs/flink-sandbox-python.git"
+PYTHON_TEMPLATE_PROJECT = "git@github.com:getindata/streaming-cli-python-template.git"
 
 
 class PythonProjectFactory:
@@ -12,7 +13,7 @@ class PythonProjectFactory:
         return pathlib.Path(project_path).exists()
 
     @staticmethod
-    def create(project_name: str) -> None:
+    def create(project_name: str, template_url: Optional[str]) -> None:
         project_path = f"./{project_name}"
 
         if PythonProjectFactory.check_if_directory_exists(project_path=project_path):
@@ -22,4 +23,4 @@ class PythonProjectFactory:
             "project_name": project_name
         }
 
-        copier.copy(src_path=PYTHON_TEMPLATE_PROJECT, dst_path=project_path, data=template_data)
+        copier.copy(src_path=(template_url or PYTHON_TEMPLATE_PROJECT), dst_path=project_path, data=template_data)
