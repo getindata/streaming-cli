@@ -2,11 +2,15 @@
 
 ## [Unreleased]
 
+## [1.3.2] - 2022-05-26
+
 ### Added
-- `--template_url` flag to `scli project init` command.
+
+-   `--template_url` flag to `scli project init` command.
 
 ### Fixed
-- `scli project init` references proper default template URLs.
+
+-   `scli project init` references proper default template URLs.
 
 ## [1.3.1] - 2022-05-10
 
@@ -18,7 +22,9 @@
 
 -   First release
 
-[Unreleased]: https://github.com/getindata/streaming-cli/compare/1.3.1...HEAD
+[Unreleased]: https://github.com/getindata/streaming-cli/compare/1.3.2...HEAD
+
+[1.3.2]: https://github.com/getindata/streaming-cli/compare/1.3.1...1.3.2
 
 [1.3.1]: https://github.com/getindata/streaming-cli/compare/1.3.0...1.3.1
 
