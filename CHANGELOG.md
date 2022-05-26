@@ -2,6 +2,12 @@
 
 ## [Unreleased]
 
+### Added
+- `--template_url` flag to `scli project init` command.
+
+### Fixed
+- `scli project init` references proper default template URLs.
+
 ## [1.3.1] - 2022-05-10
 
 ## [1.3.0] - 2022-05-09
