@@ -3,9 +3,11 @@ from typing import Optional
 
 import click
 import docker
+from docker.errors import BuildError
 
 from ..config import (ADDITIONAL_DEPENDENCIES_DIR, DEFAULT_FLINK_APP_NAME,
                       DEFAULT_NOTEBOOK_NAME)
+from ..docker_response_reader import DockerResponseReader
 from ..jupyter.jar_handler import JarHandler
 from ..jupyter.notebook_converter import ConvertedNotebook, convert_notebook
 from ..project.local_project_config import (LocalProjectConfig,
@@ -26,9 +28,14 @@ class ProjectBuilder:
         image_tag = f"{local_project_config.project_name}:{tag_name}"
         click.echo(f"Building Docker image {image_tag} ...")
 
-        (image, _) = client.images.build(path=".", tag=image_tag)
-        click.echo(f"Docker image {image.short_id} created with tags: {image.tags}")
+        try:
+            (image, logs_generator) = client.images.build(path=".", tag=image_tag)
+            DockerResponseReader(logs_generator).click_echo_ok_responses()
+        except BuildError as err:
+            build_log = "\n".join([str(log) for log in err.build_log])
+            raise click.ClickException("Error raised when using Docker.\n" + err.msg + "\n" + build_log)
 
+        click.echo(f"Docker image {image.short_id} created with tags: {image.tags}")
         return image.tags[0]
 
     @staticmethod
