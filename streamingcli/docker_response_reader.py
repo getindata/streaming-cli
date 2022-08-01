@@ -71,7 +71,7 @@ class DockerResponseReader:
     def click_echo_ok_responses(self) -> None:
         """Read, process and print positive Docker updates.
 
-        :raises DockerErrorResponseError: Came across error update in Docker response.
+        :raises click.ClickException: Came across error update in Docker response.
         """
         read_response = self.cached_read_response or self.read_response()
 
@@ -85,12 +85,9 @@ class DockerResponseReader:
         status_message = cast(str, log["status"])
         progress_detail = cast(str, log.get("progressDetail", ""))
         status_id = cast(str, log.get("id", ""))
-        message = (
-            status_message
-            + (f" ({status_id})" if status_id else "")
-            + (f": {progress_detail}" if progress_detail else "")
-        )
-
+        message = f"{status_message}" \
+                  f"{' (' + status_id + ')' if status_id else ''}" \
+                  f"{': ' + progress_detail if progress_detail else ''}"
         return DockerReadResponse(message, False)
 
     @staticmethod
@@ -115,11 +112,12 @@ class DockerResponseReader:
         error_detail = cast(Dict[str, str], log["errorDetail"])
         error_message = error_detail.get("message", "")
         error_code = error_detail.get("code", None)
+        nl_char = '\n'
         return DockerReadResponse(
-            "ERROR: " + error_message + (f"\nError code: {error_code}" if error_code else ""),
+            f"ERROR: {error_message}{nl_char + 'Error code: ' + error_code if error_code else ''}",
             True,
         )
 
     @staticmethod
     def _prepare_error(log: Dict[str, Union[str, Dict[str, str]]]) -> DockerReadResponse:
-        return DockerReadResponse("ERROR: " + cast(str, log["error"]), True)
+        return DockerReadResponse(f"ERROR: {cast(str, log['error'])}", True)
