@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Changed
+
+- `scli project build` prints Docker client output to the standard output.
+
 ## [1.3.2] - 2022-05-26
 
 ### Added
