@@ -99,6 +99,8 @@ class NotebookConverter:
             notebook = self._load_notebook(self.notebook_path)
             code_cells = filter(lambda _: _.cell_type == 'code', notebook.cells)
             script_entries: List[NotebookEntry] = []
+            init_entries = NotebookConverter._read_init_sql(os.path.dirname(self.notebook_path))
+            script_entries.extend(init_entries)
             for cell in code_cells:
                 entries = self._get_notebook_entry(cell, os.path.dirname(self.notebook_path))
                 if entries:
@@ -172,6 +174,14 @@ class NotebookConverter:
         with open(file_path, "r") as f:
             statements = list(map(lambda s: Sql(value=s.rstrip(';')), sqlparse.split(f.read())))
         return statements
+
+    @staticmethod
+    def _read_init_sql(notebook_dir: str) -> Sequence[NotebookEntry]:
+        file_path = f"{notebook_dir}/init.sql"
+        if os.path.exists(file_path):
+            with open(file_path, "r") as f:
+                return list(map(lambda s: Sql(value=s.rstrip(';')), sqlparse.split(f.read())))
+        return []
 
     @staticmethod
     def _load_config_file(path: str) -> Dict[str, Any]:

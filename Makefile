@@ -11,7 +11,7 @@ test:
 	pipenv run pytest
 
 cli/requirements:
-	pipenv lock -r > requirements.txt
+	pipenv requirements > requirements.txt
 
 cli/package: cli/requirements
 	pipenv run python setup.py sdist bdist_wheel

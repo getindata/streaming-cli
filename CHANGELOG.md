@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Added
+
+- Using `init.sql` as the initialization script.
+
 ### Changed
 
 - `scli project build` prints Docker client output to the standard output.

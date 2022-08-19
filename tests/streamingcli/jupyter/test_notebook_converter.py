@@ -111,7 +111,7 @@ t_env.execute_sql(f"""CREATE TABLE datagen (
 
     def test_notebook_with_flink_execute_sql_file(self):
         # given
-        file_path = 'tests/streamingcli/resources/jupyter/notebook4.ipynb'
+        file_path = 'tests/streamingcli/resources/jupyter/with_init/notebook4.ipynb'
 
         # expect
         converted_notebook = convert_notebook(file_path)
