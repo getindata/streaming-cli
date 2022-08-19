@@ -55,6 +55,10 @@ class ProjectBuilder:
                  local_project_config: LocalProjectConfig,
                  notebook_dir: str) -> None:
         jar_handler = JarHandler(project_root_dir=os.getcwd())
+        plugin_jars_paths = jar_handler.get_jars_using_plugin().split(";")
+        for path in plugin_jars_paths:
+            image_path = f"{ADDITIONAL_DEPENDENCIES_DIR}/{os.path.basename(path)}"
+            local_project_config.add_dependency(image_path)
         for jar in converted_notebook.remote_jars:
             local_path = jar_handler.remote_copy(jar)
             image_path = f"{ADDITIONAL_DEPENDENCIES_DIR}/{os.path.basename(local_path)}"
