@@ -2,14 +2,16 @@
 
 ## [Unreleased]
 
+## [1.4.0] - 2022-08-22
+
 ### Added
 
-- Using `init.sql` as the initialization script.
-- Use plugin to download jars
+-   Using `init.sql` as the initialization script.
+-   Use plugin to download jars
 
 ### Changed
 
-- `scli project build` prints Docker client output to the standard output.
+-   `scli project build` prints Docker client output to the standard output.
 
 ## [1.3.2] - 2022-05-26
 
@@ -31,7 +33,9 @@
 
 -   First release
 
-[Unreleased]: https://github.com/getindata/streaming-cli/compare/1.3.2...HEAD
+[Unreleased]: https://github.com/getindata/streaming-cli/compare/1.4.0...HEAD
+
+[1.4.0]: https://github.com/getindata/streaming-cli/compare/1.3.2...1.4.0
 
 [1.3.2]: https://github.com/getindata/streaming-cli/compare/1.3.1...1.3.2
 
