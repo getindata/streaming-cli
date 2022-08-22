@@ -15,7 +15,7 @@ whl:
   stage: build
   before_script:
     - pip install pipenv
-    - pipenv lock -r > requirements.txt
+    - pipenv requirements > requirements.txt
   script:
     - python setup.py sdist bdist_wheel
   artifacts:
@@ -69,7 +69,7 @@ pypi:
   stage: ship
   before_script:
     - pip install pipenv twine
-    - pipenv lock -r > requirements.txt
+    - pipenv requirements > requirements.txt
   script:
     - python setup.py verify
     - TWINE_USERNAME="gitlab-ci-token" TWINE_PASSWORD="${CI_JOB_TOKEN}"

@@ -1,5 +1,8 @@
 import os.path
 from shutil import copy2
+from typing import List
+
+from importlib_metadata import entry_points
 
 import requests
 import wget
@@ -22,6 +25,23 @@ class JarHandler:
             os.makedirs(self.project_jars, exist_ok=True)
         elif not os.path.isdir(self.project_jars):
             raise ValueError(f'{self.project_jars} is already in the project directory with incompatible type.')
+
+    def get_classpaths_of_jars_using_plugin(self) -> List[str]:
+        classpath = ""
+        for jar_provider in entry_points(group='catalog.jars.provider'):
+            provider_f = jar_provider.load()
+            classpath_to_add = provider_f()
+            if classpath_to_add:
+                classpath = self.__extend_classpath(classpath, classpath_to_add)
+        return classpath.split(";")
+
+    @staticmethod
+    def __extend_classpath(current_classpaths: str, classpath_to_add: str) -> str:
+        return (
+            f"{current_classpaths};{classpath_to_add}"
+            if len(current_classpaths) > 0
+            else classpath_to_add
+        )
 
     @staticmethod
     def __ensure_jar_accessible(remote_path: str) -> None:
