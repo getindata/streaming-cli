@@ -22,6 +22,7 @@ requests = "*"
 copier = "*"
 sqlparse = "*"
 markupsafe = "==2.0.1"
+importlib_metadata = "*"
 
 [dev-packages]
 pytest = "*"
