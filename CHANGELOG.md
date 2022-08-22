@@ -5,6 +5,7 @@
 ### Added
 
 - Using `init.sql` as the initialization script.
+- Use plugin to download jars
 
 ### Changed
 
