@@ -24,7 +24,7 @@ class JarHandler:
         elif not os.path.isdir(self.project_jars):
             raise ValueError(f'{self.project_jars} is already in the project directory with incompatible type.')
 
-    def get_jars_using_plugin(self) -> str:
+    def get_classpaths_of_jars_using_plugin(self) -> str:
         classpath = ""
         for jar_provider in entry_points(group='catalog.jars.provider'):
             provider_f = jar_provider.load()
