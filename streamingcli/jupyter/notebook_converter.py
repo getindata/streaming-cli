@@ -133,7 +133,7 @@ class NotebookConverter:
         source = cell.source
         if source.startswith('%%flink_execute_sql'):
             sql_statement = '\n'.join(source.split('\n')[1:])
-            if sql_statement.lower().startswith('select'):
+            if NotebookConverter._skip_statement(sql_statement):
                 return []
             return [Sql(value=sql_statement)]
         if source.startswith('%flink_execute_sql_file'):
@@ -200,6 +200,10 @@ class NotebookConverter:
                          filter(lambda entry: isinstance(entry, RegisterLocalJar), notebook_entries))
         return ConvertedNotebook(content=autopep8.fix_code(flink_app_script), remote_jars=list(remote_jars),
                                  local_jars=list(local_jars))
+
+    @staticmethod
+    def _skip_statement(statement: str) -> bool:
+        return statement.lower().startswith(('select', 'show', 'desc'))
 
 
 def convert_notebook(notebook_path: str) -> ConvertedNotebook:

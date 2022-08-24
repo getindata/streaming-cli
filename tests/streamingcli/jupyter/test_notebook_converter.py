@@ -138,3 +138,25 @@ t_env.execute_sql(
 
 t_env.execute_sql(f"""select * from other""")
 '''
+
+    def test_notebook_with_show_and_describe(self):
+        # given
+        file_path = 'tests/streamingcli/resources/jupyter/notebook5.ipynb'
+        # expect
+        converted_notebook = convert_notebook(file_path)
+        assert converted_notebook.content == '''from pyflink.datastream import StreamExecutionEnvironment
+from pyflink.table import StreamTableEnvironment, DataTypes
+from pyflink.table.udf import udf
+
+env = StreamExecutionEnvironment.get_execution_environment()
+env.set_parallelism(1)
+t_env = StreamTableEnvironment.create(env)
+
+
+t_env.execute_sql(f"""CREATE TABLE datagen (
+    id INT
+) WITH (
+    'connector' = 'datagen',
+    'number-of-rows' = '100'
+)""")
+'''
