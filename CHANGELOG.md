@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## [1.5.0] - 2022-08-25
+
 ### Added
 
 -   Skip `explain`, `describe` and `show`
@@ -37,7 +39,9 @@
 
 -   First release
 
-[Unreleased]: https://github.com/getindata/streaming-cli/compare/1.4.0...HEAD
+[Unreleased]: https://github.com/getindata/streaming-cli/compare/1.5.0...HEAD
+
+[1.5.0]: https://github.com/getindata/streaming-cli/compare/1.4.0...1.5.0
 
 [1.4.0]: https://github.com/getindata/streaming-cli/compare/1.3.2...1.4.0
 
