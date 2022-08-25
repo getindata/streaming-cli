@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Added
+
+-   Skip `explain`, `describe` and `show`
+
 ## [1.4.0] - 2022-08-22
 
 ### Added
