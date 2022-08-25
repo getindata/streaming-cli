@@ -9,10 +9,12 @@ class TestNotebookConverter(unittest.TestCase):
 
     def test_converter(self):
         # given
-        file_path = 'tests/streamingcli/resources/jupyter/notebook1.ipynb'
+        file_path = "tests/streamingcli/resources/jupyter/notebook1.ipynb"
         # expect
         converted_notebook = convert_notebook(file_path)
-        assert converted_notebook.content == '''import sys
+        assert (
+            converted_notebook.content
+            == '''import sys
 from pyflink.table import DataTypes
 from pyflink.datastream import StreamExecutionEnvironment
 from pyflink.table import StreamTableEnvironment, DataTypes
@@ -47,13 +49,16 @@ def filter_print(condition, message):
 
 t_env.create_temporary_function("filter_print", filter_print)
 '''
+        )
 
     def test_notebook_with_remote_java_udf_conversion(self):
         # given
-        file_path = 'tests/streamingcli/resources/jupyter/notebook2.ipynb'
+        file_path = "tests/streamingcli/resources/jupyter/notebook2.ipynb"
         # expect
         converted_notebook = convert_notebook(file_path)
-        assert converted_notebook.content == '''from pyflink.datastream import StreamExecutionEnvironment
+        assert (
+            converted_notebook.content
+            == '''from pyflink.datastream import StreamExecutionEnvironment
 from pyflink.table import StreamTableEnvironment, DataTypes
 from pyflink.table.udf import udf
 
@@ -79,13 +84,16 @@ t_env.execute_sql(f"""CREATE TABLE datagen (
     'number-of-rows' = '100'
 )""")
 '''
+        )
 
     def test_notebook_with_local_java_udf_conversion(self):
         # given
-        file_path = 'tests/streamingcli/resources/jupyter/notebook3.ipynb'
+        file_path = "tests/streamingcli/resources/jupyter/notebook3.ipynb"
         # expect
         converted_notebook = convert_notebook(file_path)
-        assert converted_notebook.content == '''from pyflink.datastream import StreamExecutionEnvironment
+        assert (
+            converted_notebook.content
+            == '''from pyflink.datastream import StreamExecutionEnvironment
 from pyflink.table import StreamTableEnvironment, DataTypes
 from pyflink.table.udf import udf
 
@@ -104,6 +112,7 @@ t_env.execute_sql(f"""CREATE TABLE datagen (
     'number-of-rows' = '100'
 )""")
 '''
+        )
 
     def test_error_raised(self):
         with self.assertRaises(FailedToOpenNotebookFile):
@@ -111,11 +120,13 @@ t_env.execute_sql(f"""CREATE TABLE datagen (
 
     def test_notebook_with_flink_execute_sql_file(self):
         # given
-        file_path = 'tests/streamingcli/resources/jupyter/with_init/notebook4.ipynb'
+        file_path = "tests/streamingcli/resources/jupyter/with_init/notebook4.ipynb"
 
         # expect
         converted_notebook = convert_notebook(file_path)
-        assert converted_notebook.content == '''from pyflink.datastream import StreamExecutionEnvironment
+        assert (
+            converted_notebook.content
+            == '''from pyflink.datastream import StreamExecutionEnvironment
 from pyflink.table import StreamTableEnvironment, DataTypes
 from pyflink.table.udf import udf
 
@@ -138,13 +149,16 @@ t_env.execute_sql(
 
 t_env.execute_sql(f"""select * from other""")
 '''
+        )
 
     def test_notebook_with_show_and_describe(self):
         # given
-        file_path = 'tests/streamingcli/resources/jupyter/notebook5.ipynb'
+        file_path = "tests/streamingcli/resources/jupyter/notebook5.ipynb"
         # expect
         converted_notebook = convert_notebook(file_path)
-        assert converted_notebook.content == '''from pyflink.datastream import StreamExecutionEnvironment
+        assert (
+            converted_notebook.content
+            == '''from pyflink.datastream import StreamExecutionEnvironment
 from pyflink.table import StreamTableEnvironment, DataTypes
 from pyflink.table.udf import udf
 
@@ -160,3 +174,4 @@ t_env.execute_sql(f"""CREATE TABLE datagen (
     'number-of-rows' = '100'
 )""")
 '''
+        )
