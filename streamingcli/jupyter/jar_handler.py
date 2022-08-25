@@ -2,21 +2,20 @@ import os.path
 from shutil import copy2
 from typing import List
 
-from importlib_metadata import entry_points
-
 import requests
 import wget
+from importlib_metadata import entry_points
 
 
 class JarHandler:
     def __init__(self, project_root_dir: str):
         self.project_root_dir = project_root_dir
-        self.project_jars = os.path.join(project_root_dir, 'jars')
+        self.project_jars = os.path.join(project_root_dir, "jars")
         self.create_project_jars()
 
     def local_copy(self, jar_path: str) -> str:
         if not os.path.exists(jar_path):
-            raise ValueError(f'Path {jar_path} does not exist.')
+            raise ValueError(f"Path {jar_path} does not exist.")
         full_dst = copy2(jar_path, self.project_jars)
         return JarHandler.__prepend_file_protocol(full_dst)
 
@@ -24,11 +23,13 @@ class JarHandler:
         if not os.path.exists(self.project_jars):
             os.makedirs(self.project_jars, exist_ok=True)
         elif not os.path.isdir(self.project_jars):
-            raise ValueError(f'{self.project_jars} is already in the project directory with incompatible type.')
+            raise ValueError(
+                f"{self.project_jars} is already in the project directory with incompatible type."
+            )
 
     def get_classpaths_of_jars_using_plugin(self) -> List[str]:
         classpath = ""
-        for jar_provider in entry_points(group='catalog.jars.provider'):
+        for jar_provider in entry_points(group="catalog.jars.provider"):
             provider_f = jar_provider.load()
             classpath_to_add = provider_f()
             if classpath_to_add:
@@ -47,7 +48,7 @@ class JarHandler:
     def __ensure_jar_accessible(remote_path: str) -> None:
         r = requests.head(remote_path, allow_redirects=True)
         if r.status_code != 200:
-            raise ValueError(f'Remote path {remote_path} is not accessible')
+            raise ValueError(f"Remote path {remote_path} is not accessible")
 
     @staticmethod
     def __prepend_file_protocol(path: str) -> str:

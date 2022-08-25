@@ -5,18 +5,19 @@ import click
 import docker
 from docker.errors import BuildError
 
-from ..config import (ADDITIONAL_DEPENDENCIES_DIR, DEFAULT_FLINK_APP_NAME,
-                      DEFAULT_NOTEBOOK_NAME)
+from ..config import (
+    ADDITIONAL_DEPENDENCIES_DIR,
+    DEFAULT_FLINK_APP_NAME,
+    DEFAULT_NOTEBOOK_NAME,
+)
 from ..docker_response_reader import DockerResponseReader
 from ..jupyter.jar_handler import JarHandler
 from ..jupyter.notebook_converter import ConvertedNotebook, convert_notebook
-from ..project.local_project_config import (LocalProjectConfig,
-                                            LocalProjectConfigIO)
+from ..project.local_project_config import LocalProjectConfig, LocalProjectConfigIO
 from ..project.project_type import ProjectType
 
 
 class ProjectBuilder:
-
     @staticmethod
     def build_project(tag_name: str) -> str:
         # Load local project config
@@ -33,27 +34,43 @@ class ProjectBuilder:
             DockerResponseReader(logs_generator).click_echo_ok_responses()
         except BuildError as err:
             build_log = "\n".join([str(log) for log in err.build_log])
-            raise click.ClickException("Error raised when using Docker.\n" + err.msg + "\n" + build_log)
+            raise click.ClickException(
+                "Error raised when using Docker.\n" + err.msg + "\n" + build_log
+            )
 
         click.echo(f"Docker image {image.short_id} created with tags: {image.tags}")
         return image.tags[0]
 
     @staticmethod
     def convert_jupyter_notebook(local_project_config: LocalProjectConfig) -> None:
-        notebook_dir = './src'
-        notebooks = [os.path.join(notebook_dir, _) for _ in os.listdir(notebook_dir) if _.endswith(".ipynb")]
+        notebook_dir = "./src"
+        notebooks = [
+            os.path.join(notebook_dir, _)
+            for _ in os.listdir(notebook_dir)
+            if _.endswith(".ipynb")
+        ]
         if len(notebooks) > 1:
-            raise click.ClickException(f"Too many notebooks in directory {notebook_dir}")
-        notebook_path = notebooks[0] if len(notebooks) == 1 else f"{notebook_dir}/{DEFAULT_NOTEBOOK_NAME}"
+            raise click.ClickException(
+                f"Too many notebooks in directory {notebook_dir}"
+            )
+        notebook_path = (
+            notebooks[0]
+            if len(notebooks) == 1
+            else f"{notebook_dir}/{DEFAULT_NOTEBOOK_NAME}"
+        )
         converted_notebook = ProjectBuilder.convert_notebook(notebook_path)
         ProjectBuilder.write_notebook(converted_notebook.content)
         if converted_notebook.remote_jars or converted_notebook.local_jars:
-            ProjectBuilder.get_jars(converted_notebook, local_project_config, notebook_dir)
+            ProjectBuilder.get_jars(
+                converted_notebook, local_project_config, notebook_dir
+            )
 
     @staticmethod
-    def get_jars(converted_notebook: ConvertedNotebook,
-                 local_project_config: LocalProjectConfig,
-                 notebook_dir: str) -> None:
+    def get_jars(
+        converted_notebook: ConvertedNotebook,
+        local_project_config: LocalProjectConfig,
+        notebook_dir: str,
+    ) -> None:
         jar_handler = JarHandler(project_root_dir=os.getcwd())
         plugin_jars_paths = jar_handler.get_classpaths_of_jars_using_plugin()
         for path in plugin_jars_paths:
@@ -72,7 +89,11 @@ class ProjectBuilder:
 
     @staticmethod
     def convert_notebook(notebook_path: Optional[str] = None) -> ConvertedNotebook:
-        file_path = notebook_path if notebook_path is not None else f"./src/{DEFAULT_NOTEBOOK_NAME}"
+        file_path = (
+            notebook_path
+            if notebook_path is not None
+            else f"./src/{DEFAULT_NOTEBOOK_NAME}"
+        )
         return convert_notebook(file_path)
 
     @staticmethod

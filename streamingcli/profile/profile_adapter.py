@@ -7,8 +7,11 @@ import click
 from marshmallow_dataclass import class_schema
 from yaml import SafeLoader, load, safe_dump  # type: ignore
 
-from streamingcli.config import (DEFAULT_PROFILE_DIR, DEFAULT_PROFILE_PATH,
-                                 PROFILE_ENV_VARIABLE_NAME)
+from streamingcli.config import (
+    DEFAULT_PROFILE_DIR,
+    DEFAULT_PROFILE_PATH,
+    PROFILE_ENV_VARIABLE_NAME,
+)
 
 
 @dataclass(repr=True)
@@ -27,7 +30,6 @@ class ScliProfiles:
 
 
 class ProfileAdapter:
-
     @staticmethod
     def save_profile(scli_profile: ScliProfile) -> None:
         os.makedirs(DEFAULT_PROFILE_DIR, exist_ok=True)
@@ -45,11 +47,17 @@ class ProfileAdapter:
 
     @staticmethod
     def get_or_create_temporary(ordered_profile_name: str) -> ScliProfile:
-        profile_name = ProfileAdapter.get_profile_name(profile_name=ordered_profile_name)
+        profile_name = ProfileAdapter.get_profile_name(
+            profile_name=ordered_profile_name
+        )
 
         if profile_name is not None:
             profile = ProfileAdapter.get_profile(profile_name=profile_name)
-            return profile if profile is not None else ScliProfile(profile_name="temporary")
+            return (
+                profile
+                if profile is not None
+                else ScliProfile(profile_name="temporary")
+            )
         else:
             raise click.ClickException(
                 f"Profile data not accessible for profile name: {ordered_profile_name}. Create profile first"
@@ -59,7 +67,7 @@ class ProfileAdapter:
     def load_profiles(default_profile_path: str = DEFAULT_PROFILE_PATH) -> ScliProfiles:
         profiles_path = Path(default_profile_path)
 
-        if (profiles_path.is_file() is False):
+        if profiles_path.is_file() is False:
             return ScliProfiles(profiles={})
 
         with open(profiles_path, "r") as file:
@@ -67,23 +75,25 @@ class ProfileAdapter:
             return ProfileAdapter.strict_load_yaml(content, ScliProfiles)
 
     @staticmethod
-    def update_profile_data(profile_data: ScliProfile,
-                            ververica_url: Optional[str] = None,
-                            ververica_namespace: Optional[str] = None,
-                            ververica_deployment_target_name: Optional[str] = None,
-                            ververica_webtoken_secret: Optional[str] = None,
-                            docker_registry_url: Optional[str] = None) -> ScliProfile:
+    def update_profile_data(
+        profile_data: ScliProfile,
+        ververica_url: Optional[str] = None,
+        ververica_namespace: Optional[str] = None,
+        ververica_deployment_target_name: Optional[str] = None,
+        ververica_webtoken_secret: Optional[str] = None,
+        docker_registry_url: Optional[str] = None,
+    ) -> ScliProfile:
         params = {}
         if ververica_url is not None:
-            params['ververica_url'] = ververica_url
+            params["ververica_url"] = ververica_url
         if ververica_namespace is not None:
-            params['ververica_namespace'] = ververica_namespace
+            params["ververica_namespace"] = ververica_namespace
         if ververica_deployment_target_name is not None:
-            params['ververica_deployment_target'] = ververica_deployment_target_name
+            params["ververica_deployment_target"] = ververica_deployment_target_name
         if ververica_webtoken_secret is not None:
-            params['ververica_api_token'] = ververica_webtoken_secret
+            params["ververica_api_token"] = ververica_webtoken_secret
         if docker_registry_url is not None:
-            params['docker_registry_url'] = docker_registry_url
+            params["docker_registry_url"] = docker_registry_url
 
         non_empty_params = {
             key: value for (key, value) in params.items() if value is not None

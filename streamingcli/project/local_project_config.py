@@ -38,13 +38,14 @@ class LocalProjectConfigFactory:
         project_version = config_yaml["project_version"]
         project_type = config_yaml["project_type"]
 
-        return LocalProjectConfig(project_name=project_name,
-                                  project_version=project_version,
-                                  project_type=project_type)
+        return LocalProjectConfig(
+            project_name=project_name,
+            project_version=project_version,
+            project_type=project_type,
+        )
 
 
 class LocalProjectConfigIO:
-
     @staticmethod
     def project_config_default_path() -> str:
         return f"./{PROJECT_LOCAL_CONFIG_FILE_NAME}"
@@ -52,7 +53,9 @@ class LocalProjectConfigIO:
     @staticmethod
     def save_project_config(config: LocalProjectConfig) -> None:
         config_yaml = safe_dump(asdict(config, dict_factory=custom_asdict_factory))
-        with open(f"./{config.project_name}/{PROJECT_LOCAL_CONFIG_FILE_NAME}", "w") as config_file:
+        with open(
+            f"./{config.project_name}/{PROJECT_LOCAL_CONFIG_FILE_NAME}", "w"
+        ) as config_file:
             config_file.write(config_yaml)
 
     @staticmethod
@@ -69,9 +72,13 @@ class LocalProjectConfigIO:
         try:
             with open(config_file_path, "r+") as config_file:
                 content = config_file.read()
-                return LocalProjectConfigIO.strict_load_yaml(content, LocalProjectConfig)
+                return LocalProjectConfigIO.strict_load_yaml(
+                    content, LocalProjectConfig
+                )
         except Exception:  # noqa
-            raise click.ClickException("Current directory is not streaming project. Initialize project first")
+            raise click.ClickException(
+                "Current directory is not streaming project. Initialize project first"
+            )
 
     @staticmethod
     def strict_load_yaml(yaml: str, loaded_type: Type[Any]) -> LocalProjectConfig:
