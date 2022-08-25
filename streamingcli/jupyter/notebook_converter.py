@@ -203,7 +203,7 @@ class NotebookConverter:
 
     @staticmethod
     def _skip_statement(statement: str) -> bool:
-        return statement.lower().startswith(('select', 'show', 'desc', 'explain'))
+        return statement.strip().lower().startswith(('select', 'show', 'desc', 'explain'))
 
 
 def convert_notebook(notebook_path: str) -> ConvertedNotebook:
