@@ -172,7 +172,7 @@ class NotebookConverter:
         args = NotebookConverter._flink_execute_sql_file_parser.parse_args(shlex.split(source)[1:])
         file_path = args.path if os.path.isabs(args.path) else f"{notebook_dir}/{args.path}"
         with open(file_path, "r") as f:
-            statements = list(map(lambda s: Sql(value=s.rstrip(';')), sqlparse.split(f.read())))
+            statements = [Sql(value=s.rstrip(';')) for s in sqlparse.split(f.read())]
         return statements
 
     @staticmethod
@@ -180,7 +180,7 @@ class NotebookConverter:
         file_path = f"{notebook_dir}/init.sql"
         if os.path.exists(file_path):
             with open(file_path, "r") as f:
-                return list(map(lambda s: Sql(value=s.rstrip(';')), sqlparse.split(f.read())))
+                return [Sql(value=s.rstrip(';')) for s in sqlparse.split(f.read())]
         return []
 
     @staticmethod
@@ -194,12 +194,13 @@ class NotebookConverter:
         flink_app_script = Environment().from_string(flink_app_template).render(
             notebook_entries=notebook_entries
         )
-        remote_jars = map(lambda entry: asdict(entry)["url"],
-                          filter(lambda entry: isinstance(entry, RegisterJar), notebook_entries))
-        local_jars = map(lambda entry: asdict(entry)["local_path"],
-                         filter(lambda entry: isinstance(entry, RegisterLocalJar), notebook_entries))
-        return ConvertedNotebook(content=autopep8.fix_code(flink_app_script), remote_jars=list(remote_jars),
-                                 local_jars=list(local_jars))
+        remote_jars = [asdict(entry)["url"] for entry in notebook_entries if isinstance(entry, RegisterJar)]
+        local_jars = [asdict(entry)["local_path"] for entry in notebook_entries if isinstance(entry, RegisterLocalJar)]
+        return ConvertedNotebook(
+            content=autopep8.fix_code(flink_app_script),
+            remote_jars=remote_jars,
+            local_jars=local_jars
+        )
 
     @staticmethod
     def _skip_statement(statement: str) -> bool:
