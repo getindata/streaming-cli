@@ -24,6 +24,11 @@ jobs:
           python -m pip install pipenv
           pipenv requirements > requirements.txt
 
+      - name: Check pre-commit status
+        run: |
+          pip install pre-commit==2.15.0
+          pre-commit run --all-files
+
       - name: Test
         run: |
           pip install pipenv

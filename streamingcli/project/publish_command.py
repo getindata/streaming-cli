@@ -65,7 +65,7 @@ class ProjectPublisher:
             total = 0
             pushed = 0
             items: Dict[str, int] = {}
-            for item in map(lambda item: json.loads(json.dumps(item)), data):
+            for item in (json.loads(json.dumps(item)) for item in data):
                 status = item.get('status')
                 id = item.get('id')
                 progress_detail = item.get('progressDetail')

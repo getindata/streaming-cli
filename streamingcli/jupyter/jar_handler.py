@@ -2,10 +2,9 @@ import os.path
 from shutil import copy2
 from typing import List
 
-from importlib_metadata import entry_points
-
 import requests
 import wget
+from importlib_metadata import entry_points
 
 
 class JarHandler:
