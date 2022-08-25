@@ -10,6 +10,7 @@ class YamlMerger:
             interpolate=True,
             failonmissingfiles=True,
             mergelists=True,
-            castinterpolated=True)
+            castinterpolated=True,
+        )
 
         return hiyapyco.dump(merged_result)

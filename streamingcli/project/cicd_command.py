@@ -23,7 +23,7 @@ class CICDInitializer:
         cicd_yaml = CICDInitializer.generate_from_template(
             template_name=provider_config.templateName,
             project_name=project_name,
-            project_version=project_version
+            project_version=project_version,
         )
         CICDInitializer.save_yaml_file(cicd_yaml, provider_config.outputFileName)
         click.echo(
@@ -31,11 +31,14 @@ class CICDInitializer:
         )
 
     @staticmethod
-    def generate_from_template(template_name: str, project_name: str, project_version: str) -> str:
+    def generate_from_template(
+        template_name: str, project_name: str, project_version: str
+    ) -> str:
         template = TemplateLoader.load_project_template(template_name)
-        return Environment().from_string(template).render(
-            project_name=project_name,
-            project_version=project_version
+        return (
+            Environment()
+            .from_string(template)
+            .render(project_name=project_name, project_version=project_version)
         )
 
     @staticmethod
@@ -45,7 +48,5 @@ class CICDInitializer:
 
     @staticmethod
     def get_providers_config(provider: str) -> ProviderConfig:
-        providers_dict = {
-            "gitlab": ProviderConfig("gitlab-ci.yml", ".gitlab-ci.yml")
-        }
+        providers_dict = {"gitlab": ProviderConfig("gitlab-ci.yml", ".gitlab-ci.yml")}
         return providers_dict[provider]

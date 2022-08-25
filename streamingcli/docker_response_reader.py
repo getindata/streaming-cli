@@ -77,28 +77,39 @@ class DockerResponseReader:
 
         for response in read_response:
             if response.is_error:
-                raise click.ClickException("Error raised when using Docker.\n" + response.msg)
+                raise click.ClickException(
+                    "Error raised when using Docker.\n" + response.msg
+                )
             click.echo(response.msg)
 
     @staticmethod
-    def _prepare_status(log: Dict[str, Union[str, Dict[str, str]]]) -> DockerReadResponse:
+    def _prepare_status(
+        log: Dict[str, Union[str, Dict[str, str]]]
+    ) -> DockerReadResponse:
         status_message = cast(str, log["status"])
         progress_detail = cast(str, log.get("progressDetail", ""))
         status_id = cast(str, log.get("id", ""))
-        message = f"{status_message}" \
-                  f"{' (' + status_id + ')' if status_id else ''}" \
-                  f"{': ' + progress_detail if progress_detail else ''}"
+        message = (
+            f"{status_message}"
+            f"{' (' + status_id + ')' if status_id else ''}"
+            f"{': ' + progress_detail if progress_detail else ''}"
+        )
         return DockerReadResponse(message, False)
 
     @staticmethod
-    def _prepare_stream(log: Dict[str, Union[str, Dict[str, str]]]) -> List[DockerReadResponse]:
+    def _prepare_stream(
+        log: Dict[str, Union[str, Dict[str, str]]]
+    ) -> List[DockerReadResponse]:
         stream = cast(str, log["stream"])
         return [
-            DockerReadResponse(line, False) for line in filter(lambda x: x, stream.splitlines())
+            DockerReadResponse(line, False)
+            for line in filter(lambda x: x, stream.splitlines())
         ]
 
     @staticmethod
-    def _prepare_aux(log: Dict[str, Union[str, Dict[str, str]]]) -> List[DockerReadResponse]:
+    def _prepare_aux(
+        log: Dict[str, Union[str, Dict[str, str]]]
+    ) -> List[DockerReadResponse]:
         aux = cast(Dict[str, str], log["aux"])
         to_return = []
         if "Digest" in aux:
@@ -108,16 +119,20 @@ class DockerResponseReader:
         return to_return
 
     @staticmethod
-    def _prepare_error_detail(log: Dict[str, Union[str, Dict[str, str]]]) -> DockerReadResponse:
+    def _prepare_error_detail(
+        log: Dict[str, Union[str, Dict[str, str]]]
+    ) -> DockerReadResponse:
         error_detail = cast(Dict[str, str], log["errorDetail"])
         error_message = error_detail.get("message", "")
         error_code = error_detail.get("code", None)
-        nl_char = '\n'
+        nl_char = "\n"
         return DockerReadResponse(
             f"ERROR: {error_message}{nl_char + 'Error code: ' + error_code if error_code else ''}",
             True,
         )
 
     @staticmethod
-    def _prepare_error(log: Dict[str, Union[str, Dict[str, str]]]) -> DockerReadResponse:
+    def _prepare_error(
+        log: Dict[str, Union[str, Dict[str, str]]]
+    ) -> DockerReadResponse:
         return DockerReadResponse(f"ERROR: {cast(str, log['error'])}", True)
