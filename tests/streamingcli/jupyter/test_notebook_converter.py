@@ -175,3 +175,55 @@ t_env.execute_sql(f"""CREATE TABLE datagen (
 )""")
 '''
         )
+
+    def test_notebook_hidden_to_env_conversion(self):
+        # given
+        file_path = "tests/streamingcli/resources/jupyter/notebook_env.ipynb"
+        # expect
+        converted_notebook = convert_notebook(file_path)
+        assert (
+            converted_notebook.content
+            == '''import os
+from pyflink.datastream import StreamExecutionEnvironment
+from pyflink.table import StreamTableEnvironment, DataTypes
+from pyflink.table.udf import udf
+
+env = StreamExecutionEnvironment.get_execution_environment()
+env.set_parallelism(1)
+t_env = StreamTableEnvironment.create(env)
+
+
+mysql_table_name = 'datagen'
+
+
+__env_var_0__MY_ENV_VARIABLE = os.environ["MY_ENV_VARIABLE"]
+
+
+t_env.execute_sql(f"""CREATE TABLE datagen (
+    id INT
+) WITH (
+    'connector' = 'datagen',
+    'number-of-rows' = '{__env_var_0__MY_ENV_VARIABLE}'
+)""")
+
+
+__env_var_1__MYSQL_USER = os.environ["MYSQL_USER"]
+
+
+__env_var_2__MYSQL_PASSWORD = os.environ["MYSQL_PASSWORD"]
+
+
+t_env.execute_sql(f"""CREATE TABLE mysql (
+    id INT
+) WITH (
+    'connector' = 'jdbc',
+    'url' = 'jdbc:mysql://localhost:3306/mydatabase',
+    'table-name' = '{mysql_table_name}',
+    'username' = '{__env_var_1__MYSQL_USER}',
+    'password' = '{__env_var_2__MYSQL_PASSWORD}'
+)""")
+
+
+t_env.execute_sql(f"""INSERT INTO mysql (SELECT * FROM datagen)""")
+'''
+        )
