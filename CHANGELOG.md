@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Added
+
+- Convert secret variables (marked with `${variable_name}`) to use environment variables.
+
 ## [1.5.0] - 2022-08-25
 
 ### Added

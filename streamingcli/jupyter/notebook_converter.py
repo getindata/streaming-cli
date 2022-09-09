@@ -1,10 +1,11 @@
 import argparse
 import json
 import os
+import re
 import shlex
 import sys
 from dataclasses import asdict, dataclass, field
-from typing import Any, Dict, List, Sequence
+from typing import Any, Dict, List, Sequence, Tuple, cast
 
 import autopep8
 import nbformat
@@ -70,6 +71,10 @@ class NotebookConverter:
 
     notebook_path: str
     """String representing path to .ipynb file"""
+
+    hidden_variable_counter: int
+    """Counter of hidden variables that are read from ENVs"""
+
     _udf_parser = argparse.ArgumentParser()
     """Argument parser for %register_udf magic"""
     _udf_parser.add_argument("--function_name", "-n")
@@ -77,15 +82,18 @@ class NotebookConverter:
     _udf_parser.add_argument("--language", "-l")
     _udf_parser.add_argument("--remote_path", "-r")
     _udf_parser.add_argument("--local_path", "-p")
+
     _load_config_parser = argparse.ArgumentParser()
     """Argument parser for %load_config magic"""
     _load_config_parser.add_argument("--path", "-p")
+
     _flink_execute_sql_file_parser = argparse.ArgumentParser()
     """Argument parser for %flink_execute_sql_file magic"""
     _flink_execute_sql_file_parser.add_argument("--path", "-p")
 
     def __init__(self, notebook_path: str):
         self.notebook_path = notebook_path
+        self.hidden_variable_counter = 0
 
     """
     Read and convert Jupyter Notebook
@@ -99,9 +107,7 @@ class NotebookConverter:
             notebook = self._load_notebook(self.notebook_path)
             code_cells = filter(lambda _: _.cell_type == "code", notebook.cells)
             script_entries: List[NotebookEntry] = []
-            init_entries = NotebookConverter._read_init_sql(
-                os.path.dirname(self.notebook_path)
-            )
+            init_entries = self._read_init_sql(os.path.dirname(self.notebook_path))
             script_entries.extend(init_entries)
             for cell in code_cells:
                 entries = self._get_notebook_entry(
@@ -123,29 +129,27 @@ class NotebookConverter:
         with open(notebook_path, "r+") as notebook_file:
             return nbformat.reads(notebook_file.read(), as_version=4)
 
-    @staticmethod
     def _get_notebook_entry(
-        cell: nbformat.NotebookNode, notebook_dir: str
+        self, cell: nbformat.NotebookNode, notebook_dir: str
     ) -> Sequence[NotebookEntry]:
         if cell.source.startswith("%"):
-            return NotebookConverter._handle_magic_cell(cell, notebook_dir)
+            return self._handle_magic_cell(cell, notebook_dir)
         elif not cell.source.startswith("##"):
             return [Code(value=cell.source)]
         else:
             return []
 
-    @staticmethod
     def _handle_magic_cell(
-        cell: nbformat.NotebookNode, notebook_dir: str
+        self, cell: nbformat.NotebookNode, notebook_dir: str
     ) -> Sequence[NotebookEntry]:
         source = cell.source
         if source.startswith("%%flink_execute_sql"):
             sql_statement = "\n".join(source.split("\n")[1:])
             if NotebookConverter._skip_statement(sql_statement):
                 return []
-            return [Sql(value=sql_statement)]
+            return self._convert_sql_statement_to_python_instructions(sql_statement)
         if source.startswith("%flink_execute_sql_file"):
-            return NotebookConverter._get_statements_from_file(source, notebook_dir)
+            return self._get_statements_from_file(source, notebook_dir)
         if source.startswith("%flink_register_function"):
             args = NotebookConverter._udf_parser.parse_args(shlex.split(source)[1:])
             return [
@@ -185,9 +189,8 @@ class NotebookConverter:
         all_variable_strings = "\n".join(variable_strings)
         return Code(value=f"{all_variable_strings}")
 
-    @staticmethod
     def _get_statements_from_file(
-        source: str, notebook_dir: str
+        self, source: str, notebook_dir: str
     ) -> Sequence[NotebookEntry]:
         args = NotebookConverter._flink_execute_sql_file_parser.parse_args(
             shlex.split(source)[1:]
@@ -196,15 +199,26 @@ class NotebookConverter:
             args.path if os.path.isabs(args.path) else f"{notebook_dir}/{args.path}"
         )
         with open(file_path, "r") as f:
-            statements = [Sql(value=s.rstrip(";")) for s in sqlparse.split(f.read())]
-        return statements
+            instructions = [
+                instruction
+                for statement in sqlparse.split(f.read())
+                for instruction in self._convert_sql_statement_to_python_instructions(
+                    statement.rstrip(";")
+                )
+            ]
+        return instructions
 
-    @staticmethod
-    def _read_init_sql(notebook_dir: str) -> Sequence[NotebookEntry]:
+    def _read_init_sql(self, notebook_dir: str) -> Sequence[NotebookEntry]:
         file_path = f"{notebook_dir}/init.sql"
         if os.path.exists(file_path):
             with open(file_path, "r") as f:
-                return [Sql(value=s.rstrip(";")) for s in sqlparse.split(f.read())]
+                return [
+                    instruction
+                    for statement in sqlparse.split(f.read())
+                    for instruction in self._convert_sql_statement_to_python_instructions(
+                        statement.rstrip(";")
+                    )
+                ]
         return []
 
     @staticmethod
@@ -245,6 +259,38 @@ class NotebookConverter:
         return (
             statement.strip().lower().startswith(("select", "show", "desc", "explain"))
         )
+
+    def _convert_sql_statement_to_python_instructions(
+        self, sql_statement: str
+    ) -> List[NotebookEntry]:
+        sql_statement, env_var_loads = self._convert_hidden_variables_to_env_vars(
+            sql_statement
+        )
+        return env_var_loads + [Sql(value=sql_statement)]
+
+    def _convert_hidden_variables_to_env_vars(
+        self, sql_statement: str
+    ) -> Tuple[str, List[NotebookEntry]]:
+        hidden_var_pattern = r"(\$\{[_a-zA-Z][_a-zA-Z0-9]*\})"
+        hidden_list = cast(List[str], re.findall(hidden_var_pattern, sql_statement))
+        hidden_env_load_instructions: List[NotebookEntry] = (
+            [Code(value="import os")] if len(hidden_list) > 0 else []
+        )
+        for hidden in hidden_list:
+            var_name = hidden[2:-1].strip()
+
+            hidden_variable_index = self.hidden_variable_counter
+            self.hidden_variable_counter = self.hidden_variable_counter + 1
+
+            hidden_env_variable = f"__env_var_{hidden_variable_index}__{var_name}"
+            hidden_env_load_instructions.append(
+                Code(value=f'{hidden_env_variable} = os.environ["{var_name}"]')
+            )
+
+            sql_statement = sql_statement.replace(
+                hidden, "{" + hidden_env_variable + "}"
+            )
+        return sql_statement, hidden_env_load_instructions
 
 
 def convert_notebook(notebook_path: str) -> ConvertedNotebook:
