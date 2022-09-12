@@ -16,6 +16,7 @@ class LocalProjectConfig:
     project_version: str
     project_type: ProjectType = field(metadata={"by_value": True})
     dependencies: List[str] = field(default_factory=lambda: [])
+    secrets: Dict[str, str] = field(default_factory=lambda: {})
 
     def add_dependency(self, dependency_path: str) -> None:
         self.dependencies.append(dependency_path)
@@ -37,11 +38,13 @@ class LocalProjectConfigFactory:
         project_name = config_yaml["project_name"]
         project_version = config_yaml["project_version"]
         project_type = config_yaml["project_type"]
+        secrets = config_yaml.get("secrets") or {}
 
         return LocalProjectConfig(
             project_name=project_name,
             project_version=project_version,
             project_type=project_type,
+            secrets=secrets,
         )
 
 

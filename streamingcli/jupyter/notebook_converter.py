@@ -5,7 +5,7 @@ import re
 import shlex
 import sys
 from dataclasses import asdict, dataclass, field
-from typing import Any, Dict, List, Sequence, Tuple, cast
+from typing import Any, Dict, List, Optional, Sequence, Tuple, cast
 
 import autopep8
 import nbformat
@@ -72,6 +72,9 @@ class NotebookConverter:
     notebook_path: str
     """String representing path to .ipynb file"""
 
+    secrets_paths: Dict[str, str]
+    """Mapping from secret variable name to path of the file holding the secret."""
+
     hidden_variable_counter: int
     """Counter of hidden variables that are read from ENVs"""
 
@@ -87,12 +90,18 @@ class NotebookConverter:
     """Argument parser for %load_config magic"""
     _load_config_parser.add_argument("--path", "-p")
 
+    _load_secret_parser = argparse.ArgumentParser()
+    """Argument parser for %load_secret magic"""
+    _load_secret_parser.add_argument("--path", "-p")
+    _load_secret_parser.add_argument("varname")
+
     _flink_execute_sql_file_parser = argparse.ArgumentParser()
     """Argument parser for %flink_execute_sql_file magic"""
     _flink_execute_sql_file_parser.add_argument("--path", "-p")
 
-    def __init__(self, notebook_path: str):
+    def __init__(self, notebook_path: str, secrets_paths: Optional[Dict[str, str]]):
         self.notebook_path = notebook_path
+        self.secrets_paths = secrets_paths or {}
         self.hidden_variable_counter = 0
 
     """
@@ -107,8 +116,10 @@ class NotebookConverter:
             notebook = self._load_notebook(self.notebook_path)
             code_cells = filter(lambda _: _.cell_type == "code", notebook.cells)
             script_entries: List[NotebookEntry] = []
-            init_entries = self._read_init_sql(os.path.dirname(self.notebook_path))
-            script_entries.extend(init_entries)
+            script_entries.extend(self._load_secrets_from_scli_config())
+            script_entries.extend(
+                self._read_init_sql(os.path.dirname(self.notebook_path))
+            )
             for cell in code_cells:
                 entries = self._get_notebook_entry(
                     cell, os.path.dirname(self.notebook_path)
@@ -171,6 +182,14 @@ class NotebookConverter:
                 if args.remote_path is not None
                 else RegisterLocalJar(local_path=args.local_path)
             ]
+        if source.startswith("%load_secret_file"):
+            args = NotebookConverter._load_secret_parser.parse_args(
+                shlex.split(source)[1:]
+            )
+            file_path = (
+                args.path if os.path.isabs(args.path) else f"{notebook_dir}/{args.path}"
+            )
+            return [NotebookConverter._load_secret_from_file(args.varname, file_path)]
         return []
 
     @staticmethod
@@ -292,6 +311,20 @@ class NotebookConverter:
             )
         return sql_statement, hidden_env_load_instructions
 
+    def _load_secrets_from_scli_config(self) -> Sequence[NotebookEntry]:
+        return [
+            self._load_secret_from_file(var_name, filepath)
+            for var_name, filepath in self.secrets_paths.items()
+        ]
 
-def convert_notebook(notebook_path: str) -> ConvertedNotebook:
-    return NotebookConverter(notebook_path).convert_notebook()
+    @staticmethod
+    def _load_secret_from_file(var_name: str, filepath: str) -> NotebookEntry:
+        return Code(
+            value=f'with open("{filepath}", "r") as secret_file:\n    {var_name} = secret_file.read().rstrip()'
+        )
+
+
+def convert_notebook(
+    notebook_path: str, secrets_paths: Optional[Dict[str, str]] = None
+) -> ConvertedNotebook:
+    return NotebookConverter(notebook_path, secrets_paths).convert_notebook()
