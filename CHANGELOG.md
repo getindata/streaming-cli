@@ -2,15 +2,17 @@
 
 ## [Unreleased]
 
+## [1.6.0] - 2022-09-12
+
 ### Added
 
-- Convert secret variables (marked with `${variable_name}`) to use environment variables.
-- Load secret from file using `%load_secret_file` magic.
-- Load secrets from files listed in `.streaming_config.yml` file.
+-   Convert secret variables (marked with `${variable_name}`) to use environment variables.
+-   Load secret from file using `%load_secret_file` magic.
+-   Load secrets from files listed in `.streaming_config.yml` file.
 
 ### Fixed
 
-- Show raw `"status"` response from Docker if it is not a string.
+-   Show raw `"status"` response from Docker if it is not a string.
 
 ## [1.5.0] - 2022-08-25
 
@@ -49,7 +51,9 @@
 
 -   First release
 
-[Unreleased]: https://github.com/getindata/streaming-cli/compare/1.5.0...HEAD
+[Unreleased]: https://github.com/getindata/streaming-cli/compare/1.6.0...HEAD
+
+[1.6.0]: https://github.com/getindata/streaming-cli/compare/1.5.0...1.6.0
 
 [1.5.0]: https://github.com/getindata/streaming-cli/compare/1.4.0...1.5.0
 
