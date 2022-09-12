@@ -5,6 +5,8 @@
 ### Added
 
 - Convert secret variables (marked with `${variable_name}`) to use environment variables.
+- Load secret from file using `%load_secret_file` magic.
+- Load secrets from files listed in `.streaming_config.yml` file.
 
 ## [1.5.0] - 2022-08-25
 

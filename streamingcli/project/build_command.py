@@ -1,5 +1,5 @@
 import os
-from typing import Optional
+from typing import Dict, Optional
 
 import click
 import docker
@@ -58,7 +58,9 @@ class ProjectBuilder:
             if len(notebooks) == 1
             else f"{notebook_dir}/{DEFAULT_NOTEBOOK_NAME}"
         )
-        converted_notebook = ProjectBuilder.convert_notebook(notebook_path)
+        converted_notebook = ProjectBuilder.convert_notebook(
+            notebook_path, local_project_config.secrets
+        )
         ProjectBuilder.write_notebook(converted_notebook.content)
         if converted_notebook.remote_jars or converted_notebook.local_jars:
             ProjectBuilder.get_jars(
@@ -88,13 +90,16 @@ class ProjectBuilder:
         LocalProjectConfigIO.update_project_config(local_project_config)
 
     @staticmethod
-    def convert_notebook(notebook_path: Optional[str] = None) -> ConvertedNotebook:
+    def convert_notebook(
+        notebook_path: Optional[str] = None,
+        secrets_paths: Optional[Dict[str, str]] = None,
+    ) -> ConvertedNotebook:
         file_path = (
             notebook_path
             if notebook_path is not None
             else f"./src/{DEFAULT_NOTEBOOK_NAME}"
         )
-        return convert_notebook(file_path)
+        return convert_notebook(file_path, secrets_paths)
 
     @staticmethod
     def write_notebook(notebook_content: str) -> None:
