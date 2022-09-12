@@ -8,6 +8,10 @@
 - Load secret from file using `%load_secret_file` magic.
 - Load secrets from files listed in `.streaming_config.yml` file.
 
+### Fixed
+
+- Show raw `"status"` response from Docker if it is not a string.
+
 ## [1.5.0] - 2022-08-25
 
 ### Added
