@@ -86,6 +86,9 @@ class DockerResponseReader:
     def _prepare_status(
         log: Dict[str, Union[str, Dict[str, str]]]
     ) -> DockerReadResponse:
+        if log["status"] is not str:
+            return DockerReadResponse(str(log), False)
+
         status_message = cast(str, log["status"])
         progress_detail = cast(str, log.get("progressDetail", ""))
         status_id = cast(str, log.get("id", ""))
