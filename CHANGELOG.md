@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Fixed
+
+- Allow for whitespaces in secret variables regex.
+
 ## [1.6.0] - 2022-09-12
 
 ### Added
