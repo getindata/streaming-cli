@@ -290,7 +290,7 @@ class NotebookConverter:
     def _convert_hidden_variables_to_env_vars(
         self, sql_statement: str
     ) -> Tuple[str, List[NotebookEntry]]:
-        hidden_var_pattern = r"(\$\{[_a-zA-Z][_a-zA-Z0-9]*\})"
+        hidden_var_pattern = r"(\$\{ *[_a-zA-Z][_a-zA-Z0-9]* *\})"
         hidden_list = cast(List[str], re.findall(hidden_var_pattern, sql_statement))
         hidden_env_load_instructions: List[NotebookEntry] = (
             [Code(value="import os")] if len(hidden_list) > 0 else []
