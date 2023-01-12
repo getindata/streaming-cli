@@ -14,9 +14,11 @@ from streamingcli.config import (
     PROFILE_ENV_VARIABLE_NAME,
 )
 
+
 class DeploymentMode(Enum):
     VVP = "vvp"
     K8S_OPERATOR = "k8s_operator"
+
 
 @dataclass(repr=True)
 class ScliProfile:
