@@ -9,6 +9,7 @@ from .error import StreamingCliError
 from .platform.apitoken_create_command import VervericaApiTokenCreateCommand
 from .platform.apitoken_remove_command import VervericaApiTokenRemoveCommand
 from .platform.deployment_target_command import DeploymentTargetCommand
+from .profile.profile_adapter import DeploymentMode
 from .profile.profile_command import ProfileCommand
 from .project.build_command import ProjectBuilder
 from .project.cicd_command import CICDInitializer
@@ -94,6 +95,11 @@ def project_init(
 )
 @click.option("--profile", help="Profile name to use")
 @click.option(
+    "--deployment-mode",
+    "deployment_mode",
+    type=click.Choice(list(map(lambda x: x.name, DeploymentMode)), case_sensitive=False)
+)
+@click.option(
     "--vvp-url",
     "ververica_url",
     help='URL for Ververica cluster, i.e: "https://vvp.streaming-platform.example.com"',
@@ -110,6 +116,11 @@ def project_init(
     help="Ververica WebToken secret to make API calls",
 )
 @click.option(
+    "--k8s-namespace",
+    "k8s_namespace",
+    help="Target namespace"
+)
+@click.option(
     "--overrides-from-yaml",
     help="Path to additional deployment YAML file to merge with Ververica one",
 )
@@ -118,10 +129,12 @@ def project_deploy(
     docker_image_registry: Optional[str] = None,
     docker_image_repository: Optional[str] = None,
     profile: Optional[str] = None,
+    deployment_mode: Optional[DeploymentMode] = None,
     ververica_url: Optional[str] = None,
     ververica_namespace: Optional[str] = None,
     ververica_deployment_target_name: Optional[str] = None,
     vvp_api_token: Optional[str] = None,
+    k8s_namespace: Optional[str] = None,
     overrides_from_yaml: Optional[str] = None,
 ) -> None:
     ProjectDeployer.deploy_project(
@@ -129,10 +142,12 @@ def project_deploy(
         docker_registry_url=docker_image_registry,
         docker_image_repository=docker_image_repository,
         profile=profile,
+        deployment_mode=deployment_mode,
         ververica_url=ververica_url,
         ververica_namespace=ververica_namespace,
         ververica_deployment_target_name=ververica_deployment_target_name,
         ververica_webtoken_secret=vvp_api_token,
+        k8s_namespace=k8s_namespace,
         overrides_from_yaml=overrides_from_yaml,
     )
 
@@ -317,6 +332,12 @@ def profile() -> None:
 @profile.command()
 @click.argument("profile_name")
 @click.option(
+    "--deployment-mode",
+    "deployment_mode",
+    type=click.Choice(list(map(lambda x: x.name, DeploymentMode)), case_sensitive=False),
+    default="vvp"
+)
+@click.option(
     "--vvp-url",
     required=False,
     help='URL for Ververica cluster, i.e: "https://vvp.streaming-platform.example.com"',
@@ -331,21 +352,30 @@ def profile() -> None:
     required=False,
     help='URL for Docker registry, i.e: "https://hub.docker.com/"',
 )
+@click.option(
+    "--k8s-namespace",
+    "k8s_namespace",
+    help="Target namespace"
+)
 def add_profile(
     profile_name: str,
+    deployment_mode: Optional[DeploymentMode],
     vvp_url: Optional[str],
     vvp_namespace: Optional[str],
     vvp_deployment_target: Optional[str],
     vvp_api_token: Optional[str],
     docker_registry_url: Optional[str],
+    k8s_namespace: Optional[str],
 ) -> None:
     ProfileCommand.create_profile(
         profile_name=profile_name,
+        deployment_mode=deployment_mode,
         ververica_url=vvp_url,
         ververica_namespace=vvp_namespace,
         ververica_deployment_target=vvp_deployment_target,
         ververica_api_token=vvp_api_token,
         docker_registry_url=docker_registry_url,
+        k8s_namespace=k8s_namespace,
     )
 
 

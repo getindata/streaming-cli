@@ -1,5 +1,6 @@
 import os
 from dataclasses import asdict, dataclass, field, replace
+from enum import Enum
 from pathlib import Path
 from typing import Any, Dict, Optional, Type
 
@@ -13,15 +14,20 @@ from streamingcli.config import (
     PROFILE_ENV_VARIABLE_NAME,
 )
 
+class DeploymentMode(Enum):
+    VVP = "vvp"
+    K8S_OPERATOR = "k8s_operator"
 
 @dataclass(repr=True)
 class ScliProfile:
     profile_name: str
+    deployment_mode: Optional[DeploymentMode] = field(default=DeploymentMode.VVP)
     ververica_url: Optional[str] = field(default=None)
     ververica_namespace: Optional[str] = field(default=None)
     ververica_deployment_target: Optional[str] = field(default=None)
     ververica_api_token: Optional[str] = field(default=None)
     docker_registry_url: Optional[str] = field(default=None)
+    k8s_namespace: Optional[str] = field(default=None)
 
 
 @dataclass
@@ -77,13 +83,17 @@ class ProfileAdapter:
     @staticmethod
     def update_profile_data(
         profile_data: ScliProfile,
+        deployment_mode: Optional[DeploymentMode] = None,
         ververica_url: Optional[str] = None,
         ververica_namespace: Optional[str] = None,
         ververica_deployment_target_name: Optional[str] = None,
         ververica_webtoken_secret: Optional[str] = None,
         docker_registry_url: Optional[str] = None,
+        k8s_namespace: Optional[str] = None
     ) -> ScliProfile:
         params = {}
+        if deployment_mode is not None:
+            params["deployment_mode"] = deployment_mode
         if ververica_url is not None:
             params["ververica_url"] = ververica_url
         if ververica_namespace is not None:
@@ -94,6 +104,8 @@ class ProfileAdapter:
             params["ververica_api_token"] = ververica_webtoken_secret
         if docker_registry_url is not None:
             params["docker_registry_url"] = docker_registry_url
+        if k8s_namespace is not None:
+            params["k8s_namespace"] = k8s_namespace
 
         non_empty_params = {
             key: value for (key, value) in params.items() if value is not None
