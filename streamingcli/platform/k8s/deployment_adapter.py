@@ -1,20 +1,28 @@
+import os
 from typing import Optional
 
 import click
-from kubernetes import utils
+import requests
 import yaml
+from kubernetes.config import KUBE_CONFIG_DEFAULT_LOCATION
+from requests import Response
 
 from streamingcli.platform.deployment_adapter import DeploymentAdapter
-from streamingcli.platform.k8s.config_loader import KubernetesConfigLoader
 
 
 class K8SDeploymentAdapter(DeploymentAdapter):
 
     def deploy(self, deployment_yml: Optional[str]) -> Optional[str]:
-        k8s_client = KubernetesConfigLoader.get_client()
-        utils.create_from_dict(k8s_client, yaml.load(deployment_yml), namespace=self.profile_data.k8s_namespace)
+        self.load_k8s_config()
 
-        return f"Created FlinkDeployment: {self.project_name}"
+        response = self.post_deployment_file(deployment_yml)
+
+        if response.status_code != 201:
+            raise click.ClickException("Failed to POST deployment.yaml file")
+        else:
+            deployment_name = response.json()["metadata"]["name"]
+            namespace = response.json()["metadata"]["namespace"]
+            return f"Created deployment: {deployment_name} (namespace: {namespace})"
 
     def validate_profile_data(self) -> None:
         if self.profile_data.k8s_namespace is None:
@@ -32,3 +40,32 @@ class K8SDeploymentAdapter(DeploymentAdapter):
     def get_template_name() -> str:
         return "k8s_flink_deployment.yml"
 
+    def post_deployment_file(self, deployment_file: str) -> Response:
+        deployments_url = (
+            f"{self.cluster}/apis/flink.apache.org/v1beta1/namespaces/{self.profile_data.k8s_namespace}/flinkdeployments"
+        )
+
+        response = requests.post(
+            url=deployments_url,
+            data=deployment_file,
+            verify=self.ca_crt,
+            cert=(self.client_crt, self.client_key),
+            headers={
+                "Content-Type": "application/yaml",
+            },
+        )
+        return response
+
+    def load_k8s_config(self):
+        path = os.path.expanduser(KUBE_CONFIG_DEFAULT_LOCATION)
+        with open(path, 'r') as stream:
+            parsed_yaml = yaml.safe_load(stream)
+            current_context = parsed_yaml["current-context"]
+            for cluster in parsed_yaml["clusters"]:
+                if cluster["name"] == current_context:
+                    self.ca_crt = cluster["cluster"]["certificate-authority"]
+                    self.cluster = cluster["cluster"]["server"]
+            for user in parsed_yaml["users"]:
+                if user["name"] == current_context:
+                    self.client_crt = user["user"]["client-certificate"]
+                    self.client_key = user["user"]["client-key"]

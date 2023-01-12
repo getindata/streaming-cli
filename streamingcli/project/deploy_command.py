@@ -2,9 +2,10 @@ import os
 from typing import Optional
 
 import click
+from streamingcli.platform.ververica.deployment_adapter import VervericaDeploymentAdapter
 
 from streamingcli.config import PROFILE_ENV_VARIABLE_NAME
-from streamingcli.platform.deployment_adapter import DeploymentAdapterFactory
+from streamingcli.platform.k8s.deployment_adapter import K8SDeploymentAdapter
 from streamingcli.profile.profile_adapter import ProfileAdapter, ScliProfile, DeploymentMode
 from streamingcli.project.local_project_config import LocalProjectConfigIO
 from streamingcli.project.yaml_merger import YamlMerger
@@ -72,3 +73,12 @@ class ProjectDeployer:
         click.echo(f"Deploying streaming project: {project_name} ...")
         msg = deployment_adapter.deploy(deployment_yml)
         click.echo(msg)
+
+
+class DeploymentAdapterFactory:
+    @staticmethod
+    def get_adapter(deployment_mode: DeploymentMode, **kwargs):
+        if deployment_mode == DeploymentMode.K8S_OPERATOR:
+            return K8SDeploymentAdapter(**kwargs)
+        if deployment_mode == DeploymentMode.VVP:
+            return VervericaDeploymentAdapter(**kwargs)

@@ -2,9 +2,6 @@ from abc import ABC, abstractmethod
 from jinja2 import Environment
 from typing import Optional, List
 
-from streamingcli.platform.ververica.deployment_adapter import VervericaDeploymentAdapter
-
-from streamingcli.platform.k8s.deployment_adapter import K8SDeploymentAdapter
 from streamingcli.project.template_loader import TemplateLoader
 
 from streamingcli.profile.profile_adapter import ScliProfile, DeploymentMode
@@ -41,12 +38,3 @@ class DeploymentAdapter(ABC):
             .from_string(template)
             .render(params)
         )
-
-
-class DeploymentAdapterFactory:
-    @staticmethod
-    def get_adapter(deployment_mode: DeploymentMode, **kwargs):
-        if deployment_mode == DeploymentMode.K8S_OPERATOR:
-            return K8SDeploymentAdapter(**kwargs)
-        if deployment_mode == DeploymentMode.VVP:
-            return VervericaDeploymentAdapter(**kwargs)
