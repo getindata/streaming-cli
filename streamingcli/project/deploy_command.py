@@ -68,8 +68,6 @@ class ProjectDeployer:
             project_name=project_name,
         )
 
-        deployment_adapter.validate_profile_data()
-
         # Generate deployment YAML
         deployment_yml = deployment_adapter.generate_project_template(
             local_project_config.dependencies

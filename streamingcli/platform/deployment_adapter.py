@@ -15,6 +15,8 @@ class DeploymentAdapter(ABC):
         self.docker_image_tag = docker_image_tag
         self.project_name = project_name
 
+        self.validate_profile_data()
+
     @abstractmethod
     def deploy(self, deployment_yml: str) -> Optional[str]:
         pass
