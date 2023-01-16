@@ -8,17 +8,18 @@ from streamingcli.platform.deployment_adapter import DeploymentAdapter
 
 
 class VervericaDeploymentAdapter(DeploymentAdapter):
-
-    def deploy(self, deployment_yml: Optional[str]) -> Optional[str]:
+    def deploy(self, deployment_yml: str) -> Optional[str]:
         response = self.post_deployment_file(deployment_yml)
 
         if response.status_code != 201:
             raise click.ClickException("Failed to POST deployment.yaml file")
         else:
             deployment_name = response.json()["metadata"]["name"]
-            return f"Created deployment: " + \
-                f"{self.profile_data.ververica_url}/app/#/namespaces/" + \
-                f"{self.profile_data.ververica_namespace}/deployments/{deployment_name}"
+            return (
+                "Created deployment: "
+                + f"{self.profile_data.ververica_url}/app/#/namespaces/"
+                + f"{self.profile_data.ververica_namespace}/deployments/{deployment_name}"
+            )
 
     def validate_profile_data(self) -> None:
         if self.profile_data.ververica_url is None:
@@ -46,11 +47,10 @@ class VervericaDeploymentAdapter(DeploymentAdapter):
     def get_template_name() -> str:
         return "vvp_flink_deployment.yml"
 
-    def post_deployment_file(
-        self, deployment_file: str
-    ) -> Response:
+    def post_deployment_file(self, deployment_file: str) -> Response:
         deployments_url = (
-            f"{self.profile_data.ververica_url}/api/v1/namespaces/{self.profile_data.ververica_namespace}/deployments"
+            f"{self.profile_data.ververica_url}/api/v1/namespaces/"
+            + f"{self.profile_data.ververica_namespace}/deployments"
         )
 
         response = requests.post(

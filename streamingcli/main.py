@@ -97,7 +97,7 @@ def project_init(
 @click.option(
     "--deployment-mode",
     "deployment_mode",
-    type=click.Choice(list(map(lambda x: x.name, DeploymentMode)), case_sensitive=False)
+    type=click.Choice([x.name for x in DeploymentMode], case_sensitive=False),
 )
 @click.option(
     "--vvp-url",
@@ -115,11 +115,7 @@ def project_init(
     "vvp_api_token",
     help="Ververica WebToken secret to make API calls",
 )
-@click.option(
-    "--k8s-namespace",
-    "k8s_namespace",
-    help="Target namespace"
-)
+@click.option("--k8s-namespace", "k8s_namespace", help="Target namespace")
 @click.option(
     "--overrides-from-yaml",
     help="Path to additional deployment YAML file to merge with Ververica one",
@@ -334,8 +330,8 @@ def profile() -> None:
 @click.option(
     "--deployment-mode",
     "deployment_mode",
-    type=click.Choice(list(map(lambda x: x.name, DeploymentMode)), case_sensitive=False),
-    default="vvp"
+    type=click.Choice([x.name for x in DeploymentMode], case_sensitive=False),
+    default="VVP",
 )
 @click.option(
     "--vvp-url",
@@ -352,14 +348,10 @@ def profile() -> None:
     required=False,
     help='URL for Docker registry, i.e: "https://hub.docker.com/"',
 )
-@click.option(
-    "--k8s-namespace",
-    "k8s_namespace",
-    help="Target namespace"
-)
+@click.option("--k8s-namespace", "k8s_namespace", help="Target namespace")
 def add_profile(
     profile_name: str,
-    deployment_mode: Optional[str],
+    deployment_mode: str,
     vvp_url: Optional[str],
     vvp_namespace: Optional[str],
     vvp_deployment_target: Optional[str],

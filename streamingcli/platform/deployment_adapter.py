@@ -1,21 +1,22 @@
 from abc import ABC, abstractmethod
+from typing import List, Optional
+
 from jinja2 import Environment
-from typing import Optional, List
 
+from streamingcli.profile.profile_adapter import ScliProfile
 from streamingcli.project.template_loader import TemplateLoader
-
-from streamingcli.profile.profile_adapter import ScliProfile, DeploymentMode
 
 
 class DeploymentAdapter(ABC):
-
-    def __init__(self, profile_data: ScliProfile, docker_image_tag: str, project_name: str):
+    def __init__(
+        self, profile_data: ScliProfile, docker_image_tag: str, project_name: str
+    ):
         self.profile_data = profile_data
         self.docker_image_tag = docker_image_tag
         self.project_name = project_name
 
     @abstractmethod
-    def deploy(self, deployment_yml: Optional[str]) -> Optional[str]:
+    def deploy(self, deployment_yml: str) -> Optional[str]:
         pass
 
     @abstractmethod
@@ -33,8 +34,4 @@ class DeploymentAdapter(ABC):
         params["project_name"] = self.project_name
         params["docker_image_tag"] = self.docker_image_tag
         params["dependencies"] = dependencies
-        return (
-            Environment()
-            .from_string(template)
-            .render(params)
-        )
+        return Environment().from_string(template).render(params)

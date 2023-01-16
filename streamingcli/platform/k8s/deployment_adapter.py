@@ -11,8 +11,7 @@ from streamingcli.platform.deployment_adapter import DeploymentAdapter
 
 
 class K8SDeploymentAdapter(DeploymentAdapter):
-
-    def deploy(self, deployment_yml: Optional[str]) -> Optional[str]:
+    def deploy(self, deployment_yml: str) -> Optional[str]:
         self.load_k8s_config()
 
         response = self.post_deployment_file(deployment_yml)
@@ -26,9 +25,7 @@ class K8SDeploymentAdapter(DeploymentAdapter):
 
     def validate_profile_data(self) -> None:
         if self.profile_data.k8s_namespace is None:
-            raise click.ClickException(
-                "Missing K8S Namespace attribute or profile"
-            )
+            raise click.ClickException("Missing K8S Namespace attribute or profile")
         if self.profile_data.docker_registry_url is None:
             raise click.ClickException(
                 "Missing Docker repository URL attribute or profile"
@@ -42,7 +39,8 @@ class K8SDeploymentAdapter(DeploymentAdapter):
 
     def post_deployment_file(self, deployment_file: str) -> Response:
         deployments_url = (
-            f"{self.cluster}/apis/flink.apache.org/v1beta1/namespaces/{self.profile_data.k8s_namespace}/flinkdeployments"
+            f"{self.cluster}/apis/flink.apache.org/v1beta1/namespaces/"
+            + f"{self.profile_data.k8s_namespace}/flinkdeployments"
         )
 
         response = requests.post(
@@ -56,9 +54,9 @@ class K8SDeploymentAdapter(DeploymentAdapter):
         )
         return response
 
-    def load_k8s_config(self):
+    def load_k8s_config(self) -> None:
         path = os.path.expanduser(KUBE_CONFIG_DEFAULT_LOCATION)
-        with open(path, 'r') as stream:
+        with open(path, "r") as stream:
             parsed_yaml = yaml.safe_load(stream)
             current_context = parsed_yaml["current-context"]
             for cluster in parsed_yaml["clusters"]:

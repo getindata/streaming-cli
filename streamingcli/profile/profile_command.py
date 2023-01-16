@@ -2,14 +2,18 @@ from typing import Optional
 
 import click
 
-from streamingcli.profile.profile_adapter import ProfileAdapter, ScliProfile, DeploymentMode
+from streamingcli.profile.profile_adapter import (
+    DeploymentMode,
+    ProfileAdapter,
+    ScliProfile,
+)
 
 
 class ProfileCommand:
     @staticmethod
     def create_profile(
         profile_name: str,
-        deployment_mode: Optional[str] = None,
+        deployment_mode: str,
         ververica_url: Optional[str] = None,
         ververica_namespace: Optional[str] = None,
         ververica_deployment_target: Optional[str] = None,
@@ -19,7 +23,7 @@ class ProfileCommand:
     ) -> None:
         scli_profile = ScliProfile(
             profile_name=profile_name,
-            deployment_mode=DeploymentMode.value_of(deployment_mode),
+            deployment_mode=DeploymentMode(deployment_mode.upper()),
             ververica_url=ververica_url,
             ververica_namespace=ververica_namespace,
             ververica_deployment_target=ververica_deployment_target,

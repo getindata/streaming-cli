@@ -4,7 +4,7 @@ from typing import Any, Dict, List, Tuple, Type
 
 import click
 from marshmallow_dataclass import class_schema
-from yaml import SafeLoader, load, safe_dump  # type: ignore
+from yaml import SafeLoader, load, safe_dump
 
 from streamingcli.config import PROJECT_LOCAL_CONFIG_FILE_NAME
 from streamingcli.project.project_type import ProjectType

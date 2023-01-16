@@ -6,7 +6,7 @@ from typing import Any, Dict, Optional, Type
 
 import click
 from marshmallow_dataclass import class_schema
-from yaml import SafeLoader, load, safe_dump  # type: ignore
+from yaml import SafeLoader, load, safe_dump
 
 from streamingcli.config import (
     DEFAULT_PROFILE_DIR,
@@ -19,22 +19,14 @@ class DeploymentMode(Enum):
     VVP = "VVP"
     K8S_OPERATOR = "K8S_OPERATOR"
 
-    @classmethod
-    def value_of(cls, value):
-        for k, v in cls.__members__.items():
-            if k.upper() == value.upper():
-                return v
-        else:
-            raise ValueError(f"'{cls.__name__}' enum not found for '{value}'")
 
-
-def custom_asdict_factory(data):
-    def convert_value(obj):
+def custom_asdict_factory(data: Any) -> Dict[str, Any]:
+    def convert_value(obj: Any) -> Any:
         if isinstance(obj, Enum):
             return obj.value
         return obj
 
-    return dict((k, convert_value(v)) for k, v in data)
+    return {k: convert_value(v) for k, v in data}
 
 
 @dataclass(repr=True)
@@ -61,7 +53,12 @@ class ProfileAdapter:
         profiles = ProfileAdapter.load_profiles()
         profiles_dict = profiles.profiles
         profiles_dict[scli_profile.profile_name] = scli_profile
-        content = safe_dump(asdict(replace(profiles, profiles=profiles_dict), dict_factory=custom_asdict_factory))
+        content = safe_dump(
+            asdict(
+                replace(profiles, profiles=profiles_dict),
+                dict_factory=custom_asdict_factory,
+            )
+        )
         with open(DEFAULT_PROFILE_PATH, "w+") as file:
             file.write(content)
 
@@ -108,9 +105,9 @@ class ProfileAdapter:
         ververica_deployment_target_name: Optional[str] = None,
         ververica_webtoken_secret: Optional[str] = None,
         docker_registry_url: Optional[str] = None,
-        k8s_namespace: Optional[str] = None
+        k8s_namespace: Optional[str] = None,
     ) -> ScliProfile:
-        params = {}
+        params = {}  # type: Dict[str, Any]
         if deployment_mode is not None:
             params["deployment_mode"] = deployment_mode
         if ververica_url is not None:

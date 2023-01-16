@@ -2,7 +2,11 @@ import os
 from unittest import mock
 
 from streamingcli.config import DEFAULT_PROFILE_PATH, PROFILE_ENV_VARIABLE_NAME
-from streamingcli.profile.profile_adapter import ProfileAdapter, ScliProfile, DeploymentMode
+from streamingcli.profile.profile_adapter import (
+    DeploymentMode,
+    ProfileAdapter,
+    ScliProfile,
+)
 
 VVP_TEST_PROFILE = ScliProfile(
     profile_name="test_profile",
@@ -39,8 +43,8 @@ class TestProfileAdapter:
         assert saved_profile.ververica_api_token == VVP_TEST_PROFILE.ververica_api_token
         assert saved_profile.k8s_namespace is None
         assert (
-                saved_profile.ververica_deployment_target
-                == VVP_TEST_PROFILE.ververica_deployment_target
+            saved_profile.ververica_deployment_target
+            == VVP_TEST_PROFILE.ververica_deployment_target
         )
 
     """Test updating profile data"""

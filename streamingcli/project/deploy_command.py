@@ -1,12 +1,19 @@
 import os
-from typing import Optional
+from typing import Any, Optional
 
 import click
-from streamingcli.platform.ververica.deployment_adapter import VervericaDeploymentAdapter
 
 from streamingcli.config import PROFILE_ENV_VARIABLE_NAME
+from streamingcli.platform.deployment_adapter import DeploymentAdapter
 from streamingcli.platform.k8s.deployment_adapter import K8SDeploymentAdapter
-from streamingcli.profile.profile_adapter import ProfileAdapter, ScliProfile, DeploymentMode
+from streamingcli.platform.ververica.deployment_adapter import (
+    VervericaDeploymentAdapter,
+)
+from streamingcli.profile.profile_adapter import (
+    DeploymentMode,
+    ProfileAdapter,
+    ScliProfile,
+)
 from streamingcli.project.local_project_config import LocalProjectConfigIO
 from streamingcli.project.yaml_merger import YamlMerger
 
@@ -58,12 +65,15 @@ class ProjectDeployer:
             profile_data.deployment_mode,
             profile_data=profile_data,
             docker_image_tag=docker_image_tag,
-            project_name=project_name)
+            project_name=project_name,
+        )
 
         deployment_adapter.validate_profile_data()
 
         # Generate deployment YAML
-        deployment_yml = deployment_adapter.generate_project_template(local_project_config.dependencies)
+        deployment_yml = deployment_adapter.generate_project_template(
+            local_project_config.dependencies
+        )
 
         if overrides_from_yaml:
             deployment_yml = YamlMerger.merge_two_yaml(
@@ -77,8 +87,11 @@ class ProjectDeployer:
 
 class DeploymentAdapterFactory:
     @staticmethod
-    def get_adapter(deployment_mode: DeploymentMode, **kwargs):
+    def get_adapter(
+        deployment_mode: Optional[DeploymentMode], **kwargs: Any
+    ) -> DeploymentAdapter:
         if deployment_mode == DeploymentMode.K8S_OPERATOR:
             return K8SDeploymentAdapter(**kwargs)
         if deployment_mode == DeploymentMode.VVP:
             return VervericaDeploymentAdapter(**kwargs)
+        raise click.ClickException("Unsupported deployment mode")

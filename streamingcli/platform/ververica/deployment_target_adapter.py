@@ -2,7 +2,7 @@ from typing import Optional
 
 import click
 import requests
-import yaml  # type: ignore
+import yaml
 from jinja2 import Environment
 
 from streamingcli.project.template_loader import TemplateLoader
