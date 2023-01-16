@@ -359,7 +359,7 @@ def profile() -> None:
 )
 def add_profile(
     profile_name: str,
-    deployment_mode: Optional[DeploymentMode],
+    deployment_mode: Optional[str],
     vvp_url: Optional[str],
     vvp_namespace: Optional[str],
     vvp_deployment_target: Optional[str],

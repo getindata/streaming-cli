@@ -16,8 +16,25 @@ from streamingcli.config import (
 
 
 class DeploymentMode(Enum):
-    VVP = "vvp"
-    K8S_OPERATOR = "k8s_operator"
+    VVP = "VVP"
+    K8S_OPERATOR = "K8S_OPERATOR"
+
+    @classmethod
+    def value_of(cls, value):
+        for k, v in cls.__members__.items():
+            if k.upper() == value.upper():
+                return v
+        else:
+            raise ValueError(f"'{cls.__name__}' enum not found for '{value}'")
+
+
+def custom_asdict_factory(data):
+    def convert_value(obj):
+        if isinstance(obj, Enum):
+            return obj.value
+        return obj
+
+    return dict((k, convert_value(v)) for k, v in data)
 
 
 @dataclass(repr=True)
@@ -44,7 +61,7 @@ class ProfileAdapter:
         profiles = ProfileAdapter.load_profiles()
         profiles_dict = profiles.profiles
         profiles_dict[scli_profile.profile_name] = scli_profile
-        content = safe_dump(asdict(replace(profiles, profiles=profiles_dict)))
+        content = safe_dump(asdict(replace(profiles, profiles=profiles_dict), dict_factory=custom_asdict_factory))
         with open(DEFAULT_PROFILE_PATH, "w+") as file:
             file.write(content)
 

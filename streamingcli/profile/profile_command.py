@@ -9,7 +9,7 @@ class ProfileCommand:
     @staticmethod
     def create_profile(
         profile_name: str,
-        deployment_mode: Optional[DeploymentMode] = None,
+        deployment_mode: Optional[str] = None,
         ververica_url: Optional[str] = None,
         ververica_namespace: Optional[str] = None,
         ververica_deployment_target: Optional[str] = None,
@@ -19,7 +19,7 @@ class ProfileCommand:
     ) -> None:
         scli_profile = ScliProfile(
             profile_name=profile_name,
-            deployment_mode=deployment_mode,
+            deployment_mode=DeploymentMode.value_of(deployment_mode),
             ververica_url=ververica_url,
             ververica_namespace=ververica_namespace,
             ververica_deployment_target=ververica_deployment_target,
