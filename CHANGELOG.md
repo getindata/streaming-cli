@@ -2,9 +2,11 @@
 
 ## [Unreleased]
 
+## [1.6.1] - 2023-01-17
+
 ### Added
 
--    Deploy using Flink Kubernetes Operator
+-   Deploy using Flink Kubernetes Operator
 
 ### Fixed
 
@@ -59,7 +61,9 @@
 
 -   First release
 
-[Unreleased]: https://github.com/getindata/streaming-cli/compare/1.6.0...HEAD
+[Unreleased]: https://github.com/getindata/streaming-cli/compare/1.6.1...HEAD
+
+[1.6.1]: https://github.com/getindata/streaming-cli/compare/1.6.0...1.6.1
 
 [1.6.0]: https://github.com/getindata/streaming-cli/compare/1.5.0...1.6.0
 
