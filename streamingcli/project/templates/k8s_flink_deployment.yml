@@ -1,0 +1,31 @@
+apiVersion: flink.apache.org/v1beta1
+kind: FlinkDeployment
+metadata:
+  namespace: {{k8s_namespace}}
+  name: {{project_name}}
+spec:
+  image: {{docker_registry_url}}/{{project_name}}:{{docker_image_tag}}
+  flinkVersion: v1_16
+  flinkConfiguration:
+    taskmanager.numberOfTaskSlots: "2"
+  serviceAccount: flink
+  jobManager:
+    replicas: 1
+    resource:
+      memory: "2048m"
+      cpu: 1
+  taskManager:
+    resource:
+      memory: "2048m"
+      cpu: 1
+  job:
+    jarURI: local:///opt/flink/opt/flink-python-1.16.0.jar
+    entryClass: org.apache.flink.client.python.PythonDriver
+    args: ["--python", "/app/src/flink_app.py"]
+    parallelism: 2
+    upgradeMode: stateless
+  ingress:
+    template: "/{{ '{{namespace}}' }}/{{ '{{name}}' }}(/|$)(.*)"
+    className: "nginx"
+    annotations:
+      nginx.ingress.kubernetes.io/rewrite-target: "/$2"

@@ -2,6 +2,16 @@
 
 ## [Unreleased]
 
+## [1.7.0] - 2023-01-17
+
+### Added
+
+-   Deploy using Flink Kubernetes Operator
+
+### Fixed
+
+-   Allow for whitespaces in secret variables regex.
+
 ## [1.6.0] - 2022-09-12
 
 ### Added
@@ -51,7 +61,9 @@
 
 -   First release
 
-[Unreleased]: https://github.com/getindata/streaming-cli/compare/1.6.0...HEAD
+[Unreleased]: https://github.com/getindata/streaming-cli/compare/1.7.0...HEAD
+
+[1.7.0]: https://github.com/getindata/streaming-cli/compare/1.6.0...1.7.0
 
 [1.6.0]: https://github.com/getindata/streaming-cli/compare/1.5.0...1.6.0
 

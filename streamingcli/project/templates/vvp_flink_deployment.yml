@@ -1,7 +1,7 @@
 metadata:
   displayName: {{project_name}}
 spec:
-  deploymentTargetName: {{deployment_target_name}}
+  deploymentTargetName: {{ververica_deployment_target}}
   maxJobCreationAttempts: 4
   maxSavepointCreationAttempts: 4
   restoreStrategy:
