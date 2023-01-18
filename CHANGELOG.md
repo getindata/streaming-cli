@@ -2,6 +2,13 @@
 
 ## [Unreleased]
 
+### Added
+
+-   Fixed version of python-dateutil
+
+### Fixed
+
+
 ## [1.7.0] - 2023-01-17
 
 ### Added
