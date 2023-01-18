@@ -23,6 +23,7 @@ copier = "*"
 sqlparse = "*"
 markupsafe = "==2.0.1"
 importlib_metadata = "*"
+python-dateutil = "==2.8.0"
 
 [dev-packages]
 pytest = "*"
