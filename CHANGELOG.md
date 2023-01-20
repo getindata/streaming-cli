@@ -2,15 +2,15 @@
 
 ## [Unreleased]
 
+## [1.8.0] - 2023-01-20
+
 ### Added
 
 -   Convert CMD
 
-
 ### Fixed
 
 -   Repository template protocol ssh -> https
-
 
 ## [1.7.1] - 2023-01-18
 
@@ -79,7 +79,9 @@
 
 -   First release
 
-[Unreleased]: https://github.com/getindata/streaming-cli/compare/1.7.0...HEAD
+[Unreleased]: https://github.com/getindata/streaming-cli/compare/1.8.0...HEAD
+
+[1.8.0]: https://github.com/getindata/streaming-cli/compare/1.7.1...1.8.0
 
 [1.7.0]: https://github.com/getindata/streaming-cli/compare/1.6.0...1.7.0
 
