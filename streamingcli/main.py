@@ -155,7 +155,6 @@ def project_build(docker_image_tag: str) -> None:
 
 
 @project.command()
-@click.option(help="Convert jupyter notebook to python")
 def project_convert() -> None:
     ProjectBuilder.convert_jupyter_notebook()
 
