@@ -25,7 +25,7 @@ class ProjectBuilder:
         client = docker.from_env()
 
         if local_project_config.project_type == ProjectType.JUPYTER:
-            ProjectBuilder.convert_jupyter_notebook(local_project_config)
+            ProjectBuilder._do_convert_jupyter_notebook(local_project_config)
         image_tag = f"{local_project_config.project_name}:{tag_name}"
         click.echo(f"Building Docker image {image_tag} ...")
 
@@ -42,7 +42,15 @@ class ProjectBuilder:
         return image.tags[0]
 
     @staticmethod
-    def convert_jupyter_notebook(local_project_config: LocalProjectConfig) -> None:
+    def convert_jupyter_notebook() -> None:
+        local_project_config = LocalProjectConfigIO.load_project_config()
+        if local_project_config.project_type != ProjectType.JUPYTER:
+            raise RuntimeError("Couldn't convert not jupyter project")
+        ProjectBuilder._do_convert_jupyter_notebook(local_project_config)
+        click.echo("Jupyter notebook converted")
+
+    @staticmethod
+    def _do_convert_jupyter_notebook(local_project_config: LocalProjectConfig) -> None:
         notebook_dir = "./src"
         notebooks = [
             os.path.join(notebook_dir, _)
