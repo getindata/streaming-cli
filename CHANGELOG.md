@@ -2,6 +2,16 @@
 
 ## [Unreleased]
 
+### Added
+
+-   Convert CMD
+
+
+### Fixed
+
+-   Repository template protocol ssh -> https
+
+
 ## [1.7.1] - 2023-01-18
 
 ### Added
