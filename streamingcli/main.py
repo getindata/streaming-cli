@@ -155,6 +155,12 @@ def project_build(docker_image_tag: str) -> None:
 
 
 @project.command()
+@click.option(help="Convert jupyter notebook to python")
+def project_convert() -> None:
+    ProjectBuilder.convert_jupyter_notebook()
+
+
+@project.command()
 @click.option(
     "--registry-url",
     prompt="Docker registry URL",
@@ -390,6 +396,7 @@ def docker_login(username: str, password: str, docker_registry_url: str) -> None
 
 project.add_command(project_init, "init")
 project.add_command(project_deploy, "deploy")
+project.add_command(project_convert, "convert")
 project.add_command(project_build, "build")
 project.add_command(project_publish, "publish")
 api_token.add_command(platform_apitoken_create, "create")

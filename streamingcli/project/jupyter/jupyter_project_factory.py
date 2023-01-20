@@ -4,7 +4,7 @@ from typing import Optional
 import click
 import copier
 
-JUPYTER_TEMPLATE_PROJECT = "git@github.com:getindata/streaming-cli-jupyter-template.git"
+JUPYTER_TEMPLATE_PROJECT = "https://github.com/getindata/streaming-cli-jupyter-template.git"
 
 
 class JupyterProjectFactory:
