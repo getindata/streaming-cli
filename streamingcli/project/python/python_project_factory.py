@@ -4,7 +4,9 @@ from typing import Optional
 import click
 import copier
 
-PYTHON_TEMPLATE_PROJECT = "git@github.com:getindata/streaming-cli-python-template.git"
+PYTHON_TEMPLATE_PROJECT = (
+    "https://github.com/getindata/streaming-cli-python-template.git"
+)
 
 
 class PythonProjectFactory:
