@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Fixed
+
+-   Deploy - develop mode
+
 ## [1.8.0] - 2023-01-20
 
 ### Added
