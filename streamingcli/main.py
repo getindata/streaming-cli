@@ -138,7 +138,7 @@ def project_deploy(
         docker_registry_url=docker_image_registry,
         docker_image_repository=docker_image_repository,
         profile=profile,
-        deployment_mode=DeploymentMode(deployment_mode.upper()),
+        deployment_mode=DeploymentMode(deployment_mode.upper()) if deployment_mode else None,
         ververica_url=ververica_url,
         ververica_namespace=ververica_namespace,
         ververica_deployment_target_name=ververica_deployment_target_name,
