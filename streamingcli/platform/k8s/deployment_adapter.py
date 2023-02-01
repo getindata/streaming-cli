@@ -1,7 +1,7 @@
-from typing import Optional, AnyStr
+import subprocess
+from typing import Optional, Tuple
 
 import click
-import subprocess
 
 from streamingcli.platform.deployment_adapter import DeploymentAdapter
 
@@ -12,7 +12,9 @@ class K8SDeploymentAdapter(DeploymentAdapter):
         (stdout, stderr) = self._kubectl_apply(deployment_yml)
 
         if stderr:
-            raise click.ClickException(f"Failed to kubectl apply deployment.yaml file: {stderr}")
+            raise click.ClickException(
+                f"Failed to kubectl apply deployment.yaml file: {str(stderr)}"
+            )
         return str(stdout) if stdout else None
 
     def validate_profile_data(self) -> None:
@@ -30,6 +32,8 @@ class K8SDeploymentAdapter(DeploymentAdapter):
         return "k8s_flink_deployment.yml"
 
     @staticmethod
-    def _kubectl_apply(deployment_yml: str) -> (AnyStr, AnyStr):
-        cmd = subprocess.Popen(["kubectl apply -f -"], stdin=subprocess.PIPE, shell=True)
+    def _kubectl_apply(deployment_yml: str) -> Tuple[bytes, bytes]:
+        cmd = subprocess.Popen(
+            ["kubectl apply -f -"], stdin=subprocess.PIPE, shell=True
+        )
         return cmd.communicate(bytes(deployment_yml, "utf-8"), timeout=120)
