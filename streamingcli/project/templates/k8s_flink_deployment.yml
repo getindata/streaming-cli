@@ -13,16 +13,16 @@ spec:
     replicas: 1
     resource:
       memory: "2048m"
-      cpu: 1
+      cpu: 0.5
   taskManager:
     resource:
       memory: "2048m"
-      cpu: 1
+      cpu: 0.5
   job:
     jarURI: local:///opt/flink/opt/flink-python-1.16.0.jar
     entryClass: org.apache.flink.client.python.PythonDriver
     args: ["--python", "/app/src/flink_app.py"]
-    parallelism: 2
+    parallelism: 1
     upgradeMode: stateless
   ingress:
     template: "/{{ '{{namespace}}' }}/{{ '{{name}}' }}(/|$)(.*)"
