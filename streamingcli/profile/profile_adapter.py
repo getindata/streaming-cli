@@ -19,6 +19,10 @@ class DeploymentMode(Enum):
     VVP = "VVP"
     K8S_OPERATOR = "K8S_OPERATOR"
 
+    @staticmethod
+    def from_label(label: Optional[str]) -> Optional["DeploymentMode"]:
+        return DeploymentMode(label.upper()) if label else None
+
 
 def custom_asdict_factory(data: Any) -> Dict[str, Any]:
     def convert_value(obj: Any) -> Any:

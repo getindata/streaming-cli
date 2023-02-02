@@ -23,7 +23,7 @@ class ProfileCommand:
     ) -> None:
         scli_profile = ScliProfile(
             profile_name=profile_name,
-            deployment_mode=DeploymentMode(deployment_mode.upper()),
+            deployment_mode=DeploymentMode.from_label(deployment_mode),
             ververica_url=ververica_url,
             ververica_namespace=ververica_namespace,
             ververica_deployment_target=ververica_deployment_target,
