@@ -340,8 +340,8 @@ table_env.create_temporary_function("filter_print", filter_print)
         # expect
         converted_notebook = convert_notebook(file_path)
         assert (
-                converted_notebook.content
-                == '''from pyflink.common.typeinfo import Types
+            converted_notebook.content
+            == """from pyflink.common.typeinfo import Types
 from pyflink.datastream import StreamExecutionEnvironment
 from pyflink.table import StreamTableEnvironment, DataTypes
 from pyflink.table.udf import udf
@@ -355,5 +355,5 @@ execution_output = stream_env.from_collection(
     collection=[(1, 'aaa'), (2, 'bb'), (3, 'cccc')],
     type_info=Types.ROW([Types.INT(), Types.STRING()])
 )
-'''
+"""
         )
