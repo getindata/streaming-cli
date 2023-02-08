@@ -16,9 +16,9 @@ class TestNotebookConverter(unittest.TestCase):
             converted_notebook.content
             == '''import sys
 from pyflink.table import DataTypes
-from pyflink.datastream import StreamExecutionEnvironment
-from pyflink.table import StreamTableEnvironment, DataTypes
 from pyflink.table.udf import udf
+from pyflink.datastream import StreamExecutionEnvironment
+from pyflink.table import StreamTableEnvironment
 
 stream_env = StreamExecutionEnvironment.get_execution_environment()
 stream_env.set_parallelism(1)
@@ -59,8 +59,7 @@ table_env.create_temporary_function("filter_print", filter_print)
         assert (
             converted_notebook.content
             == '''from pyflink.datastream import StreamExecutionEnvironment
-from pyflink.table import StreamTableEnvironment, DataTypes
-from pyflink.table.udf import udf
+from pyflink.table import StreamTableEnvironment
 
 stream_env = StreamExecutionEnvironment.get_execution_environment()
 stream_env.set_parallelism(1)
@@ -96,8 +95,7 @@ table_env.execute_sql(f"""CREATE TABLE datagen (
         assert (
             converted_notebook.content
             == '''from pyflink.datastream import StreamExecutionEnvironment
-from pyflink.table import StreamTableEnvironment, DataTypes
-from pyflink.table.udf import udf
+from pyflink.table import StreamTableEnvironment
 
 stream_env = StreamExecutionEnvironment.get_execution_environment()
 stream_env.set_parallelism(1)
@@ -130,8 +128,7 @@ table_env.execute_sql(f"""CREATE TABLE datagen (
         assert (
             converted_notebook.content
             == '''from pyflink.datastream import StreamExecutionEnvironment
-from pyflink.table import StreamTableEnvironment, DataTypes
-from pyflink.table.udf import udf
+from pyflink.table import StreamTableEnvironment
 
 stream_env = StreamExecutionEnvironment.get_execution_environment()
 stream_env.set_parallelism(1)
@@ -162,8 +159,7 @@ table_env.execute_sql(f"""select * from other""")
         assert (
             converted_notebook.content
             == '''from pyflink.datastream import StreamExecutionEnvironment
-from pyflink.table import StreamTableEnvironment, DataTypes
-from pyflink.table.udf import udf
+from pyflink.table import StreamTableEnvironment
 
 stream_env = StreamExecutionEnvironment.get_execution_environment()
 stream_env.set_parallelism(1)
@@ -188,8 +184,7 @@ table_env.execute_sql(f"""CREATE TABLE datagen (
             converted_notebook.content
             == '''import os
 from pyflink.datastream import StreamExecutionEnvironment
-from pyflink.table import StreamTableEnvironment, DataTypes
-from pyflink.table.udf import udf
+from pyflink.table import StreamTableEnvironment
 
 stream_env = StreamExecutionEnvironment.get_execution_environment()
 stream_env.set_parallelism(1)
@@ -239,8 +234,7 @@ table_env.execute_sql(f"""INSERT INTO mysql (SELECT * FROM datagen)""")
         assert (
             converted_notebook.content
             == '''from pyflink.datastream import StreamExecutionEnvironment
-from pyflink.table import StreamTableEnvironment, DataTypes
-from pyflink.table.udf import udf
+from pyflink.table import StreamTableEnvironment
 
 stream_env = StreamExecutionEnvironment.get_execution_environment()
 stream_env.set_parallelism(1)
@@ -295,9 +289,9 @@ table_env.execute_sql(f"""INSERT INTO mysql (SELECT * FROM kafka)""")
             converted_notebook.content
             == '''import sys
 from pyflink.table import DataTypes
-from pyflink.datastream import StreamExecutionEnvironment
-from pyflink.table import StreamTableEnvironment, DataTypes
 from pyflink.table.udf import udf
+from pyflink.datastream import StreamExecutionEnvironment
+from pyflink.table import StreamTableEnvironment
 
 stream_env = StreamExecutionEnvironment.get_execution_environment()
 stream_env.set_parallelism(1)
@@ -343,8 +337,7 @@ table_env.create_temporary_function("filter_print", filter_print)
             converted_notebook.content
             == """from pyflink.common.typeinfo import Types
 from pyflink.datastream import StreamExecutionEnvironment
-from pyflink.table import StreamTableEnvironment, DataTypes
-from pyflink.table.udf import udf
+from pyflink.table import StreamTableEnvironment
 
 stream_env = StreamExecutionEnvironment.get_execution_environment()
 stream_env.set_parallelism(1)

@@ -1,6 +1,5 @@
 from pyflink.datastream import StreamExecutionEnvironment
-from pyflink.table import StreamTableEnvironment, DataTypes
-from pyflink.table.udf import udf
+from pyflink.table import StreamTableEnvironment
 
 stream_env = StreamExecutionEnvironment.get_execution_environment()
 stream_env.set_parallelism(1)
