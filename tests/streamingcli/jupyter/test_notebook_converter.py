@@ -20,9 +20,9 @@ from pyflink.datastream import StreamExecutionEnvironment
 from pyflink.table import StreamTableEnvironment, DataTypes
 from pyflink.table.udf import udf
 
-env = StreamExecutionEnvironment.get_execution_environment()
-env.set_parallelism(1)
-t_env = StreamTableEnvironment.create(env)
+stream_env = StreamExecutionEnvironment.get_execution_environment()
+stream_env.set_parallelism(1)
+table_env = StreamTableEnvironment.create(stream_env)
 
 
 maximum_number_of_rows = 10
@@ -32,7 +32,7 @@ some_text_variable = "some_text_value"
 number_of_rows = 10
 
 
-t_env.execute_sql(f"""CREATE TABLE datagen (
+table_env.execute_sql(f"""CREATE TABLE datagen (
     id INT
 ) WITH (
     'connector' = 'datagen',
@@ -47,7 +47,7 @@ def filter_print(condition, message):
     return condition
 
 
-t_env.create_temporary_function("filter_print", filter_print)
+table_env.create_temporary_function("filter_print", filter_print)
 '''
         )
 
@@ -62,22 +62,24 @@ t_env.create_temporary_function("filter_print", filter_print)
 from pyflink.table import StreamTableEnvironment, DataTypes
 from pyflink.table.udf import udf
 
-env = StreamExecutionEnvironment.get_execution_environment()
-env.set_parallelism(1)
-t_env = StreamTableEnvironment.create(env)
+stream_env = StreamExecutionEnvironment.get_execution_environment()
+stream_env.set_parallelism(1)
+table_env = StreamTableEnvironment.create(stream_env)
 
 
 maximum_number_of_rows = 10
 some_text_variable = "some_text_value"
 
 
-t_env.create_java_temporary_function("remote_trace", "com.getindata.TraceUDF")
+table_env.create_java_temporary_function(
+    "remote_trace", "com.getindata.TraceUDF")
 
 
-t_env.create_java_temporary_function("other_function", "com.getindata.Other")
+table_env.create_java_temporary_function(
+    "other_function", "com.getindata.Other")
 
 
-t_env.execute_sql(f"""CREATE TABLE datagen (
+table_env.execute_sql(f"""CREATE TABLE datagen (
     id INT
 ) WITH (
     'connector' = 'datagen',
@@ -97,15 +99,16 @@ t_env.execute_sql(f"""CREATE TABLE datagen (
 from pyflink.table import StreamTableEnvironment, DataTypes
 from pyflink.table.udf import udf
 
-env = StreamExecutionEnvironment.get_execution_environment()
-env.set_parallelism(1)
-t_env = StreamTableEnvironment.create(env)
+stream_env = StreamExecutionEnvironment.get_execution_environment()
+stream_env.set_parallelism(1)
+table_env = StreamTableEnvironment.create(stream_env)
 
 
-t_env.create_java_temporary_function("local_trace", "com.getindata.TraceUDF")
+table_env.create_java_temporary_function(
+    "local_trace", "com.getindata.TraceUDF")
 
 
-t_env.execute_sql(f"""CREATE TABLE datagen (
+table_env.execute_sql(f"""CREATE TABLE datagen (
     id INT
 ) WITH (
     'connector' = 'datagen',
@@ -130,12 +133,12 @@ t_env.execute_sql(f"""CREATE TABLE datagen (
 from pyflink.table import StreamTableEnvironment, DataTypes
 from pyflink.table.udf import udf
 
-env = StreamExecutionEnvironment.get_execution_environment()
-env.set_parallelism(1)
-t_env = StreamTableEnvironment.create(env)
+stream_env = StreamExecutionEnvironment.get_execution_environment()
+stream_env.set_parallelism(1)
+table_env = StreamTableEnvironment.create(stream_env)
 
 
-t_env.execute_sql(f"""CREATE TABLE datagen (
+table_env.execute_sql(f"""CREATE TABLE datagen (
     id INT
 ) WITH (
       'connector' = 'datagen',
@@ -143,11 +146,11 @@ t_env.execute_sql(f"""CREATE TABLE datagen (
       )""")
 
 
-t_env.execute_sql(
+table_env.execute_sql(
     f"""select * from datagen WHERE remote_trace(true, 'TRACE_ME', id)""")
 
 
-t_env.execute_sql(f"""select * from other""")
+table_env.execute_sql(f"""select * from other""")
 '''
         )
 
@@ -162,12 +165,12 @@ t_env.execute_sql(f"""select * from other""")
 from pyflink.table import StreamTableEnvironment, DataTypes
 from pyflink.table.udf import udf
 
-env = StreamExecutionEnvironment.get_execution_environment()
-env.set_parallelism(1)
-t_env = StreamTableEnvironment.create(env)
+stream_env = StreamExecutionEnvironment.get_execution_environment()
+stream_env.set_parallelism(1)
+table_env = StreamTableEnvironment.create(stream_env)
 
 
-t_env.execute_sql(f"""CREATE TABLE datagen (
+table_env.execute_sql(f"""CREATE TABLE datagen (
     id INT
 ) WITH (
     'connector' = 'datagen',
@@ -188,9 +191,9 @@ from pyflink.datastream import StreamExecutionEnvironment
 from pyflink.table import StreamTableEnvironment, DataTypes
 from pyflink.table.udf import udf
 
-env = StreamExecutionEnvironment.get_execution_environment()
-env.set_parallelism(1)
-t_env = StreamTableEnvironment.create(env)
+stream_env = StreamExecutionEnvironment.get_execution_environment()
+stream_env.set_parallelism(1)
+table_env = StreamTableEnvironment.create(stream_env)
 
 
 mysql_table_name = 'datagen'
@@ -199,7 +202,7 @@ mysql_table_name = 'datagen'
 __env_var_0__MY_ENV_VARIABLE = os.environ["MY_ENV_VARIABLE"]
 
 
-t_env.execute_sql(f"""CREATE TABLE datagen (
+table_env.execute_sql(f"""CREATE TABLE datagen (
     id INT
 ) WITH (
     'connector' = 'datagen',
@@ -213,7 +216,7 @@ __env_var_1__MYSQL_USER = os.environ["MYSQL_USER"]
 __env_var_2__MYSQL_PASSWORD = os.environ["MYSQL_PASSWORD"]
 
 
-t_env.execute_sql(f"""CREATE TABLE mysql (
+table_env.execute_sql(f"""CREATE TABLE mysql (
     id INT
 ) WITH (
     'connector' = 'jdbc',
@@ -224,7 +227,7 @@ t_env.execute_sql(f"""CREATE TABLE mysql (
 )""")
 
 
-t_env.execute_sql(f"""INSERT INTO mysql (SELECT * FROM datagen)""")
+table_env.execute_sql(f"""INSERT INTO mysql (SELECT * FROM datagen)""")
 '''
         )
 
@@ -239,9 +242,9 @@ t_env.execute_sql(f"""INSERT INTO mysql (SELECT * FROM datagen)""")
 from pyflink.table import StreamTableEnvironment, DataTypes
 from pyflink.table.udf import udf
 
-env = StreamExecutionEnvironment.get_execution_environment()
-env.set_parallelism(1)
-t_env = StreamTableEnvironment.create(env)
+stream_env = StreamExecutionEnvironment.get_execution_environment()
+stream_env.set_parallelism(1)
+table_env = StreamTableEnvironment.create(stream_env)
 
 
 with open("tests/streamingcli/resources/jupyter/secret.txt", "r") as secret_file:
@@ -251,7 +254,7 @@ with open("tests/streamingcli/resources/jupyter/secret.txt", "r") as secret_file
 kafka_topic = 'example_topic'
 
 
-t_env.execute_sql(f"""CREATE TABLE kafka (
+table_env.execute_sql(f"""CREATE TABLE kafka (
     id INT
 ) WITH (
     'connector' = 'kafka',
@@ -266,7 +269,7 @@ t_env.execute_sql(f"""CREATE TABLE kafka (
 )""")
 
 
-t_env.execute_sql(f"""CREATE TABLE mysql (
+table_env.execute_sql(f"""CREATE TABLE mysql (
     id INT
 ) WITH (
     'connector' = 'jdbc',
@@ -277,7 +280,7 @@ t_env.execute_sql(f"""CREATE TABLE mysql (
 )""")
 
 
-t_env.execute_sql(f"""INSERT INTO mysql (SELECT * FROM kafka)""")
+table_env.execute_sql(f"""INSERT INTO mysql (SELECT * FROM kafka)""")
 '''
         )
 
@@ -296,9 +299,9 @@ from pyflink.datastream import StreamExecutionEnvironment
 from pyflink.table import StreamTableEnvironment, DataTypes
 from pyflink.table.udf import udf
 
-env = StreamExecutionEnvironment.get_execution_environment()
-env.set_parallelism(1)
-t_env = StreamTableEnvironment.create(env)
+stream_env = StreamExecutionEnvironment.get_execution_environment()
+stream_env.set_parallelism(1)
+table_env = StreamTableEnvironment.create(stream_env)
 
 
 with open("/var/secrets/secret.txt", "r") as secret_file:
@@ -312,7 +315,7 @@ some_text_variable = "some_text_value"
 number_of_rows = 10
 
 
-t_env.execute_sql(f"""CREATE TABLE datagen (
+table_env.execute_sql(f"""CREATE TABLE datagen (
     id INT
 ) WITH (
     'connector' = 'datagen',
@@ -327,6 +330,30 @@ def filter_print(condition, message):
     return condition
 
 
-t_env.create_temporary_function("filter_print", filter_print)
+table_env.create_temporary_function("filter_print", filter_print)
+'''
+        )
+
+    def test_notebook_with_flink_code(self):
+        # given
+        file_path = "tests/streamingcli/resources/jupyter/notebook7.ipynb"
+        # expect
+        converted_notebook = convert_notebook(file_path)
+        assert (
+                converted_notebook.content
+                == '''from pyflink.common.typeinfo import Types
+from pyflink.datastream import StreamExecutionEnvironment
+from pyflink.table import StreamTableEnvironment, DataTypes
+from pyflink.table.udf import udf
+
+stream_env = StreamExecutionEnvironment.get_execution_environment()
+stream_env.set_parallelism(1)
+table_env = StreamTableEnvironment.create(stream_env)
+
+
+execution_output = stream_env.from_collection(
+    collection=[(1, 'aaa'), (2, 'bb'), (3, 'cccc')],
+    type_info=Types.ROW([Types.INT(), Types.STRING()])
+)
 '''
         )
