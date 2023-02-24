@@ -6,6 +6,10 @@
 
 -   Handle `%%flink_execute`
 
+### Fixed
+
+-   Don't add shell commands to the converted notebooks
+
 ## [1.8.1] - 2023-02-02
 
 ### Fixed

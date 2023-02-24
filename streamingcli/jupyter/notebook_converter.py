@@ -145,7 +145,7 @@ class NotebookConverter:
     ) -> Sequence[NotebookEntry]:
         if cell.source.startswith("%"):
             return self._handle_magic_cell(cell, notebook_dir)
-        elif not cell.source.startswith("##"):
+        elif not cell.source.startswith("##") and not cell.source.startswith("!"):
             return [Code(value=cell.source)]
         else:
             return []
