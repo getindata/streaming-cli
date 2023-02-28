@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## [1.9.0] - 2023-02-28
+
 ### Added
 
 -   Handle `%%flink_execute`
@@ -93,7 +95,9 @@
 
 -   First release
 
-[Unreleased]: https://github.com/getindata/streaming-cli/compare/1.8.0...HEAD
+[Unreleased]: https://github.com/getindata/streaming-cli/compare/1.9.0...HEAD
+
+[1.9.0]: https://github.com/getindata/streaming-cli/compare/1.8.0...1.9.0
 
 [1.8.0]: https://github.com/getindata/streaming-cli/compare/1.7.1...1.8.0
 
