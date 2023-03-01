@@ -84,8 +84,8 @@ jobs:
           context: release
           build-args: |
             PYTHON_VERSION=${{ matrix.python-version }}
-            STREAMING_CLI_VERSION=${{ steps.create_release.outputs.id }}
+            STREAMING_CLI_VERSION=${{ steps.set_package_version.outputs.PACKAGE_VERSION }}
           build-contexts: |
             context=docker-image://docker:stable-git
           push: true
-          tags: gcr.io/getindata-images-public/streaming-cli:${{ steps.create_release.outputs.id }}
+          tags: gcr.io/getindata-images-public/streaming-cli:${{ steps.set_package_version.outputs.PACKAGE_VERSION }}
