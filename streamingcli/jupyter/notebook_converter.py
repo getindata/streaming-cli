@@ -145,7 +145,7 @@ class NotebookConverter:
     ) -> Sequence[NotebookEntry]:
         if cell.source.startswith("%"):
             return self._handle_magic_cell(cell, notebook_dir)
-        elif not cell.source.startswith("##"):
+        elif not cell.source.startswith("##") and not cell.source.startswith("!"):
             return [Code(value=cell.source)]
         else:
             return []
@@ -159,6 +159,9 @@ class NotebookConverter:
             if NotebookConverter._skip_statement(sql_statement):
                 return []
             return self._convert_sql_statement_to_python_instructions(sql_statement)
+        if source.startswith("%%flink_execute"):
+            code = "\n".join(source.split("\n")[1:])
+            return [Code(value=code)]
         if source.startswith("%flink_execute_sql_file"):
             return self._get_statements_from_file(source, notebook_dir)
         if source.startswith("%flink_register_function"):

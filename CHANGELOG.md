@@ -2,6 +2,16 @@
 
 ## [Unreleased]
 
+## [1.9.0] - 2023-02-28
+
+### Added
+
+-   Handle `%%flink_execute`
+
+### Fixed
+
+-   Don't add shell commands to the converted notebooks
+
 ## [1.8.1] - 2023-02-02
 
 ### Fixed
@@ -85,11 +95,11 @@
 
 -   First release
 
-[Unreleased]: https://github.com/getindata/streaming-cli/compare/1.8.1...HEAD
+[Unreleased]: https://github.com/getindata/streaming-cli/compare/1.9.0...HEAD
 
-[1.8.1]: https://github.com/getindata/streaming-cli/compare/1.8.0...1.8.1
+[1.9.0]: https://github.com/getindata/streaming-cli/compare/1.8.0...1.9.0
 
-[1.7.1]: https://github.com/getindata/streaming-cli/compare/1.7.0...1.7.1
+[1.8.0]: https://github.com/getindata/streaming-cli/compare/1.7.1...1.8.0
 
 [1.7.0]: https://github.com/getindata/streaming-cli/compare/1.6.0...1.7.0
 
