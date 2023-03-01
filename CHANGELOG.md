@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Added
+
+-   Create and publish docker image
+
 
 ## [1.9.0] - 2023-02-28
 
