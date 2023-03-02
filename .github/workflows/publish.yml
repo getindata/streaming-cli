@@ -65,3 +65,27 @@ jobs:
           user: __token__
           password: ${{ secrets.PYPI_API_TOKEN }}
           verbose: true  # trace if the upload fails
+
+        # Setting up Docker Buildx with docker-container driver is required
+        # at the moment to be able to use a subdirectory with Git context
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Login to GCR
+        uses: docker/login-action@v1
+        with:
+          registry: gcr.io
+          username: _json_key
+          password: ${{ secrets.PUBLIC_GCR_DEPLOY_SA_KEY }}
+
+      - name: Build docker image using public pypi package
+        uses: docker/build-push-action@v4
+        with:
+          context: release
+          build-args: |
+            PYTHON_VERSION=${{ matrix.python-version }}
+            STREAMING_CLI_VERSION=${{ steps.set_package_version.outputs.PACKAGE_VERSION }}
+          build-contexts: |
+            context=docker-image://docker:stable-git
+          push: true
+          tags: gcr.io/getindata-images-public/streaming-cli:${{ steps.set_package_version.outputs.PACKAGE_VERSION }}
