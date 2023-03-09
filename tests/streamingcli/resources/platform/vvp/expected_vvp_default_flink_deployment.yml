@@ -1,0 +1,46 @@
+metadata:
+  displayName: test
+spec:
+  deploymentTargetName: deploymenttarget
+  maxJobCreationAttempts: 4
+  maxSavepointCreationAttempts: 4
+  restoreStrategy:
+    allowNonRestoredState: false
+    kind: LATEST_STATE
+  sessionClusterName: null
+  state: RUNNING
+  template:
+    metadata:
+      annotations:
+        flink.queryable-state.enabled: 'false'
+        flink.security.ssl.enabled: 'false'
+    spec:
+      artifact:
+        flinkImageRegistry: docker_registry_url
+        flinkImageRepository: test
+        flinkImageTag: latest
+        flinkVersion: '1.14'
+        additionalDependencies:
+          - file:///app/lib/flink-python_2.12-1.14.0.jar
+          
+        jarUri: file:///app/lib/flink-python-loader-1.1.0.jar
+        entryClass: com.getindata.streaming.FlinkPythonLoader
+        kind: JAR
+        mainArgs: /app/src/flink_app.py
+      flinkConfiguration:
+        execution.checkpointing.externalized-checkpoint-retention: RETAIN_ON_CANCELLATION
+        execution.checkpointing.interval: 10s
+      logging:
+        log4jLoggers:
+          '': INFO
+        loggingProfile: default
+      parallelism: 1
+      resources:
+        jobmanager:
+          cpu: 1
+          memory: 1G
+        taskmanager:
+          cpu: 1
+          memory: 1G
+  upgradeStrategy:
+    kind: STATEFUL
