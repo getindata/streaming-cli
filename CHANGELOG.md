@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Added
+
+-   Deploy to vvp with given deployment descriptor
+
 ## [1.9.1] - 2023-03-02
 
 ### Added
