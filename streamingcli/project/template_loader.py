@@ -22,8 +22,7 @@ class TemplateLoader:
     @staticmethod
     def try_to_load_text_from_packages(name: str) -> Optional[str]:
         try:
-            text = pkg_resources.read_text(templates, name)
-            return text
+            return pkg_resources.read_text(templates, name)
         except:
             return None
 
