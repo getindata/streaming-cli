@@ -49,7 +49,8 @@ class TestVVPProfileAdapter(unittest.TestCase):
 
     def test_generating_project_with_custom_template(self):
         custom_profile = copy.deepcopy(self.VVP_TEST_PROFILE)
-        custom_profile.ververica_deployment_template_path = "tests/streamingcli/resources/platform/vvp/custom_vvp_flink_deployment_template.yml"
+        custom_profile.ververica_deployment_template_path = \
+            "tests/streamingcli/resources/platform/vvp/custom_vvp_flink_deployment_template.yml"
         vvp_deployment_adapter = VervericaDeploymentAdapter(
             custom_profile, self.DOCKER_TAG, self.PROJECT_NAME
         )

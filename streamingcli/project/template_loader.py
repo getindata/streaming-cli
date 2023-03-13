@@ -23,12 +23,12 @@ class TemplateLoader:
     def try_to_load_text_from_packages(name: str) -> Optional[str]:
         try:
             return pkg_resources.read_text(templates, name)
-        except:
+        except ValueError:
             return None
 
     @staticmethod
     def try_to_load_text_from_path(name: str) -> Optional[str]:
         try:
             return Path(name).absolute().read_text()
-        except:
+        except OSError:
             return None
