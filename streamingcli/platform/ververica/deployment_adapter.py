@@ -44,7 +44,10 @@ class VervericaDeploymentAdapter(DeploymentAdapter):
             raise click.ClickException("Missing Docker image tag attribute")
 
     def get_template_name(self) -> str:
-        return self.profile_data.ververica_deployment_template_path or "vvp_flink_deployment.yml"
+        return (
+            self.profile_data.ververica_deployment_template_path
+            or "vvp_flink_deployment.yml"
+        )
 
     def post_deployment_file(self, deployment_file: str) -> Response:
         deployments_url = (

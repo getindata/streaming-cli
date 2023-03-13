@@ -21,7 +21,6 @@ class TestVVPProfileAdapter(unittest.TestCase):
     PROJECT_NAME = "test"
     DOCKER_TAG = "latest"
 
-
     def test_init_with_valid_profile(self):
         vvp_deployment_adapter = VervericaDeploymentAdapter(
             self.VVP_TEST_PROFILE, self.DOCKER_TAG, self.PROJECT_NAME
@@ -48,9 +47,9 @@ class TestVVPProfileAdapter(unittest.TestCase):
         )
 
     def test_generating_project_with_custom_template(self):
+        custom_deployment_file = "tests/streamingcli/resources/platform/vvp/custom_vvp_flink_deployment_template.yml"
         custom_profile = copy.deepcopy(self.VVP_TEST_PROFILE)
-        custom_profile.ververica_deployment_template_path = \
-            "tests/streamingcli/resources/platform/vvp/custom_vvp_flink_deployment_template.yml"
+        custom_profile.ververica_deployment_template_path = custom_deployment_file
         vvp_deployment_adapter = VervericaDeploymentAdapter(
             custom_profile, self.DOCKER_TAG, self.PROJECT_NAME
         )

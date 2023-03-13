@@ -1,14 +1,16 @@
 import importlib.resources as pkg_resources
-
 from pathlib import Path
-from streamingcli.project import templates
 from typing import Optional
+
+from streamingcli.project import templates
+
 
 class TemplateLoader:
     @staticmethod
     def load_project_template(template_name: str) -> str:
-        template = TemplateLoader.try_to_load_text_from_packages(template_name) or \
-                   TemplateLoader.try_to_load_text_from_path(template_name)
+        template = TemplateLoader.try_to_load_text_from_packages(
+            template_name
+        ) or TemplateLoader.try_to_load_text_from_path(template_name)
         if template is None:
             raise ValueError(f"Could not read file for name: {template_name}")
         return template
