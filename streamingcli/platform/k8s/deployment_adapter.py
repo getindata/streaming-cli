@@ -27,8 +27,7 @@ class K8SDeploymentAdapter(DeploymentAdapter):
         if self.docker_image_tag is None or len(self.docker_image_tag) == 0:
             raise click.ClickException("Missing Docker image tag attribute")
 
-    @staticmethod
-    def get_template_name() -> str:
+    def get_template_name(self) -> str:
         return "k8s_flink_deployment.yml"
 
     @staticmethod

@@ -40,6 +40,7 @@ class ScliProfile:
     ververica_url: Optional[str] = field(default=None)
     ververica_namespace: Optional[str] = field(default=None)
     ververica_deployment_target: Optional[str] = field(default=None)
+    ververica_deployment_template_path: Optional[str] = field(default=None)
     ververica_api_token: Optional[str] = field(default=None)
     docker_registry_url: Optional[str] = field(default=None)
     k8s_namespace: Optional[str] = field(default=None)
@@ -108,6 +109,7 @@ class ProfileAdapter:
         ververica_namespace: Optional[str] = None,
         ververica_deployment_target_name: Optional[str] = None,
         ververica_webtoken_secret: Optional[str] = None,
+        ververica_deployment_template_path: Optional[str] = None,
         docker_registry_url: Optional[str] = None,
         k8s_namespace: Optional[str] = None,
     ) -> ScliProfile:
@@ -120,6 +122,8 @@ class ProfileAdapter:
             params["ververica_namespace"] = ververica_namespace
         if ververica_deployment_target_name is not None:
             params["ververica_deployment_target"] = ververica_deployment_target_name
+        if ververica_deployment_template_path is not None:
+            params["ververica_deployment_template_path"] = ververica_deployment_template_path
         if ververica_webtoken_secret is not None:
             params["ververica_api_token"] = ververica_webtoken_secret
         if docker_registry_url is not None:

@@ -1,0 +1,50 @@
+metadata:
+  displayName: test
+  name: test
+spec:
+  deploymentTargetName: deploymenttarget
+  maxJobCreationAttempts: 4
+  maxSavepointCreationAttempts: 4
+  restoreStrategy:
+    allowNonRestoredState: false
+    kind: LATEST_STATE
+  state: RUNNING
+  template:
+    metadata:
+      annotations:
+        flink.queryable-state.enabled: 'false'
+        flink.security.ssl.enabled: 'false'
+    spec:
+      artifact:
+        flinkImageRegistry: docker_registry_url
+        flinkImageRepository: test
+        flinkImageTag: latest
+        flinkVersion: '1.16'
+        kind: JAR
+        jarUri: 'file:///opt/flink/opt/flink-python-1.16.0.jar'
+        entryClass: org.apache.flink.client.python.PythonDriver
+        mainArgs: '--python /app/src/flink_app.py'
+      flinkConfiguration:
+        execution.checkpointing.externalized-checkpoint-retention: RETAIN_ON_CANCELLATION
+        execution.checkpointing.interval: 10s
+        execution.checkpointing.min-pause: 10s
+        high-availability: vvp-kubernetes
+        metrics.reporter.prom.class: org.apache.flink.metrics.prometheus.PrometheusReporter
+        state.backend: filesystem
+        taskmanager.memory.managed.fraction: '0.0'
+        taskmanager.numberOfTaskSlots: '1'
+        web.cancel.enable: 'false'
+      logging:
+        log4jLoggers:
+          '': INFO
+        loggingProfile: default
+      parallelism: 1
+      resources:
+        jobmanager:
+          cpu: 1
+          memory: 1G
+        taskmanager:
+          cpu: 1
+          memory: 1G
+  upgradeStrategy:
+    kind: STATEFUL

@@ -8,7 +8,7 @@ from streamingcli.platform.ververica.deployment_adapter import VervericaDeployme
 from streamingcli.profile.profile_adapter import DeploymentMode, ScliProfile
 
 
-class TestK8SProfileAdapter(unittest.TestCase):
+class TestVVPProfileAdapter(unittest.TestCase):
     VVP_TEST_PROFILE = ScliProfile(
         profile_name="test_profile",
         deployment_mode=DeploymentMode.VVP,
@@ -43,6 +43,19 @@ class TestK8SProfileAdapter(unittest.TestCase):
         print(vvp_deployment_adapter.generate_project_template([]))
         expected_file_path = "tests/streamingcli/resources/platform/vvp/expected_vvp_default_flink_deployment.yml"
         self.assertEqual(
-            vvp_deployment_adapter.generate_project_template([]),
             Path(expected_file_path).read_text(),
+            vvp_deployment_adapter.generate_project_template([]),
+        )
+
+    def test_generating_project_with_custom_template(self):
+        custom_profile = copy.deepcopy(self.VVP_TEST_PROFILE)
+        custom_profile.ververica_deployment_template_path = "tests/streamingcli/resources/platform/vvp/custom_vvp_flink_deployment_template.yml"
+        vvp_deployment_adapter = VervericaDeploymentAdapter(
+            custom_profile, self.DOCKER_TAG, self.PROJECT_NAME
+        )
+        print(vvp_deployment_adapter.generate_project_template([]))
+        expected_file_path = "tests/streamingcli/resources/platform/vvp/expected_vvp_custom_flink_deployment.yml"
+        self.assertEqual(
+            Path(expected_file_path).read_text(),
+            vvp_deployment_adapter.generate_project_template([]),
         )
