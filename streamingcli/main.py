@@ -111,6 +111,11 @@ def project_init(
     help="Ververica deployment target name",
 )
 @click.option(
+    "--vvp-deployment-template-path",
+    "ververica_deployment_template_path",
+    help="Optional custom Ververica deployment descriptor file absolute path",
+)
+@click.option(
     "--vvp-api-token",
     "vvp_api_token",
     help="Ververica WebToken secret to make API calls",
@@ -129,6 +134,7 @@ def project_deploy(
     ververica_url: Optional[str] = None,
     ververica_namespace: Optional[str] = None,
     ververica_deployment_target_name: Optional[str] = None,
+    ververica_deployment_template_path: Optional[str] = None,
     vvp_api_token: Optional[str] = None,
     k8s_namespace: Optional[str] = None,
     overrides_from_yaml: Optional[str] = None,
@@ -142,6 +148,7 @@ def project_deploy(
         ververica_url=ververica_url,
         ververica_namespace=ververica_namespace,
         ververica_deployment_target_name=ververica_deployment_target_name,
+        ververica_deployment_template_path=ververica_deployment_template_path,
         ververica_webtoken_secret=vvp_api_token,
         k8s_namespace=k8s_namespace,
         overrides_from_yaml=overrides_from_yaml,
