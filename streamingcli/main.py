@@ -354,6 +354,9 @@ def profile() -> None:
 @click.option(
     "--vvp-deployment-target", required=False, help="Ververica deployment target name"
 )
+@click.option(
+    "--vvp-deployment-template-path", required=False, help="Ververica deployment template absolute path"
+)
 @click.option("--vvp-api-token", required=False, help="Ververica API Token")
 @click.option(
     "--docker-registry-url",
@@ -367,6 +370,7 @@ def add_profile(
     vvp_url: Optional[str],
     vvp_namespace: Optional[str],
     vvp_deployment_target: Optional[str],
+    vvp_deployment_template_path: Optional[str],
     vvp_api_token: Optional[str],
     docker_registry_url: Optional[str],
     k8s_namespace: Optional[str],
@@ -377,6 +381,7 @@ def add_profile(
         ververica_url=vvp_url,
         ververica_namespace=vvp_namespace,
         ververica_deployment_target=vvp_deployment_target,
+        ververica_deployment_template_path=vvp_deployment_template_path,
         ververica_api_token=vvp_api_token,
         docker_registry_url=docker_registry_url,
         k8s_namespace=k8s_namespace,
