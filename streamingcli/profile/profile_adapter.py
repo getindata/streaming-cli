@@ -123,7 +123,9 @@ class ProfileAdapter:
         if ververica_deployment_target_name is not None:
             params["ververica_deployment_target"] = ververica_deployment_target_name
         if ververica_deployment_template_path is not None:
-            params["ververica_deployment_template_path"] = ververica_deployment_template_path
+            params[
+                "ververica_deployment_template_path"
+            ] = ververica_deployment_template_path
         if ververica_webtoken_secret is not None:
             params["ververica_api_token"] = ververica_webtoken_secret
         if docker_registry_url is not None:

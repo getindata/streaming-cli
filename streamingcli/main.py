@@ -355,7 +355,9 @@ def profile() -> None:
     "--vvp-deployment-target", required=False, help="Ververica deployment target name"
 )
 @click.option(
-    "--vvp-deployment-template-path", required=False, help="Ververica deployment template absolute path"
+    "--vvp-deployment-template-path",
+    required=False,
+    help="Ververica deployment template absolute path",
 )
 @click.option("--vvp-api-token", required=False, help="Ververica API Token")
 @click.option(
