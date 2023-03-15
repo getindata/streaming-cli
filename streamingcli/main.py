@@ -111,6 +111,11 @@ def project_init(
     help="Ververica deployment target name",
 )
 @click.option(
+    "--vvp-deployment-template-path",
+    "ververica_deployment_template_path",
+    help="Optional custom Ververica deployment descriptor file absolute path",
+)
+@click.option(
     "--vvp-api-token",
     "vvp_api_token",
     help="Ververica WebToken secret to make API calls",
@@ -129,6 +134,7 @@ def project_deploy(
     ververica_url: Optional[str] = None,
     ververica_namespace: Optional[str] = None,
     ververica_deployment_target_name: Optional[str] = None,
+    ververica_deployment_template_path: Optional[str] = None,
     vvp_api_token: Optional[str] = None,
     k8s_namespace: Optional[str] = None,
     overrides_from_yaml: Optional[str] = None,
@@ -142,6 +148,7 @@ def project_deploy(
         ververica_url=ververica_url,
         ververica_namespace=ververica_namespace,
         ververica_deployment_target_name=ververica_deployment_target_name,
+        ververica_deployment_template_path=ververica_deployment_template_path,
         ververica_webtoken_secret=vvp_api_token,
         k8s_namespace=k8s_namespace,
         overrides_from_yaml=overrides_from_yaml,
@@ -347,6 +354,11 @@ def profile() -> None:
 @click.option(
     "--vvp-deployment-target", required=False, help="Ververica deployment target name"
 )
+@click.option(
+    "--vvp-deployment-template-path",
+    required=False,
+    help="Ververica deployment template absolute path",
+)
 @click.option("--vvp-api-token", required=False, help="Ververica API Token")
 @click.option(
     "--docker-registry-url",
@@ -360,6 +372,7 @@ def add_profile(
     vvp_url: Optional[str],
     vvp_namespace: Optional[str],
     vvp_deployment_target: Optional[str],
+    vvp_deployment_template_path: Optional[str],
     vvp_api_token: Optional[str],
     docker_registry_url: Optional[str],
     k8s_namespace: Optional[str],
@@ -370,6 +383,7 @@ def add_profile(
         ververica_url=vvp_url,
         ververica_namespace=vvp_namespace,
         ververica_deployment_target=vvp_deployment_target,
+        ververica_deployment_template_path=vvp_deployment_template_path,
         ververica_api_token=vvp_api_token,
         docker_registry_url=docker_registry_url,
         k8s_namespace=k8s_namespace,

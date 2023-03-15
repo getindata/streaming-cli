@@ -39,6 +39,6 @@ class TestK8SProfileAdapter(unittest.TestCase):
         print(k8s_deployment_adapter.generate_project_template([]))
         file_path = "tests/streamingcli/resources/platform/k8s_flink_deployment.yml"
         self.assertEqual(
-            k8s_deployment_adapter.generate_project_template([]),
             Path(file_path).read_text(),
+            k8s_deployment_adapter.generate_project_template([]),
         )
