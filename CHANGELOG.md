@@ -5,6 +5,11 @@
 ### Added
 
 -   Deploy to vvp with given deployment descriptor
+-   Documentation on adding certificates needed by requests library
+
+### Changed
+
+-   Ververica job deployment now uses PUT http method instead of POST
 
 ## [1.9.1] - 2023-03-02
 
