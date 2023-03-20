@@ -124,6 +124,17 @@ scli docker login \
 
 > Parameters`--docker-image-tag` is optional and has default value `latest`.
 
+### Providing certificates
+Scli uses `requests` library to deploy jobs to Ververica Platform via REST Api. Currently `requests` does not support 
+automatic downloading of intermediate certificates so entire chain of certificates should be present before making 
+a http call
+
+example:
+```sh
+sh -c 'CA_CERT_PATH=`python3 -c "import requests; print(requests.certs.where())"`;for CERT in certs/*; do cat ${CERT}; done >> ${CA_CERT_PATH}';
+
+```
+
 ### Project operations
 
 ## SCLI Development
