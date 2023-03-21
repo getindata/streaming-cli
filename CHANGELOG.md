@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## [1.10.0] - 2023-03-21
+
 ### Added
 
 -   Deploy to vvp with given deployment descriptor
@@ -112,7 +114,9 @@
 
 # [Unreleased]&#x3A; <https://github.com/getindata/streaming-cli/compare/1.8.0...HEAD>
 
-[Unreleased]: https://github.com/getindata/streaming-cli/compare/1.9.1...HEAD
+[Unreleased]: https://github.com/getindata/streaming-cli/compare/1.10.0...HEAD
+
+[1.10.0]: https://github.com/getindata/streaming-cli/compare/1.9.1...1.10.0
 
 [1.9.1]: https://github.com/getindata/streaming-cli/compare/1.9.0...1.9.1
 
