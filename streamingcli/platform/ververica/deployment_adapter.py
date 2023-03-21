@@ -9,10 +9,10 @@ from streamingcli.platform.deployment_adapter import DeploymentAdapter
 
 class VervericaDeploymentAdapter(DeploymentAdapter):
     def deploy(self, deployment_yml: str) -> Optional[str]:
-        response = self.post_deployment_file(deployment_yml)
+        response = self.put_deployment_file(deployment_yml)
 
         if response.status_code != 201:
-            raise click.ClickException("Failed to POST deployment.yaml file")
+            raise click.ClickException("Failed to PUT deployment.yaml file")
         else:
             deployment_name = response.json()["metadata"]["name"]
             return (
@@ -49,13 +49,13 @@ class VervericaDeploymentAdapter(DeploymentAdapter):
             or "vvp_flink_deployment.yml"
         )
 
-    def post_deployment_file(self, deployment_file: str) -> Response:
+    def put_deployment_file(self, deployment_file: str) -> Response:
         deployments_url = (
             f"{self.profile_data.ververica_url}/api/v1/namespaces/"
-            + f"{self.profile_data.ververica_namespace}/deployments"
+            + f"{self.profile_data.ververica_namespace}/deployments/{self.project_name}"
         )
 
-        response = requests.post(
+        response = requests.put(
             url=deployments_url,
             data=deployment_file,
             headers={
