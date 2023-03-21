@@ -1,8 +1,8 @@
 metadata:
-  name: {{project_name}}
-  displayName: {{project_name}}
+  name: test
+  displayName: test
 spec:
-  deploymentTargetName: {{ververica_deployment_target}}
+  deploymentTargetName: deploymenttarget
   maxJobCreationAttempts: 4
   maxSavepointCreationAttempts: 4
   restoreStrategy:
@@ -17,15 +17,12 @@ spec:
         flink.security.ssl.enabled: 'false'
     spec:
       artifact:
-        flinkImageRegistry: {{docker_registry_url}}
-        flinkImageRepository: {{project_name}}
-        flinkImageTag: {{docker_image_tag}}
+        flinkImageRegistry: docker_registry_url
+        flinkImageRepository: test
+        flinkImageTag: latest
         flinkVersion: '1.14'
         additionalDependencies:
           - file:///app/lib/flink-python_2.12-1.14.0.jar
-          {%- for dependency in dependencies %}
-          - file://{{dependency}}
-          {%- endfor %}
         jarUri: file:///app/lib/flink-python-loader-1.1.0.jar
         entryClass: com.getindata.streaming.FlinkPythonLoader
         kind: JAR

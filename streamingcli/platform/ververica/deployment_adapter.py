@@ -9,10 +9,10 @@ from streamingcli.platform.deployment_adapter import DeploymentAdapter
 
 class VervericaDeploymentAdapter(DeploymentAdapter):
     def deploy(self, deployment_yml: str) -> Optional[str]:
-        response = self.post_deployment_file(deployment_yml)
+        response = self.put_deployment_file(deployment_yml)
 
         if response.status_code != 201:
-            raise click.ClickException("Failed to POST deployment.yaml file")
+            raise click.ClickException("Failed to PUT deployment.yaml file")
         else:
             deployment_name = response.json()["metadata"]["name"]
             return (
@@ -43,17 +43,19 @@ class VervericaDeploymentAdapter(DeploymentAdapter):
         if self.docker_image_tag is None or len(self.docker_image_tag) == 0:
             raise click.ClickException("Missing Docker image tag attribute")
 
-    @staticmethod
-    def get_template_name() -> str:
-        return "vvp_flink_deployment.yml"
-
-    def post_deployment_file(self, deployment_file: str) -> Response:
-        deployments_url = (
-            f"{self.profile_data.ververica_url}/api/v1/namespaces/"
-            + f"{self.profile_data.ververica_namespace}/deployments"
+    def get_template_name(self) -> str:
+        return (
+            self.profile_data.ververica_deployment_template_path
+            or "vvp_flink_deployment.yml"
         )
 
-        response = requests.post(
+    def put_deployment_file(self, deployment_file: str) -> Response:
+        deployments_url = (
+            f"{self.profile_data.ververica_url}/api/v1/namespaces/"
+            + f"{self.profile_data.ververica_namespace}/deployments/{self.project_name}"
+        )
+
+        response = requests.put(
             url=deployments_url,
             data=deployment_file,
             headers={

@@ -25,9 +25,8 @@ class DeploymentAdapter(ABC):
     def validate_profile_data(self) -> None:
         pass
 
-    @staticmethod
     @abstractmethod
-    def get_template_name() -> str:
+    def get_template_name(self) -> str:
         pass
 
     def generate_project_template(self, dependencies: List[str]) -> str:
