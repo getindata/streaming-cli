@@ -9,17 +9,23 @@ from streamingcli.platform.deployment_adapter import DeploymentAdapter
 
 class VervericaDeploymentAdapter(DeploymentAdapter):
     def deploy(self, deployment_yml: str) -> Optional[str]:
-        response = self.put_deployment_file(deployment_yml)
+        deployment_url = (
+            f"{self.profile_data.ververica_url}/api/v1/namespaces/"
+            + f"{self.profile_data.ververica_namespace}/deployments/{self.project_name}"
+        )
 
-        if response.status_code != 201:
-            raise click.ClickException("Failed to PUT deployment.yaml file")
-        else:
-            deployment_name = response.json()["metadata"]["name"]
+        response = self.put_deployment_file(deployment_yml, deployment_url)
+
+        if response.ok:
             return (
-                "Created deployment: "
-                + f"{self.profile_data.ververica_url}/app/#/namespaces/"
-                + f"{self.profile_data.ververica_namespace}/deployments/{deployment_name}"
+                f"Status {response.status_code}. Deployment: {deployment_url} \n"
+                + f"{response.text}"
             )
+
+        raise click.ClickException(
+            f"Failed to PUT deployment.yaml file. Status code: {response.status_code}. "
+            f"{response.text}"
+        )
 
     def validate_profile_data(self) -> None:
         if self.profile_data.ververica_url is None:
@@ -49,14 +55,11 @@ class VervericaDeploymentAdapter(DeploymentAdapter):
             or "vvp_flink_deployment.yml"
         )
 
-    def put_deployment_file(self, deployment_file: str) -> Response:
-        deployments_url = (
-            f"{self.profile_data.ververica_url}/api/v1/namespaces/"
-            + f"{self.profile_data.ververica_namespace}/deployments/{self.project_name}"
-        )
-
+    def put_deployment_file(
+        self, deployment_file: str, deployment_url: str
+    ) -> Response:
         response = requests.put(
-            url=deployments_url,
+            url=deployment_url,
             data=deployment_file,
             headers={
                 "Content-Type": "application/yaml",
