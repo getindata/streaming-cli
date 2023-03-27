@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## [1.10.1] - 2023-03-27
+
 ### Fixed
 
 -   Properly handle http response status
@@ -118,7 +120,9 @@
 
 # [Unreleased]&#x3A; <https://github.com/getindata/streaming-cli/compare/1.8.0...HEAD>
 
-[Unreleased]: https://github.com/getindata/streaming-cli/compare/1.10.0...HEAD
+[Unreleased]: https://github.com/getindata/streaming-cli/compare/1.10.1...HEAD
+
+[1.10.1]: https://github.com/getindata/streaming-cli/compare/1.10.0...1.10.1
 
 [1.10.0]: https://github.com/getindata/streaming-cli/compare/1.9.1...1.10.0
 
