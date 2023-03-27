@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Fixed
+
+-   Properly handle http response status
+
 ## [1.10.0] - 2023-03-21
 
 ### Added
