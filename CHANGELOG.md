@@ -2,6 +2,12 @@
 
 ## [Unreleased]
 
+## [1.10.2] - 2023-03-28
+
+### Added
+
+-   Separate CI job for docker creation
+
 ## [1.10.1] - 2023-03-27
 
 ### Fixed
@@ -120,7 +126,9 @@
 
 # [Unreleased]&#x3A; <https://github.com/getindata/streaming-cli/compare/1.8.0...HEAD>
 
-[Unreleased]: https://github.com/getindata/streaming-cli/compare/1.10.1...HEAD
+[Unreleased]: https://github.com/getindata/streaming-cli/compare/1.10.2...HEAD
+
+[1.10.2]: https://github.com/getindata/streaming-cli/compare/1.10.1...1.10.2
 
 [1.10.1]: https://github.com/getindata/streaming-cli/compare/1.10.0...1.10.1
 
