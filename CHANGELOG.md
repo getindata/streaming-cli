@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Added
+
+-   Separate CI job for docker creation
+
 ## [1.10.1] - 2023-03-27
 
 ### Fixed

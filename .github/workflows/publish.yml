@@ -65,6 +65,18 @@ jobs:
           user: __token__
           password: ${{ secrets.PYPI_API_TOKEN }}
           verbose: true  # trace if the upload fails
+    outputs:
+      package_version: ${{ steps.set_package_version.outputs.PACKAGE_VERSION }}
+
+  docker:
+    needs: deploy
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.8]
+    steps:
+      - name: Checkout the repo
+        uses: actions/checkout@v2
 
         # Setting up Docker Buildx with docker-container driver is required
         # at the moment to be able to use a subdirectory with Git context
@@ -84,8 +96,8 @@ jobs:
           context: release
           build-args: |
             PYTHON_VERSION=${{ matrix.python-version }}
-            STREAMING_CLI_VERSION=${{ steps.set_package_version.outputs.PACKAGE_VERSION }}
+            STREAMING_CLI_VERSION=${{ needs.deploy.outputs.package_version }}
           build-contexts: |
             context=docker-image://docker:stable-git
           push: true
-          tags: gcr.io/getindata-images-public/streaming-cli:${{ steps.set_package_version.outputs.PACKAGE_VERSION }}
+          tags: gcr.io/getindata-images-public/streaming-cli:${{ needs.deploy.outputs.package_version }}
