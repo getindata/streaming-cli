@@ -4,9 +4,14 @@ from pyflink.table import StreamTableEnvironment
 stream_env = StreamExecutionEnvironment.get_execution_environment()
 stream_env.set_parallelism(1)
 table_env = StreamTableEnvironment.create(stream_env)
+stmt_set = table_env.create_statement_set()
+
 {% for entry in notebook_entries %}
 {% if entry.type == 'SQL' %}
 table_env.execute_sql(f"""{{entry.value}}""")
+{% endif %}
+{% if entry.type == 'SQL_INSERT' %}
+stmt_set.add_insert_sql(f"""{{entry.value}}""")
 {% endif %}
 {% if entry.type == 'REGISTER_UDF' %}
 table_env.create_temporary_function("{{entry.function_name}}", {{entry.object_name}})
@@ -18,3 +23,5 @@ table_env.create_java_temporary_function("{{entry.function_name}}", "{{entry.obj
 {{entry.value}}
 {% endif %}
 {% endfor %}
+
+stmt_set.execute()

@@ -35,6 +35,11 @@ class Sql(NotebookEntry):
 
 
 @dataclass
+class SqlInsert(NotebookEntry):
+    value: str = ""
+    type: str = "SQL_INSERT"
+
+@dataclass
 class RegisterUdf(NotebookEntry):
     function_name: str = ""
     object_name: str = ""
@@ -288,6 +293,8 @@ class NotebookConverter:
         sql_statement, env_var_loads = self._convert_hidden_variables_to_env_vars(
             sql_statement
         )
+        if sql_statement.strip().lower().startswith("insert"):
+            return env_var_loads + [SqlInsert(value=sql_statement)]
         return env_var_loads + [Sql(value=sql_statement)]
 
     def _convert_hidden_variables_to_env_vars(

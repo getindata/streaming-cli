@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Added
+
+-   All inserts within statement set
+
 ## [1.10.2] - 2023-03-28
 
 ### Added
