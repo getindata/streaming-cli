@@ -4,7 +4,7 @@
 
 ### Added
 
--   All inserts within statement set
+-   New `flink_execute_sql_set` magic processing - create a statement set with inserts
 
 ## [1.10.2] - 2023-03-28
 

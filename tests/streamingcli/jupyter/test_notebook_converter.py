@@ -23,7 +23,6 @@ from pyflink.table import StreamTableEnvironment
 stream_env = StreamExecutionEnvironment.get_execution_environment()
 stream_env.set_parallelism(1)
 table_env = StreamTableEnvironment.create(stream_env)
-stmt_set = table_env.create_statement_set()
 
 
 maximum_number_of_rows = 10
@@ -49,9 +48,6 @@ def filter_print(condition, message):
 
 
 table_env.create_temporary_function("filter_print", filter_print)
-
-
-stmt_set.execute()
 '''
         )
 
@@ -68,7 +64,6 @@ from pyflink.table import StreamTableEnvironment
 stream_env = StreamExecutionEnvironment.get_execution_environment()
 stream_env.set_parallelism(1)
 table_env = StreamTableEnvironment.create(stream_env)
-stmt_set = table_env.create_statement_set()
 
 
 maximum_number_of_rows = 10
@@ -89,9 +84,6 @@ table_env.execute_sql(f"""CREATE TABLE datagen (
     'connector' = 'datagen',
     'number-of-rows' = '100'
 )""")
-
-
-stmt_set.execute()
 '''
         )
 
@@ -108,7 +100,6 @@ from pyflink.table import StreamTableEnvironment
 stream_env = StreamExecutionEnvironment.get_execution_environment()
 stream_env.set_parallelism(1)
 table_env = StreamTableEnvironment.create(stream_env)
-stmt_set = table_env.create_statement_set()
 
 
 table_env.create_java_temporary_function(
@@ -121,9 +112,6 @@ table_env.execute_sql(f"""CREATE TABLE datagen (
     'connector' = 'datagen',
     'number-of-rows' = '100'
 )""")
-
-
-stmt_set.execute()
 '''
         )
 
@@ -145,7 +133,6 @@ from pyflink.table import StreamTableEnvironment
 stream_env = StreamExecutionEnvironment.get_execution_environment()
 stream_env.set_parallelism(1)
 table_env = StreamTableEnvironment.create(stream_env)
-stmt_set = table_env.create_statement_set()
 
 
 table_env.execute_sql(f"""CREATE TABLE datagen (
@@ -161,9 +148,6 @@ table_env.execute_sql(
 
 
 table_env.execute_sql(f"""select * from other""")
-
-
-stmt_set.execute()
 '''
         )
 
@@ -180,7 +164,6 @@ from pyflink.table import StreamTableEnvironment
 stream_env = StreamExecutionEnvironment.get_execution_environment()
 stream_env.set_parallelism(1)
 table_env = StreamTableEnvironment.create(stream_env)
-stmt_set = table_env.create_statement_set()
 
 
 table_env.execute_sql(f"""CREATE TABLE datagen (
@@ -189,9 +172,6 @@ table_env.execute_sql(f"""CREATE TABLE datagen (
     'connector' = 'datagen',
     'number-of-rows' = '100'
 )""")
-
-
-stmt_set.execute()
 '''
         )
 
@@ -209,7 +189,6 @@ from pyflink.table import StreamTableEnvironment
 stream_env = StreamExecutionEnvironment.get_execution_environment()
 stream_env.set_parallelism(1)
 table_env = StreamTableEnvironment.create(stream_env)
-stmt_set = table_env.create_statement_set()
 
 
 mysql_table_name = 'datagen'
@@ -243,10 +222,7 @@ table_env.execute_sql(f"""CREATE TABLE mysql (
 )""")
 
 
-stmt_set.add_insert_sql(f"""INSERT INTO mysql (SELECT * FROM datagen)""")
-
-
-stmt_set.execute()
+table_env.execute_sql(f"""INSERT INTO mysql (SELECT * FROM datagen)""")
 '''
         )
 
@@ -263,7 +239,6 @@ from pyflink.table import StreamTableEnvironment
 stream_env = StreamExecutionEnvironment.get_execution_environment()
 stream_env.set_parallelism(1)
 table_env = StreamTableEnvironment.create(stream_env)
-stmt_set = table_env.create_statement_set()
 
 
 with open("tests/streamingcli/resources/jupyter/secret.txt", "r") as secret_file:
@@ -299,10 +274,7 @@ table_env.execute_sql(f"""CREATE TABLE mysql (
 )""")
 
 
-stmt_set.add_insert_sql(f"""INSERT INTO mysql (SELECT * FROM kafka)""")
-
-
-stmt_set.execute()
+table_env.execute_sql(f"""INSERT INTO mysql (SELECT * FROM kafka)""")
 '''
         )
 
@@ -324,7 +296,6 @@ from pyflink.table import StreamTableEnvironment
 stream_env = StreamExecutionEnvironment.get_execution_environment()
 stream_env.set_parallelism(1)
 table_env = StreamTableEnvironment.create(stream_env)
-stmt_set = table_env.create_statement_set()
 
 
 with open("/var/secrets/secret.txt", "r") as secret_file:
@@ -354,9 +325,6 @@ def filter_print(condition, message):
 
 
 table_env.create_temporary_function("filter_print", filter_print)
-
-
-stmt_set.execute()
 '''
         )
 
@@ -374,16 +342,12 @@ from pyflink.table import StreamTableEnvironment
 stream_env = StreamExecutionEnvironment.get_execution_environment()
 stream_env.set_parallelism(1)
 table_env = StreamTableEnvironment.create(stream_env)
-stmt_set = table_env.create_statement_set()
 
 
 execution_output = stream_env.from_collection(
     collection=[(1, 'aaa'), (2, 'bb'), (3, 'cccc')],
     type_info=Types.ROW([Types.INT(), Types.STRING()])
 )
-
-
-stmt_set.execute()
 """
         )
 
@@ -400,7 +364,6 @@ from pyflink.table import StreamTableEnvironment
 stream_env = StreamExecutionEnvironment.get_execution_environment()
 stream_env.set_parallelism(1)
 table_env = StreamTableEnvironment.create(stream_env)
-stmt_set = table_env.create_statement_set()
 
 
 table_env.execute_sql(f"""CREATE TABLE source1 (
@@ -424,11 +387,11 @@ table_env.execute_sql(f"""CREATE TABLE sink (
 )""")
 
 
-stmt_set.add_insert_sql(f"""INSERT INTO sink SELECT * FROM source1""")
+stmt_set = table_env.create_statement_set()
 
+stmt_set.add_insert_sql(f"""INSERT INTO sink SELECT * FROM source1;""")
 
-stmt_set.add_insert_sql(f"""INSERT INTO sink SELECT * FROM source2""")
-
+stmt_set.add_insert_sql(f"""INSERT INTO sink SELECT * FROM source2;""")
 
 stmt_set.execute()
 '''

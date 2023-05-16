@@ -35,9 +35,9 @@ class Sql(NotebookEntry):
 
 
 @dataclass
-class SqlInsert(NotebookEntry):
-    value: str = ""
-    type: str = "SQL_INSERT"
+class SqlSet(NotebookEntry):
+    value: List[str] = field(default_factory=lambda: [])
+    type: str = "SQL_SET"
 
 
 @dataclass
@@ -160,6 +160,9 @@ class NotebookConverter:
         self, cell: nbformat.NotebookNode, notebook_dir: str
     ) -> Sequence[NotebookEntry]:
         source = cell.source
+        if source.startswith("%%flink_execute_sql_set"):
+            sql_statements = "\n".join(source.split("\n")[1:])
+            return [SqlSet(value=sqlparse.split(sql_statements))]
         if source.startswith("%%flink_execute_sql"):
             sql_statement = "\n".join(source.split("\n")[1:])
             if NotebookConverter._skip_statement(sql_statement):
@@ -294,8 +297,6 @@ class NotebookConverter:
         sql_statement, env_var_loads = self._convert_hidden_variables_to_env_vars(
             sql_statement
         )
-        if sql_statement.strip().lower().startswith("insert"):
-            return env_var_loads + [SqlInsert(value=sql_statement)]
         return env_var_loads + [Sql(value=sql_statement)]
 
     def _convert_hidden_variables_to_env_vars(
