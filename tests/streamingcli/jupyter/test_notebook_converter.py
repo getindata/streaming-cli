@@ -393,8 +393,8 @@ stmt_set.execute()
         # expect
         converted_notebook = convert_notebook(file_path)
         assert (
-                converted_notebook.content
-                == '''from pyflink.datastream import StreamExecutionEnvironment
+            converted_notebook.content
+            == '''from pyflink.datastream import StreamExecutionEnvironment
 from pyflink.table import StreamTableEnvironment
 
 stream_env = StreamExecutionEnvironment.get_execution_environment()
@@ -404,21 +404,21 @@ stmt_set = table_env.create_statement_set()
 
 
 table_env.execute_sql(f"""CREATE TABLE source1 (
- num INT    
+ num INT
 ) WITH (
     'connector' = 'datagen'
 )""")
 
 
 table_env.execute_sql(f"""CREATE TABLE source2 (
- num INT    
+ num INT
 ) WITH (
     'connector' = 'datagen'
 )""")
 
 
 table_env.execute_sql(f"""CREATE TABLE sink (
- num INT    
+ num INT
 ) WITH (
     'connector' = 'blackhole'
 )""")
@@ -432,4 +432,4 @@ stmt_set.add_insert_sql(f"""INSERT INTO sink SELECT * FROM source2""")
 
 stmt_set.execute()
 '''
-            )
+        )

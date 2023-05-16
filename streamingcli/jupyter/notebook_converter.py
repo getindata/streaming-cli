@@ -39,6 +39,7 @@ class SqlInsert(NotebookEntry):
     value: str = ""
     type: str = "SQL_INSERT"
 
+
 @dataclass
 class RegisterUdf(NotebookEntry):
     function_name: str = ""
