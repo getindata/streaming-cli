@@ -35,6 +35,12 @@ class Sql(NotebookEntry):
 
 
 @dataclass
+class SqlSet(NotebookEntry):
+    value: List[str] = field(default_factory=lambda: [])
+    type: str = "SQL_SET"
+
+
+@dataclass
 class RegisterUdf(NotebookEntry):
     function_name: str = ""
     object_name: str = ""
@@ -154,6 +160,9 @@ class NotebookConverter:
         self, cell: nbformat.NotebookNode, notebook_dir: str
     ) -> Sequence[NotebookEntry]:
         source = cell.source
+        if source.startswith("%%flink_execute_sql_set"):
+            sql_statements = "\n".join(source.split("\n")[1:])
+            return [SqlSet(value=sqlparse.split(sql_statements))]
         if source.startswith("%%flink_execute_sql"):
             sql_statement = "\n".join(source.split("\n")[1:])
             if NotebookConverter._skip_statement(sql_statement):
