@@ -2,6 +2,9 @@
 
 ## [Unreleased]
 
+
+## [1.11.0] - 2023-05-19
+
 ### Added
 
 -   New `flink_execute_sql_set` magic processing - create a statement set with inserts
@@ -130,7 +133,9 @@
 
 # [Unreleased]&#x3A; <https://github.com/getindata/streaming-cli/compare/1.8.0...HEAD>
 
-[Unreleased]: https://github.com/getindata/streaming-cli/compare/1.10.2...HEAD
+[Unreleased]: https://github.com/getindata/streaming-cli/compare/1.11.0...HEAD
+
+[1.11.0]: https://github.com/getindata/streaming-cli/compare/1.10.2...1.11.0
 
 [1.10.2]: https://github.com/getindata/streaming-cli/compare/1.10.1...1.10.2
 
