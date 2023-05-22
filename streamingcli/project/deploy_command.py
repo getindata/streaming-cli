@@ -52,7 +52,7 @@ class ProjectDeployer:
 
         local_project_config = LocalProjectConfigIO.load_project_config()
         project_name = docker_image_repository or local_project_config.project_name
-        profile_data = ProfileAdapter.update_profile_data(
+        profile_data = ProfileAdapter.enrich_profile_data(
             profile_data=profile_data,
             deployment_mode=deployment_mode,
             ververica_url=ververica_url,

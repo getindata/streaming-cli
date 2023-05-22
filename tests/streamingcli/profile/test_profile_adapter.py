@@ -51,7 +51,7 @@ class TestProfileAdapter:
 
     def test_updating_profile_data(self):
         updated_ververica_url = "updated_ververica_url"
-        updated_profile = ProfileAdapter.update_profile_data(
+        updated_profile = ProfileAdapter.enrich_profile_data(
             VVP_TEST_PROFILE, ververica_url=updated_ververica_url
         )
         assert updated_profile.ververica_url == updated_ververica_url

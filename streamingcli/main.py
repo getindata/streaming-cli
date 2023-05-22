@@ -270,52 +270,6 @@ def platform_apitoken_remove(
     )
 
 
-@platform.group()
-def deployment_target() -> None:
-    pass
-
-
-@deployment_target.command()
-@click.option(
-    "--kubernetes-namespace",
-    prompt="Kubernetes namespace name",
-    help="Kubernetes namespace name",
-    required=True,
-)
-@click.option("--profile", help="Profile name to use", required=True)
-@click.option("--name", help="Ververica deployment target name")
-@click.option(
-    "--vvp-url",
-    required=False,
-    help='URL for Ververica cluster, i.e: "https://vvp.streaming-platform.example.com"',
-)
-@click.option("--vvp-namespace", required=False, help="Ververica namespace")
-@click.option("--vvp-api-token", required=False, help="Ververica API Token")
-@click.option(
-    "--registry-url",
-    prompt="Docker registry URL",
-    help='URL for Docker registry, i.e: "https://hub.docker.com/"',
-)
-def deployment_target_create(
-    kubernetes_namespace: str,
-    profile: str,
-    name: Optional[str] = None,
-    vvp_url: Optional[str] = None,
-    vvp_namespace: Optional[str] = None,
-    vvp_api_token: Optional[str] = None,
-    registry_url: Optional[str] = None,
-) -> None:
-    DeploymentTargetCommand.create_deployment_target(
-        kubernetes_namespace=kubernetes_namespace,
-        deployment_target_name=name,
-        profile_name=profile,
-        ververica_url=vvp_url,
-        ververica_namespace=vvp_namespace,
-        vvp_api_token=vvp_api_token,
-        registry_url=registry_url,
-    )
-
-
 @project.group()
 def cicd() -> None:
     pass
@@ -414,7 +368,6 @@ project.add_command(project_build, "build")
 project.add_command(project_publish, "publish")
 api_token.add_command(platform_apitoken_create, "create")
 api_token.add_command(platform_apitoken_remove, "remove")
-deployment_target.add_command(deployment_target_create, "create")
 cicd.add_command(cicd_setup, "setup")
 profile.add_command(add_profile, "add")
 docker.add_command(docker_login, "login")

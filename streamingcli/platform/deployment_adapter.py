@@ -3,6 +3,7 @@ from typing import List, Optional
 
 from jinja2 import Environment
 
+from streamingcli.config import PROJECT_DEPLOYMENT_TEMPLATE
 from streamingcli.profile.profile_adapter import ScliProfile
 from streamingcli.project.template_loader import TemplateLoader
 
@@ -25,12 +26,8 @@ class DeploymentAdapter(ABC):
     def validate_profile_data(self) -> None:
         pass
 
-    @abstractmethod
-    def get_template_name(self) -> str:
-        pass
-
-    def generate_project_template(self, dependencies: List[str]) -> str:
-        template = TemplateLoader.load_project_template(self.get_template_name())
+    def generate_project_template(self, dependencies: List[str]) -> str:  # @TODO
+        template = TemplateLoader.load_project_template(PROJECT_DEPLOYMENT_TEMPLATE)
         params = self.profile_data.__dict__.copy()
         params["project_name"] = self.project_name
         params["docker_image_tag"] = self.docker_image_tag
