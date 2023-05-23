@@ -1,3 +1,5 @@
+import tempfile
+
 import hiyapyco
 
 
@@ -14,3 +16,17 @@ class YamlMerger:
         )
 
         return hiyapyco.dump(merged_result)
+
+    @staticmethod
+    def merge_two_yaml_str(input1: str, input2: str) -> str:
+        file1 = tempfile.NamedTemporaryFile()
+        file2 = tempfile.NamedTemporaryFile()
+        with open(file1.name, 'w') as fh:
+            fh.write(input1)
+        with open(file2.name, 'w') as fh:
+            fh.write(input2)
+        merged = YamlMerger.merge_two_yaml(file1.name, file2.name)
+        file1.close()
+        file2.close()
+
+        return merged

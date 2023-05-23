@@ -18,7 +18,7 @@ class K8SDeploymentAdapter(DeploymentAdapter):
         return str(stdout) if stdout else None
 
     def validate_profile_data(self) -> None:
-        if self.profile_data.k8s_namespace is None:
+        if self.profile_data.k8s_conf.namespace is None:
             raise click.ClickException("Missing K8S Namespace attribute or profile")
         if self.profile_data.docker_registry_url is None:
             raise click.ClickException(

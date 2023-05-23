@@ -43,11 +43,3 @@ class VervericaApiTokenAdapter:
                 f"Ververica ApiToken generation error: {response.status_code}"
             )
 
-    @staticmethod
-    def remove_token(
-        ververica_url: str, ververica_namespace: str, apitoken_name: str
-    ) -> None:
-        apitokens_url = f"{ververica_url}/apitokens/v1/namespaces/{ververica_namespace}/apitokens/{apitoken_name}"
-        response = requests.delete(apitokens_url)
-        if response.status_code != 200 and response.status_code != 404:
-            raise click.ClickException("Cant remove Ververica ApiToken")

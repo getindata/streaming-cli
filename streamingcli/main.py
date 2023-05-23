@@ -6,13 +6,8 @@ from markupsafe import re
 
 from .docker.login_command import LoginCommand
 from .error import StreamingCliError
-from .platform.apitoken_create_command import VervericaApiTokenCreateCommand
-from .platform.apitoken_remove_command import VervericaApiTokenRemoveCommand
-from .platform.deployment_target_command import DeploymentTargetCommand
 from .profile.profile_adapter import DeploymentMode
-from .profile.profile_command import ProfileCommand
 from .project.build_command import ProjectBuilder
-from .project.cicd_command import CICDInitializer
 from .project.deploy_command import ProjectDeployer
 from .project.jupyter.jupyter_project_factory import JupyterProjectFactory
 from .project.project_type import ProjectType
@@ -134,7 +129,6 @@ def project_deploy(
     ververica_url: Optional[str] = None,
     ververica_namespace: Optional[str] = None,
     ververica_deployment_target_name: Optional[str] = None,
-    ververica_deployment_template_path: Optional[str] = None,
     vvp_api_token: Optional[str] = None,
     k8s_namespace: Optional[str] = None,
     overrides_from_yaml: Optional[str] = None,
@@ -148,7 +142,6 @@ def project_deploy(
         ververica_url=ververica_url,
         ververica_namespace=ververica_namespace,
         ververica_deployment_target_name=ververica_deployment_target_name,
-        ververica_deployment_template_path=ververica_deployment_template_path,
         ververica_webtoken_secret=vvp_api_token,
         k8s_namespace=k8s_namespace,
         overrides_from_yaml=overrides_from_yaml,
@@ -194,156 +187,6 @@ def validate_k8s_secret(ctx: click.Context, param: click.Parameter, value: str) 
         return value
 
 
-@api_token.command()
-@click.option(
-    "--vvp-url",
-    "ververica_url",
-    prompt="Ververica URL",
-    help='URL for Ververica cluster, i.e: "https://vvp.streaming-platform.example.com"',
-)
-@click.option(
-    "--vvp-namespace",
-    "ververica_namespace",
-    prompt="Ververica namespace",
-    help="Ververica namespace",
-)
-@click.option(
-    "--name",
-    "apitoken_name",
-    prompt="Ververica ApiToken name",
-    help="Ververica ApiToken name",
-)
-@click.option(
-    "--role",
-    "apitoken_role",
-    prompt="Ververica ApiToken role",
-    help="Ververica ApiToken role",
-)
-@click.option(
-    "--save-to-kubernetes-secret",
-    "k8s_secret",
-    callback=validate_k8s_secret,
-    help="Save K8s secret in format 'namespace/secret_name' i.e. 'vvp/token",
-)
-def platform_apitoken_create(
-    ververica_url: str,
-    ververica_namespace: str,
-    apitoken_name: str,
-    apitoken_role: str,
-    k8s_secret: Optional[str] = None,
-) -> None:
-    VervericaApiTokenCreateCommand.create_apitoken(
-        ververica_url=ververica_url,
-        ververica_namespace=ververica_namespace,
-        token_name=apitoken_name,
-        token_role=apitoken_role,
-        k8s_secret=k8s_secret,
-    )
-
-
-@api_token.command()
-@click.option(
-    "--vvp-url",
-    "ververica_url",
-    prompt="Ververica URL",
-    help='URL for Ververica cluster, i.e: "https://vvp.streaming-platform.example.com"',
-)
-@click.option(
-    "--vvp-namespace",
-    "ververica_namespace",
-    prompt="Ververica namespace",
-    help="Ververica namespace",
-)
-@click.option(
-    "--name",
-    "apitoken_name",
-    prompt="Ververica ApiToken name",
-    help="Ververica ApiToken name",
-)
-def platform_apitoken_remove(
-    ververica_url: str, ververica_namespace: str, apitoken_name: str
-) -> None:
-    VervericaApiTokenRemoveCommand.remove_apitoken(
-        ververica_url=ververica_url,
-        ververica_namespace=ververica_namespace,
-        token_name=apitoken_name,
-    )
-
-
-@project.group()
-def cicd() -> None:
-    pass
-
-
-@cicd.command()
-@click.option(
-    "--provider",
-    prompt="Provider's name",
-    help="Provider's name",
-    type=click.Choice(["gitlab"], case_sensitive=False),
-)
-def cicd_setup(provider: str) -> None:
-    CICDInitializer.setup_cicd(provider)
-
-
-@_cli.group()
-def profile() -> None:
-    pass
-
-
-@profile.command()
-@click.argument("profile_name")
-@click.option(
-    "--deployment-mode",
-    "deployment_mode",
-    type=click.Choice([x.name for x in DeploymentMode], case_sensitive=False),
-    default="VVP",
-)
-@click.option(
-    "--vvp-url",
-    required=False,
-    help='URL for Ververica cluster, i.e: "https://vvp.streaming-platform.example.com"',
-)
-@click.option("--vvp-namespace", required=False, help="Ververica namespace")
-@click.option(
-    "--vvp-deployment-target", required=False, help="Ververica deployment target name"
-)
-@click.option(
-    "--vvp-deployment-template-path",
-    required=False,
-    help="Ververica deployment template absolute path",
-)
-@click.option("--vvp-api-token", required=False, help="Ververica API Token")
-@click.option(
-    "--docker-registry-url",
-    required=False,
-    help='URL for Docker registry, i.e: "https://hub.docker.com/"',
-)
-@click.option("--k8s-namespace", "k8s_namespace", help="Target namespace")
-def add_profile(
-    profile_name: str,
-    deployment_mode: str,
-    vvp_url: Optional[str],
-    vvp_namespace: Optional[str],
-    vvp_deployment_target: Optional[str],
-    vvp_deployment_template_path: Optional[str],
-    vvp_api_token: Optional[str],
-    docker_registry_url: Optional[str],
-    k8s_namespace: Optional[str],
-) -> None:
-    ProfileCommand.create_profile(
-        profile_name=profile_name,
-        deployment_mode=deployment_mode,
-        ververica_url=vvp_url,
-        ververica_namespace=vvp_namespace,
-        ververica_deployment_target=vvp_deployment_target,
-        ververica_deployment_template_path=vvp_deployment_template_path,
-        ververica_api_token=vvp_api_token,
-        docker_registry_url=docker_registry_url,
-        k8s_namespace=k8s_namespace,
-    )
-
-
 @_cli.group()
 def docker() -> None:
     pass
@@ -366,10 +209,6 @@ project.add_command(project_deploy, "deploy")
 project.add_command(project_convert, "convert")
 project.add_command(project_build, "build")
 project.add_command(project_publish, "publish")
-api_token.add_command(platform_apitoken_create, "create")
-api_token.add_command(platform_apitoken_remove, "remove")
-cicd.add_command(cicd_setup, "setup")
-profile.add_command(add_profile, "add")
 docker.add_command(docker_login, "login")
 
 if __name__ == "__main__":
