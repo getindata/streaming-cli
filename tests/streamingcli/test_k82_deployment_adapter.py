@@ -13,7 +13,7 @@ class TestK8SProfileAdapter(unittest.TestCase):
         profile_name="test_profile",
         deployment_mode=DeploymentMode.K8S_OPERATOR,
         docker_registry_url="docker_registry_url",
-        k8s_namespace="test_ns",
+        config={'k8s': {'namespace': 'test_ns'}}
     )
     PROJECT_NAME = "test"
     DOCKER_TAG = "latest"

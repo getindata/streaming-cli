@@ -6,15 +6,15 @@ from pathlib import Path
 from typing import Any, Dict, Optional, Type
 
 import click
+import yaml
 from marshmallow_dataclass import class_schema
+from streamingcli.project.yaml_merger import YamlMerger
 from yaml import SafeLoader, load, safe_dump
 
 from streamingcli.config import (
     DEFAULT_PROFILE_PATH,
-    PROFILE_ENV_VARIABLE_NAME, PROJECT_DEPLOYMENT_TEMPLATE, VVP_CONFIG_FILE, DOCKER_CONFIG_FILE, RESOURCES_CONFIG_FILE,
-    K8S_CONFIG_FILE, FLINK_CONFIG_FILE, PROFILE_CONFIG_FILE,
+    PROFILE_ENV_VARIABLE_NAME, PROFILE_CONFIG_FILE, DEFAULT_PROFILE,
 )
-from streamingcli.profile.config_merger import ConfigMerger
 
 
 class DeploymentMode(Enum):
@@ -36,22 +36,7 @@ def custom_asdict_factory(data: Any) -> Dict[str, Any]:
 
 
 @dataclass(repr=True)
-class VervericaConf:
-    url: Optional[str] = field(default=None)
-    namespace: Optional[str] = field(default=None)
-    deployment_target: Optional[str] = field(default=None)
-    api_token: Optional[str] = field(default=None)
-
-
-@dataclass(repr=True)
-class K8SConf:
-    namespace: Optional[str] = field(default=None)
-    spec: Optional[str] = field(default=None)
-
-
-@dataclass(repr=True)
 class ProfileConf:
-    name: str
     deployment_mode: Optional[DeploymentMode] = field(default=DeploymentMode.VVP)
     docker_registry_url: Optional[str] = field(default=None)
 
@@ -61,10 +46,7 @@ class ScliProfile:
     profile_name: str
     deployment_mode: Optional[DeploymentMode] = field(default=DeploymentMode.VVP)
     docker_registry_url: Optional[str] = field(default=None)
-    ververica_conf: Optional[VervericaConf] = field(default=None)
-    k8s_conf: Optional[K8SConf] = field(default=None)
-    flink_conf: Optional[str] = field(default=None)
-    resources_conf: Optional[str] = field(default=None)
+    config: Optional[Dict[str, Any]] = field(default=None)
 
 
 @dataclass
@@ -102,15 +84,12 @@ class ProfileAdapter:
         profiles_path = Path(default_profile_path)
 
         profiles = [x.name for x in profiles_path.iterdir() if x.is_dir()]
-        base = None
-        if 'base' in profiles:
-            base = ProfileAdapter.load_profile('base')
 
-        profile_list = {'base': base}
+        profile_list = {}
         for profile_name in profiles:
-            if profile_name != 'base':
-                profile = ProfileAdapter.load_profile(profile_name)
-                profile_list[profile_name] = ConfigMerger.merge_profiles(base, profile)
+            # if profile_name != DEFAULT_PROFILE:
+                profile = ProfileAdapter.load_profile(default_profile_path, profile_name)
+                profile_list[profile_name] = profile
         return ScliProfiles(profiles=profile_list)
 
     @staticmethod
@@ -128,17 +107,17 @@ class ProfileAdapter:
         if deployment_mode is not None:
             profile.deployment_mode = deployment_mode
         if ververica_url is not None:
-            profile.ververica_conf.url = ververica_url
+            profile.config['vvp']['url'] = ververica_url
         if ververica_namespace is not None:
-            profile.ververica_conf.namespace = ververica_namespace
+            profile.config['vvp']['namespace'] = ververica_namespace
         if ververica_deployment_target_name is not None:
-            profile.ververica_conf.deployment_target = ververica_deployment_target_name
+            profile.config['vvp']['deployment_target'] = ververica_deployment_target_name
         if ververica_webtoken_secret is not None:
-            profile.ververica_conf.api_token = ververica_webtoken_secret
+            profile.config['vvp']['api_token'] = ververica_webtoken_secret
         if docker_registry_url is not None:
             profile.docker_registry_url = docker_registry_url
         if k8s_namespace is not None:
-            profile.k8s_conf.namespace = k8s_namespace
+            profile.config['k8s']['namespace'] = k8s_namespace
 
         return profile
 
@@ -150,26 +129,39 @@ class ProfileAdapter:
             return os.getenv(PROFILE_ENV_VARIABLE_NAME)
 
     @staticmethod
-    def load_if_exists(profile_name: str, file: str, loaded_type: Type[Any]) -> Optional[Any]:
-        file_path = f"{DEFAULT_PROFILE_PATH}/{profile_name}/{file}"
-        if os.path.isfile(file_path):
-            with open(file_path, "r") as file:
-                content = file.read()
-                schema = class_schema(loaded_type)
-                return schema().load(load(content, Loader=SafeLoader))
-        return None
+    def load_from_file(file_path: str) -> str:
+        with open(file_path, "r") as file:
+            return file.read()
 
     @staticmethod
-    def load_profile(profile_name: str) -> ScliProfile:
-        profile_conf = ProfileAdapter.load_if_exists(profile_name, PROFILE_CONFIG_FILE, ProfileConf)
-        vvp_conf = ProfileAdapter.load_if_exists(profile_name, VVP_CONFIG_FILE, VervericaConf)
-        resources_conf = ProfileAdapter.load_if_exists(profile_name, RESOURCES_CONFIG_FILE, str)
-        k8s_conf = ProfileAdapter.load_if_exists(profile_name, K8S_CONFIG_FILE, K8SConf)
-        flink_conf = ProfileAdapter.load_if_exists(profile_name, FLINK_CONFIG_FILE, str)
+    def merge_files(base_path: Path, profile_path: Path, file: str) -> str:
+        base_file = f"{base_path}/{file}"
+        profile_file = f"{profile_path}/{file}"
+        if os.path.isfile(base_file) and os.path.isfile(profile_file):
+            return YamlMerger.merge_two_yaml(base_file, profile_file)
+        if os.path.isfile(profile_file):
+            return ProfileAdapter.load_from_file(profile_file)
+        return ProfileAdapter.load_from_file(base_file)
+
+    @staticmethod
+    def load_profile(profiles_path: str, profile_name: str) -> ScliProfile:
+        profile_path = Path(profiles_path, profile_name)
+        base_path = Path(profiles_path, DEFAULT_PROFILE)
+
+        profile_str = ProfileAdapter.merge_files(base_path, profile_path, PROFILE_CONFIG_FILE)
+        profile_schema = class_schema(ProfileConf)
+        profile_conf = profile_schema().load(load(profile_str, Loader=SafeLoader))
+
+        all_files = list(set(
+            [x.name for x in profile_path.iterdir() if x.name != PROFILE_CONFIG_FILE] +
+            [x.name for x in base_path.iterdir() if x.name != PROFILE_CONFIG_FILE]))
+        configuration = {}
+        for file in all_files:
+            merged = ProfileAdapter.merge_files(base_path, profile_path, file)
+            conf = yaml.load(merged, Loader=yaml.Loader)
+            configuration.update(conf)
 
         return ScliProfile(profile_name=profile_name, deployment_mode=profile_conf.deployment_mode,
-                           docker_registry_url=profile_conf.docker_registry_url,
-                           ververica_conf=vvp_conf, flink_conf=flink_conf, k8s_conf=k8s_conf,
-                           resources_conf=resources_conf)
+                           docker_registry_url=profile_conf.docker_registry_url, config=configuration)
 
 

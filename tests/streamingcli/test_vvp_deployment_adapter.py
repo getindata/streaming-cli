@@ -14,10 +14,9 @@ class TestVVPProfileAdapter(unittest.TestCase):
     VVP_TEST_PROFILE = ScliProfile(
         profile_name="test_profile",
         deployment_mode=DeploymentMode.VVP,
-        ververica_url="https://localhost/",
-        ververica_namespace="default",
-        ververica_deployment_target="deploymenttarget",
-        ververica_api_token="token",
+        config={'vvp':{
+            'url': 'https://localhost/', 'namespace': 'default',
+            'deployment_target': 'deploymenttarget', 'api_token': 'token'}},
         docker_registry_url="docker_registry_url",
     )
     PROJECT_NAME = "test"

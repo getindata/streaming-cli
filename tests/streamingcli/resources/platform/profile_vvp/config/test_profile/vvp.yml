@@ -1,0 +1,5 @@
+vvp:
+  url: ververica_url
+  namespace: ververica_namespace
+  api_token: some_api_token
+  deployment_target: some_deployment_target

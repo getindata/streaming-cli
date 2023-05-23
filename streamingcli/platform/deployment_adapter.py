@@ -26,7 +26,7 @@ class DeploymentAdapter(ABC):
     def validate_profile_data(self) -> None:
         pass
 
-    def generate_project_template(self, dependencies: List[str]) -> str:  # @TODO
+    def generate_project_template(self, dependencies: List[str]) -> str:
         template = TemplateLoader.load_project_template(PROJECT_DEPLOYMENT_TEMPLATE)
         params = self.profile_data.__dict__.copy()
         params["project_name"] = self.project_name
