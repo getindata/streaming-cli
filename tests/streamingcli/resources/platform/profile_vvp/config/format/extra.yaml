@@ -1,0 +1,12 @@
+flink_conf:
+  execution.checkpointing.interval: 10s
+  execution.checkpointing.unaligned: true
+k8s:
+  spec:
+    pods:
+      volumeMounts:
+        - name: ververica-crt
+          volume:
+            configMap:
+              name: ververica-crt
+            name: ververica-crt

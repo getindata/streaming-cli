@@ -1,4 +1,8 @@
+import os
 import unittest
+from pathlib import Path
+
+import pytest
 
 from streamingcli.error import FailedToOpenNotebookFile
 from streamingcli.jupyter.notebook_converter import convert_notebook
@@ -6,6 +10,10 @@ from streamingcli.jupyter.notebook_converter import convert_notebook
 
 class TestNotebookConverter(unittest.TestCase):
     """Test converting full Jupyter Notebook with udf to Python class"""
+
+    @pytest.fixture(scope="session", autouse=True)
+    def chdir(self):
+        os.chdir(Path(__file__).parent.parent.parent.parent)
 
     def test_converter(self):
         # given

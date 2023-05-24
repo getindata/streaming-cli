@@ -4,6 +4,7 @@ from typing import List, Optional
 from jinja2 import Environment
 
 from streamingcli.config import PROJECT_DEPLOYMENT_TEMPLATE
+from streamingcli.platform.jinja_prettifier import yaml_pretty
 from streamingcli.profile.profile_adapter import ScliProfile
 from streamingcli.project.template_loader import TemplateLoader
 
@@ -32,4 +33,6 @@ class DeploymentAdapter(ABC):
         params["project_name"] = self.project_name
         params["docker_image_tag"] = self.docker_image_tag
         params["dependencies"] = dependencies
-        return Environment().from_string(template).render(params)
+        env = Environment()
+        env.filters['pretty'] = yaml_pretty
+        return env.from_string(template).render(params)
