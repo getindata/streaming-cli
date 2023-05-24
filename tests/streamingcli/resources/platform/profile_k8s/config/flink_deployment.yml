@@ -1,7 +1,7 @@
 apiVersion: flink.apache.org/v1beta1
 kind: FlinkDeployment
 metadata:
-  namespace: {{k8s_namespace}}
+  namespace: {{ config.k8s.namespace }}
   name: {{project_name}}
 spec:
   image: {{docker_registry_url}}/{{project_name}}:{{docker_image_tag}}
@@ -10,14 +10,9 @@ spec:
     taskmanager.numberOfTaskSlots: "2"
   serviceAccount: flink
   jobManager:
-    replicas: 1
-    resource:
-      memory: "2048m"
-      cpu: 0.5
+{{ config.jobManager | pretty(4) }}
   taskManager:
-    resource:
-      memory: "2048m"
-      cpu: 0.5
+{{ config.taskManager | pretty(4) }}
   job:
     jarURI: local:///opt/flink/opt/flink-python-1.16.0.jar
     entryClass: org.apache.flink.client.python.PythonDriver

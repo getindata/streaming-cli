@@ -35,4 +35,5 @@ class DeploymentAdapter(ABC):
         params["dependencies"] = dependencies
         env = Environment()
         env.filters['pretty'] = yaml_pretty
+        print(params)
         return env.from_string(template).render(params)
