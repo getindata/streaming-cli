@@ -37,6 +37,9 @@ class ProjectPublisher:
             f"{profile_data.docker_registry_url}/{local_project_config.project_name}"
         )
 
+        if not profile_data.docker_registry_url:
+            raise click.ClickException("Missing docker_registry_url")
+
         if docker_credentials is not None:
             ProjectPublisher.authenticate(
                 client, docker_credentials, profile_data.docker_registry_url

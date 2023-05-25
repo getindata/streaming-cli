@@ -18,6 +18,9 @@ class LoginCommand:
     ) -> None:
         profile_name = ProjectDeployer.get_profile_name(profile_name=profile)
         profile_data = ProfileAdapter.get_profile(profile_name=profile_name)
+        if not profile_data.docker_registry_url:
+            raise click.ClickException("Missing docker_registry_url")
+
         client = docker.from_env()
         client.login(
             username, password, registry=profile_data.docker_registry_url, reauth=True

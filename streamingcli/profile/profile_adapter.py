@@ -1,6 +1,5 @@
 import copy
 import os
-import typing
 from dataclasses import dataclass, field
 from enum import Enum
 from pathlib import Path
@@ -49,7 +48,7 @@ class ScliProfile:
     profile_name: str
     deployment_mode: Optional[DeploymentMode] = field(default=DeploymentMode.VVP)
     docker_registry_url: Optional[str] = field(default=None)
-    config: Optional[Dict[str, Any]] = field(default=None)
+    config: Dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass
@@ -102,9 +101,9 @@ class ProfileAdapter:
     ) -> ScliProfile:
         profile = copy.deepcopy(profile_data)
         if ververica_webtoken_secret:
-            typing.cast(typing.Dict[str, Any], profile.config)["vvp"][
-                "api_token"
-            ] = ververica_webtoken_secret
+            if profile.config["vvp"] is None:
+                profile.config["vvp"] = {}
+            profile.config["vvp"]["api_token"] = ververica_webtoken_secret  # type: ignore
 
         return profile
 
