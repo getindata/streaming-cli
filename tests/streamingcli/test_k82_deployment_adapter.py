@@ -6,6 +6,7 @@ from pathlib import Path
 import pytest
 from click import ClickException
 
+from streamingcli.config import PROJECT_DEPLOYMENT_TEMPLATE
 from streamingcli.platform.k8s.deployment_adapter import K8SDeploymentAdapter
 from streamingcli.profile.profile_adapter import DeploymentMode, ScliProfile, ProfileAdapter
 

@@ -87,9 +87,8 @@ class ProfileAdapter:
 
         profile_list = {}
         for profile_name in profiles:
-            # if profile_name != DEFAULT_PROFILE:
-                profile = ProfileAdapter.load_profile(default_profile_path, profile_name)
-                profile_list[profile_name] = profile
+            profile = ProfileAdapter.load_profile(default_profile_path, profile_name)
+            profile_list[profile_name] = profile
         return ScliProfiles(profiles=profile_list)
 
     @staticmethod

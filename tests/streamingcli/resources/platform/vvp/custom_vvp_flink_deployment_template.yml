@@ -2,7 +2,7 @@ metadata:
   displayName: {{project_name}}
   name: {{project_name}}
 spec:
-  deploymentTargetName: {{ververica_deployment_target}}
+  deploymentTargetName: {{ config.vvp.deployment_target }}
   maxJobCreationAttempts: 4
   maxSavepointCreationAttempts: 4
   restoreStrategy:

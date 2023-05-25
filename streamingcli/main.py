@@ -2,11 +2,10 @@ import sys
 from typing import Optional
 
 import click
-from markupsafe import re
 
+from streamingcli.config import PROJECT_DEPLOYMENT_TEMPLATE
 from .docker.login_command import LoginCommand
 from .error import StreamingCliError
-from .profile.profile_adapter import DeploymentMode
 from .project.build_command import ProjectBuilder
 from .project.deploy_command import ProjectDeployer
 from .project.jupyter.jupyter_project_factory import JupyterProjectFactory
@@ -78,73 +77,28 @@ def project_init(
 
 @project.command()
 @click.option("--docker-image-tag", help="Docker image tag", default="latest")
+@click.option("--env", help="Environment name to use")
 @click.option(
-    "--docker-image-registry",
-    "docker_image_registry",
-    help='URL for Docker registry, i.e: "https://hub.docker.com/"',
-)
-@click.option(
-    "--docker-image-repository",
-    "docker_image_repository",
-    help="Docker image repository",
-)
-@click.option("--profile", help="Profile name to use")
-@click.option(
-    "--deployment-mode",
-    "deployment_mode",
-    type=click.Choice([x.name for x in DeploymentMode], case_sensitive=False),
-)
-@click.option(
-    "--vvp-url",
-    "ververica_url",
-    help='URL for Ververica cluster, i.e: "https://vvp.streaming-platform.example.com"',
-)
-@click.option("--vvp-namespace", "ververica_namespace", help="Ververica namespace")
-@click.option(
-    "--vvp-deployment-target",
-    "ververica_deployment_target_name",
-    help="Ververica deployment target name",
-)
-@click.option(
-    "--vvp-deployment-template-path",
-    "ververica_deployment_template_path",
-    help="Optional custom Ververica deployment descriptor file absolute path",
+    "--file-descriptor-path",
+    "file_descriptor_path",
+    help="Optional custom deployment descriptor file path",
 )
 @click.option(
     "--vvp-api-token",
     "vvp_api_token",
     help="Ververica WebToken secret to make API calls",
 )
-@click.option("--k8s-namespace", "k8s_namespace", help="Target namespace")
-@click.option(
-    "--overrides-from-yaml",
-    help="Path to additional deployment YAML file to merge with Ververica one",
-)
 def project_deploy(
     docker_image_tag: str,
-    docker_image_registry: Optional[str] = None,
-    docker_image_repository: Optional[str] = None,
-    profile: Optional[str] = None,
-    deployment_mode: Optional[str] = None,
-    ververica_url: Optional[str] = None,
-    ververica_namespace: Optional[str] = None,
-    ververica_deployment_target_name: Optional[str] = None,
+    env: Optional[str] = None,
+    file_descriptor_path: Optional[str] = None,
     vvp_api_token: Optional[str] = None,
-    k8s_namespace: Optional[str] = None,
-    overrides_from_yaml: Optional[str] = None,
 ) -> None:
     ProjectDeployer.deploy_project(
         docker_image_tag=docker_image_tag,
-        docker_registry_url=docker_image_registry,
-        docker_image_repository=docker_image_repository,
-        profile=profile,
-        deployment_mode=DeploymentMode.from_label(deployment_mode),
-        ververica_url=ververica_url,
-        ververica_namespace=ververica_namespace,
-        ververica_deployment_target_name=ververica_deployment_target_name,
+        env=env,
         ververica_webtoken_secret=vvp_api_token,
-        k8s_namespace=k8s_namespace,
-        overrides_from_yaml=overrides_from_yaml,
+        file_descriptor_path=file_descriptor_path,
     )
 
 
@@ -160,31 +114,15 @@ def project_convert() -> None:
 
 
 @project.command()
-@click.option(
-    "--registry-url",
-    prompt="Docker registry URL",
-    help='URL for Docker registry, i.e: "https://hub.docker.com/"',
-)
+@click.option("--env", help="Environment name to use")
 @click.option("--docker-image-tag", help="Project image tag")
-def project_publish(registry_url: str, docker_image_tag: Optional[str] = None) -> None:
-    ProjectPublisher.publish(registry_url, docker_image_tag)
+def project_publish(env: Optional[str] = None, docker_image_tag: Optional[str] = None) -> None:
+    ProjectPublisher.publish(env, docker_image_tag)
 
 
 @_cli.group()
 def platform() -> None:
     pass
-
-
-@platform.group("api-token")
-def api_token() -> None:
-    pass
-
-
-def validate_k8s_secret(ctx: click.Context, param: click.Parameter, value: str) -> str:
-    if value is not None and re.match(r"^[\w\-\_]+\/[\w\-\_]+$", value) is None:
-        raise click.BadParameter(message="K8s secret in incorrect format")
-    else:
-        return value
 
 
 @_cli.group()
@@ -195,13 +133,9 @@ def docker() -> None:
 @docker.command()
 @click.option("--username", required=True, help="The registry username")
 @click.option("--password", required=True, help="The plaintext password")
-@click.option(
-    "--docker-registry-url",
-    required=True,
-    help="URL to the registry. E.g. https://index.docker.io/v1/",
-)
-def docker_login(username: str, password: str, docker_registry_url: str) -> None:
-    LoginCommand.docker_login(username, password, docker_registry_url)
+@click.option("--env", help="Environment name to use")
+def docker_login(username: str, password: str, env: Optional[str] = None) -> None:
+    LoginCommand.docker_login(username, password, env)
 
 
 project.add_command(project_init, "init")

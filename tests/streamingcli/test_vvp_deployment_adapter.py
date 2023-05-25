@@ -6,6 +6,7 @@ from pathlib import Path
 import pytest
 from click import ClickException
 
+from streamingcli.config import PROJECT_DEPLOYMENT_TEMPLATE
 from streamingcli.platform.ververica.deployment_adapter import (
     VervericaDeploymentAdapter,
 )
@@ -70,18 +71,17 @@ class TestVVPProfileAdapter(unittest.TestCase):
             "\n".join([s for s in result.split("\n") if s.strip()])
         )
 
-    # TODO: use custom template
-    # def test_generating_project_with_custom_template(self):
-    #     custom_deployment_file = "tests/streamingcli/resources/platform/vvp/custom_vvp_flink_deployment_template.yml"
-    #     custom_profile = copy.deepcopy(self.VVP_TEST_PROFILE)
-    #     custom_profile.ververica_deployment_template_path = custom_deployment_file
-    #     vvp_deployment_adapter = VervericaDeploymentAdapter(
-    #         custom_profile, self.DOCKER_TAG, self.PROJECT_NAME
-    #     )
-    #     result = vvp_deployment_adapter.generate_project_template([])
-    #     print(result)
-    #     expected_file_path = "tests/streamingcli/resources/platform/vvp/expected_vvp_custom_flink_deployment.yml"
-    #     self.assertEqual(
-    #         Path(expected_file_path).read_text(),
-    #         result,
-    #     )
+    def test_generating_project_with_custom_template(self):
+        custom_deployment_file = "../vvp/custom_vvp_flink_deployment_template.yml"
+        custom_profile = copy.deepcopy(self.VVP_TEST_PROFILE)
+        custom_profile.ververica_deployment_template_path = custom_deployment_file
+        vvp_deployment_adapter = VervericaDeploymentAdapter(
+            custom_profile, self.DOCKER_TAG, self.PROJECT_NAME
+        )
+        result = vvp_deployment_adapter.generate_project_template([], custom_deployment_file)
+        print(result)
+        expected_file_path = "../vvp/expected_vvp_custom_flink_deployment.yml"
+        self.assertEqual(
+            Path(expected_file_path).read_text(),
+            result,
+        )
