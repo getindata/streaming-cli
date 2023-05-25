@@ -10,35 +10,47 @@
 
 ### Platform operations
 
-Commands below will help you set up and work with Ververica Platform.
+Commands below will help you create Flink job (Python or SQL) on Ververica Platform or using Flink Kubernetes Operator.
 
-#### Profiles
+#### Environments
 
-You can set up your own profile, which will help you to connect to Ververica. Instead of providing common parameters to
-each command, you can just pass the profile name with `--profile`
+You can set up your own environment, which will allow you to connect to Ververica/K8S operator. You need to fill
+properties within `config/<env_name>` directory. `config/flink_deployment.yml` is default deployment descriptor file.
+You can use jinja for templating (look at the tests for an example). `base` environment is the default environment. 
+Others environment override parameters from `base`. You need to have in `base` or your own environment `profile.yml`
+file with given schema:
+```yaml
+deployment_mode: <VVP|K8S_OPERATOR>
+docker_registry_url: <docker_registry_url>
+```
+You need also extra file(s) with Ververica/Kubernetes configuration
+and optionally other configuration used for templating.
+
+Example `vvp.yml`:
+```yaml
+vvp:
+  url: <ververica_url>
+  namespace: <ververica_namespace>
+  deployment_target: <some_deployment_target>
+  ```
+
+Example `k8s.yml`:
+```yaml
+k8s:
+  namespace: test_ns
+```
+
+For most of the command, you can pass the environment name with `--env`
 or export environmental variable as `SCLI_PROFILE`.
-
-
-
-
-> Parameters `--vvp-url`, `--vvp-namespace`, `--vvp-api-token`, `--vvp-deployment-target` are optional if they can be read from profile.
-
 
 #### Deploying job
 
 ```shell
 scli project deploy \
-  --vvp-url "https://vvp.example.com" \
-  --vvp-namespace "default" \
   --vvp-api-token "x§11d091jd1jd9jasd0j" \
-  --vvp-deployment-target "vvp-team1" \
-  --docker-image-registry "${CI_REGISTRY_IMAGE}" \
   --docker-image-tag "${CI_COMMIT_TAG}" \
-  --docker-image-repository tmp_project \
-  --profile "sandbox"
+  --profile "dev"
 ```
-
-> Parameters `--vvp-url`, `--vvp-namespace`, `--vvp-api-token`, `--vvp-deployment-target` are optional if they can be read from profile.
 
 #### Building job Docker image
 
@@ -53,7 +65,7 @@ scli project build \
 scli docker login \
   --username "user" \
   --password "password" \
-  --docker-registry-url registry.gitlab.com/getindata/
+  --profile "dev"
 ```
 
 > Parameters`--docker-image-tag` is optional and has default value `latest`.
