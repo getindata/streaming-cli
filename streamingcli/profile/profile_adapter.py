@@ -1,20 +1,23 @@
 import copy
 import os
-from dataclasses import asdict, dataclass, field, replace
+import typing
+from dataclasses import dataclass, field
 from enum import Enum
 from pathlib import Path
-from typing import Any, Dict, Optional, Type
+from typing import Any, Dict, Optional
 
 import click
 import yaml
 from marshmallow_dataclass import class_schema
-from streamingcli.project.yaml_merger import YamlMerger
-from yaml import SafeLoader, load, safe_dump
+from yaml import SafeLoader, load
 
 from streamingcli.config import (
+    DEFAULT_PROFILE,
     DEFAULT_PROFILE_PATH,
-    PROFILE_ENV_VARIABLE_NAME, PROFILE_CONFIG_FILE, DEFAULT_PROFILE,
+    PROFILE_CONFIG_FILE,
+    PROFILE_ENV_VARIABLE_NAME,
 )
+from streamingcli.project.yaml_merger import YamlMerger
 
 
 class DeploymentMode(Enum):
@@ -55,11 +58,13 @@ class ScliProfiles:
 
 
 class ProfileAdapter:
-
     @staticmethod
-    def get_profile(profile_name: str) -> Optional[ScliProfile]:
+    def get_profile(profile_name: str) -> ScliProfile:
         profiles_dict = ProfileAdapter.load_profiles().profiles
-        return profiles_dict.get(profile_name)
+        profile = profiles_dict.get(profile_name)
+        if profile is None:
+            raise click.ClickException(f"Invalid environment name: {profile_name}")
+        return profile
 
     @staticmethod
     def get_or_create_temporary(ordered_profile_name: str) -> ScliProfile:
@@ -92,31 +97,14 @@ class ProfileAdapter:
         return ScliProfiles(profiles=profile_list)
 
     @staticmethod
-    def enrich_profile_data(
-        profile_data: ScliProfile,
-        deployment_mode: Optional[DeploymentMode] = None,
-        ververica_url: Optional[str] = None,
-        ververica_namespace: Optional[str] = None,
-        ververica_deployment_target_name: Optional[str] = None,
-        ververica_webtoken_secret: Optional[str] = None,
-        docker_registry_url: Optional[str] = None,
-        k8s_namespace: Optional[str] = None,
+    def update_token(
+        profile_data: ScliProfile, ververica_webtoken_secret: Optional[str] = None
     ) -> ScliProfile:
         profile = copy.deepcopy(profile_data)
-        if deployment_mode is not None:
-            profile.deployment_mode = deployment_mode
-        if ververica_url is not None:
-            profile.config['vvp']['url'] = ververica_url
-        if ververica_namespace is not None:
-            profile.config['vvp']['namespace'] = ververica_namespace
-        if ververica_deployment_target_name is not None:
-            profile.config['vvp']['deployment_target'] = ververica_deployment_target_name
-        if ververica_webtoken_secret is not None:
-            profile.config['vvp']['api_token'] = ververica_webtoken_secret
-        if docker_registry_url is not None:
-            profile.docker_registry_url = docker_registry_url
-        if k8s_namespace is not None:
-            profile.config['k8s']['namespace'] = k8s_namespace
+        if ververica_webtoken_secret:
+            typing.cast(typing.Dict[str, Any], profile.config)["vvp"][
+                "api_token"
+            ] = ververica_webtoken_secret
 
         return profile
 
@@ -147,20 +135,31 @@ class ProfileAdapter:
         profile_path = Path(profiles_path, profile_name)
         base_path = Path(profiles_path, DEFAULT_PROFILE)
 
-        profile_str = ProfileAdapter.merge_files(base_path, profile_path, PROFILE_CONFIG_FILE)
+        profile_str = ProfileAdapter.merge_files(
+            base_path, profile_path, PROFILE_CONFIG_FILE
+        )
         profile_schema = class_schema(ProfileConf)
         profile_conf = profile_schema().load(load(profile_str, Loader=SafeLoader))
 
-        all_files = list(set(
-            [x.name for x in profile_path.iterdir() if x.name != PROFILE_CONFIG_FILE] +
-            [x.name for x in base_path.iterdir() if x.name != PROFILE_CONFIG_FILE]))
+        all_files = list(
+            set(
+                [
+                    x.name
+                    for x in profile_path.iterdir()
+                    if x.name != PROFILE_CONFIG_FILE
+                ]
+                + [x.name for x in base_path.iterdir() if x.name != PROFILE_CONFIG_FILE]
+            )
+        )
         configuration = {}
         for file in all_files:
             merged = ProfileAdapter.merge_files(base_path, profile_path, file)
             conf = yaml.load(merged, Loader=yaml.Loader)
             configuration.update(conf)
 
-        return ScliProfile(profile_name=profile_name, deployment_mode=profile_conf.deployment_mode,
-                           docker_registry_url=profile_conf.docker_registry_url, config=configuration)
-
-
+        return ScliProfile(
+            profile_name=profile_name,
+            deployment_mode=profile_conf.deployment_mode,
+            docker_registry_url=profile_conf.docker_registry_url,
+            config=configuration,
+        )

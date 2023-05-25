@@ -28,17 +28,17 @@ class VervericaDeploymentAdapter(DeploymentAdapter):
         )
 
     def validate_profile_data(self) -> None:
-        if self.profile_data.config['vvp']['url'] is None:
+        if self.profile_data.config["vvp"]["url"] is None:
             raise click.ClickException("Missing Ververica URL attribute or profile")
-        if self.profile_data.config['vvp']['namespace'] is None:
+        if self.profile_data.config["vvp"]["namespace"] is None:
             raise click.ClickException(
                 "Missing Ververica Namespace attribute or profile"
             )
-        if self.profile_data.config['vvp']['deployment_target'] is None:
+        if self.profile_data.config["vvp"]["deployment_target"] is None:
             raise click.ClickException(
                 "Missing Ververica Deployment Target Name attribute or profile"
             )
-        if self.profile_data.config['vvp']['api_token'] is None:
+        if self.profile_data.config["vvp"]["api_token"] is None:
             raise click.ClickException(
                 "Missing Ververica APIToken secret attribute or profile"
             )

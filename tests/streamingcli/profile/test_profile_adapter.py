@@ -11,14 +11,19 @@ from streamingcli.profile.profile_adapter import (
     ScliProfile,
 )
 
-TEST_PATH = 'tests/streamingcli/resources/platform/profile_vvp'
+TEST_PATH = "tests/streamingcli/resources/platform/profile_vvp"
 
 VVP_TEST_PROFILE = ScliProfile(
     profile_name="test_profile",
     deployment_mode=DeploymentMode.VVP,
-    config={'vvp': {
-        'url': 'ververica_url', 'namespace': 'ververica_namespace',
-        'api_token': 'some_api_token', 'deployment_target': 'some_deployment_target'}},
+    config={
+        "vvp": {
+            "url": "ververica_url",
+            "namespace": "ververica_namespace",
+            "api_token": "some_api_token",
+            "deployment_target": "some_deployment_target",
+        }
+    },
     docker_registry_url="docker_registry_url",
 )
 
@@ -43,32 +48,38 @@ class TestProfileAdapter:
             profile_name=VVP_TEST_PROFILE.profile_name
         )
         assert saved_profile.profile_name == VVP_TEST_PROFILE.profile_name
-        assert saved_profile.config['vvp']['url'] == VVP_TEST_PROFILE.config['vvp']['url']
-        assert saved_profile.config['vvp']['namespace'] == VVP_TEST_PROFILE.config['vvp']['namespace']
-        assert saved_profile.docker_registry_url == VVP_TEST_PROFILE.docker_registry_url
-        assert saved_profile.config['vvp']['api_token'] == VVP_TEST_PROFILE.config['vvp']['api_token']
         assert (
-            saved_profile.config['vvp']['deployment_target']
-            == VVP_TEST_PROFILE.config['vvp']['deployment_target']
+            saved_profile.config["vvp"]["url"] == VVP_TEST_PROFILE.config["vvp"]["url"]
+        )
+        assert (
+            saved_profile.config["vvp"]["namespace"]
+            == VVP_TEST_PROFILE.config["vvp"]["namespace"]
+        )
+        assert saved_profile.docker_registry_url == VVP_TEST_PROFILE.docker_registry_url
+        assert (
+            saved_profile.config["vvp"]["api_token"]
+            == VVP_TEST_PROFILE.config["vvp"]["api_token"]
+        )
+        assert (
+            saved_profile.config["vvp"]["deployment_target"]
+            == VVP_TEST_PROFILE.config["vvp"]["deployment_target"]
         )
 
     """Test updating profile data"""
 
     def test_updating_profile_data(self):
-        updated_ververica_url = "updated_ververica_url"
-        updated_profile = ProfileAdapter.enrich_profile_data(
-            VVP_TEST_PROFILE, ververica_url=updated_ververica_url
+        updated_token = "updated_token"
+        updated_profile = ProfileAdapter.update_token(
+            VVP_TEST_PROFILE, ververica_webtoken_secret=updated_token
         )
-        assert updated_profile.config['vvp']['url'] == updated_ververica_url
+        assert updated_profile.config["vvp"]["api_token"] == updated_token
 
     """Test reading base profile"""
 
     def test_getting_temporary_profile(self):
         # os.chdir(TEST_PATH)
-        saved_profile = ProfileAdapter.get_profile(
-            profile_name='base'
-        )
+        saved_profile = ProfileAdapter.get_profile(profile_name="base")
 
-        assert saved_profile.profile_name == 'base'
+        assert saved_profile.profile_name == "base"
         assert saved_profile.deployment_mode == DeploymentMode.VVP
-        assert saved_profile.docker_registry_url == 'docker_registry_url'
+        assert saved_profile.docker_registry_url == "docker_registry_url"

@@ -7,10 +7,9 @@ import docker
 from docker.client import DockerClient
 from docker.errors import DockerException
 from docker.models.images import Image
+
 from streamingcli.profile.profile_adapter import ProfileAdapter
-
 from streamingcli.project.deploy_command import ProjectDeployer
-
 from streamingcli.project.local_project_config import LocalProjectConfigIO
 
 
@@ -34,7 +33,9 @@ class ProjectPublisher:
         client = docker.from_env()
         image_tag = docker_image_tag if docker_image_tag is not None else "latest"
         local_image_tag = f"{local_project_config.project_name}:{image_tag}"
-        repository_name = f"{profile_data.docker_registry_url}/{local_project_config.project_name}"
+        repository_name = (
+            f"{profile_data.docker_registry_url}/{local_project_config.project_name}"
+        )
 
         if docker_credentials is not None:
             ProjectPublisher.authenticate(

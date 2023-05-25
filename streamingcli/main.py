@@ -3,7 +3,6 @@ from typing import Optional
 
 import click
 
-from streamingcli.config import PROJECT_DEPLOYMENT_TEMPLATE
 from .docker.login_command import LoginCommand
 from .error import StreamingCliError
 from .project.build_command import ProjectBuilder
@@ -116,7 +115,9 @@ def project_convert() -> None:
 @project.command()
 @click.option("--env", help="Environment name to use")
 @click.option("--docker-image-tag", help="Project image tag")
-def project_publish(env: Optional[str] = None, docker_image_tag: Optional[str] = None) -> None:
+def project_publish(
+    env: Optional[str] = None, docker_image_tag: Optional[str] = None
+) -> None:
     ProjectPublisher.publish(env, docker_image_tag)
 
 

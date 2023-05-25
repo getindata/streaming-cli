@@ -3,22 +3,19 @@ from typing import Any, Optional
 
 import click
 
-from streamingcli.config import PROFILE_ENV_VARIABLE_NAME, DEFAULT_PROFILE, PROJECT_DEPLOYMENT_TEMPLATE
+from streamingcli.config import DEFAULT_PROFILE, PROFILE_ENV_VARIABLE_NAME
 from streamingcli.platform.deployment_adapter import DeploymentAdapter
 from streamingcli.platform.k8s.deployment_adapter import K8SDeploymentAdapter
 from streamingcli.platform.ververica.deployment_adapter import (
     VervericaDeploymentAdapter,
 )
-from streamingcli.profile.profile_adapter import (
-    DeploymentMode,
-    ProfileAdapter,
-)
+from streamingcli.profile.profile_adapter import DeploymentMode, ProfileAdapter
 from streamingcli.project.local_project_config import LocalProjectConfigIO
 
 
 class ProjectDeployer:
     @staticmethod
-    def get_profile_name(profile_name: Optional[str]) -> Optional[str]:
+    def get_profile_name(profile_name: Optional[str]) -> str:
         return profile_name or os.getenv(PROFILE_ENV_VARIABLE_NAME) or DEFAULT_PROFILE
 
     @staticmethod
@@ -26,14 +23,14 @@ class ProjectDeployer:
         docker_image_tag: str,
         env: Optional[str] = None,
         ververica_webtoken_secret: Optional[str] = None,
-        file_descriptor_path: Optional[str] = None
+        file_descriptor_path: Optional[str] = None,
     ) -> None:
 
         profile_name = ProjectDeployer.get_profile_name(profile_name=env)
         profile_data = ProfileAdapter.get_profile(profile_name=profile_name)
 
         local_project_config = LocalProjectConfigIO.load_project_config()
-        profile_data = ProfileAdapter.enrich_profile_data(
+        profile_data = ProfileAdapter.update_token(
             profile_data=profile_data,
             ververica_webtoken_secret=ververica_webtoken_secret,
         )
@@ -50,7 +47,9 @@ class ProjectDeployer:
             file_descriptor_path,
         )
 
-        click.echo(f"Deploying streaming project: {local_project_config.project_name} ...")
+        click.echo(
+            f"Deploying streaming project: {local_project_config.project_name} ..."
+        )
         msg = deployment_adapter.deploy(deployment_yml)
         click.echo(msg)
 

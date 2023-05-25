@@ -16,8 +16,6 @@ class TestYamlMerger:
             "yaml/input_1.yml",
             "yaml/input_2.yml",
         )
-        expected = hiyapyco.dump(
-            hiyapyco.load("yaml/expected.yml")
-        )
+        expected = hiyapyco.dump(hiyapyco.load("yaml/expected.yml"))
 
         assert merged == expected

@@ -27,7 +27,9 @@ class DeploymentAdapter(ABC):
     def validate_profile_data(self) -> None:
         pass
 
-    def generate_project_template(self, dependencies: List[str], file_descriptor_path: Optional[str] = None) -> str:
+    def generate_project_template(
+        self, dependencies: List[str], file_descriptor_path: Optional[str] = None
+    ) -> str:
         descriptor_path = file_descriptor_path or PROJECT_DEPLOYMENT_TEMPLATE
         template = TemplateLoader.load_project_template(descriptor_path)
 
@@ -36,5 +38,5 @@ class DeploymentAdapter(ABC):
         params["docker_image_tag"] = self.docker_image_tag
         params["dependencies"] = dependencies
         env = Environment()
-        env.filters['pretty'] = yaml_pretty
+        env.filters["pretty"] = yaml_pretty
         return env.from_string(template).render(params)

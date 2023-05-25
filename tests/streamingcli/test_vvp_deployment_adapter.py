@@ -6,11 +6,14 @@ from pathlib import Path
 import pytest
 from click import ClickException
 
-from streamingcli.config import PROJECT_DEPLOYMENT_TEMPLATE
 from streamingcli.platform.ververica.deployment_adapter import (
     VervericaDeploymentAdapter,
 )
-from streamingcli.profile.profile_adapter import DeploymentMode, ScliProfile, ProfileAdapter
+from streamingcli.profile.profile_adapter import (
+    DeploymentMode,
+    ProfileAdapter,
+    ScliProfile,
+)
 
 
 class TestVVPProfileAdapter(unittest.TestCase):
@@ -22,9 +25,12 @@ class TestVVPProfileAdapter(unittest.TestCase):
         profile_name="format",
         deployment_mode=DeploymentMode.VVP,
         config={
-            'vvp': {
-                'url': 'https://localhost/', 'namespace': 'default',
-                'deployment_target': 'deploymenttarget', 'api_token': 'token'},
+            "vvp": {
+                "url": "https://localhost/",
+                "namespace": "default",
+                "deployment_target": "deploymenttarget",
+                "api_token": "token",
+            },
         },
         docker_registry_url="docker_registry_url",
     )
@@ -41,7 +47,7 @@ class TestVVPProfileAdapter(unittest.TestCase):
 
     def test_init_with_invalid_profile(self):
         invalid_profile = copy.deepcopy(self.VVP_TEST_PROFILE)
-        invalid_profile.config['vvp']['namespace'] = None
+        invalid_profile.config["vvp"]["namespace"] = None
         with self.assertRaises(ClickException):
             VervericaDeploymentAdapter(
                 invalid_profile, self.DOCKER_TAG, self.PROJECT_NAME
@@ -49,26 +55,26 @@ class TestVVPProfileAdapter(unittest.TestCase):
 
     def test_generating_default_project_template(self):
         vvp_deployment_adapter = VervericaDeploymentAdapter(
-            ProfileAdapter.get_profile('format'), self.DOCKER_TAG, self.PROJECT_NAME
+            ProfileAdapter.get_profile("format"), self.DOCKER_TAG, self.PROJECT_NAME
         )
         result = vvp_deployment_adapter.generate_project_template([])
         print(result)
         expected_file_path = "../vvp/expected_vvp_default_flink_deployment.yml"
         self.assertEqual(
             Path(expected_file_path).read_text(),
-            "\n".join([s for s in result.split("\n") if s.strip()])
+            "\n".join([s for s in result.split("\n") if s.strip()]),
         )
 
     def test_generating_default_project_template_with_deps(self):
         vvp_deployment_adapter = VervericaDeploymentAdapter(
-            ProfileAdapter.get_profile('format'), self.DOCKER_TAG, self.PROJECT_NAME
+            ProfileAdapter.get_profile("format"), self.DOCKER_TAG, self.PROJECT_NAME
         )
         result = vvp_deployment_adapter.generate_project_template(["another.jar"])
         print(result)
         expected_file_path = "../vvp/expected_vvp_flink_deployment_with_deps.yml"
         self.assertEqual(
             Path(expected_file_path).read_text(),
-            "\n".join([s for s in result.split("\n") if s.strip()])
+            "\n".join([s for s in result.split("\n") if s.strip()]),
         )
 
     def test_generating_project_with_custom_template(self):
@@ -78,7 +84,9 @@ class TestVVPProfileAdapter(unittest.TestCase):
         vvp_deployment_adapter = VervericaDeploymentAdapter(
             custom_profile, self.DOCKER_TAG, self.PROJECT_NAME
         )
-        result = vvp_deployment_adapter.generate_project_template([], custom_deployment_file)
+        result = vvp_deployment_adapter.generate_project_template(
+            [], custom_deployment_file
+        )
         print(result)
         expected_file_path = "../vvp/expected_vvp_custom_flink_deployment.yml"
         self.assertEqual(
