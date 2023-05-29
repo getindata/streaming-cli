@@ -77,7 +77,6 @@ class TestProfileAdapter:
     """Test reading base profile"""
 
     def test_getting_temporary_profile(self):
-        # os.chdir(TEST_PATH)
         saved_profile = ProfileAdapter.get_profile(profile_name="base")
 
         assert saved_profile.profile_name == "base"

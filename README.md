@@ -10,14 +10,13 @@
 
 ### Platform operations
 
-Commands below will help you create Flink job (Python or SQL) on Ververica Platform or using Flink Kubernetes Operator.
-
 #### Environments
 
 You can set up your own environment, which will allow you to connect to Ververica/K8S operator. You need to fill
-properties within `config/<env_name>` directory. `config/flink_deployment.yml` is default deployment descriptor file.
-You can use jinja for templating (look at the tests for an example). `base` environment is the default environment.
-Others environment override parameters from `base`. You need to have in `base` or your own environment `profile.yml`
+properties within `config/<env_name>` directory. `config/flink_deployment.yml` is default deployment descriptor file
+for each environment (you can overwrite it using `--file-descriptor-path` flag). You can use jinja for templating
+(look at the tests for an example). `base` environment is the default environment. Others environment override
+parameters from `base`. You need to have in `base` or your own environment `profile.yml`
 file with given schema:
 ```yaml
 deployment_mode: <VVP|K8S_OPERATOR>

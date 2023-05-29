@@ -122,11 +122,6 @@ def project_publish(
 
 
 @_cli.group()
-def platform() -> None:
-    pass
-
-
-@_cli.group()
 def docker() -> None:
     pass
 
