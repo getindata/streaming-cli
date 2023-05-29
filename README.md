@@ -40,7 +40,7 @@ k8s:
 ```
 
 For most of the command, you can pass the environment name with `--env`
-or export environmental variable as `SCLI_PROFILE`.
+or export environmental variable as `SCLI_ENV`.
 
 #### Deploying job
 
