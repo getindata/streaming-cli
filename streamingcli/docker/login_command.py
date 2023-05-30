@@ -1,21 +1,35 @@
 import base64
 import json
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 
 import click
 import docker
 from docker import auth
 from docker.utils import config
 
+from streamingcli.profile.profile_adapter import ProfileAdapter
+from streamingcli.project.deploy_command import ProjectDeployer
+
 
 class LoginCommand:
     @staticmethod
-    def docker_login(username: str, password: str, docker_registry_url: str) -> None:
+    def docker_login(
+        username: str, password: str, profile: Optional[str] = None
+    ) -> None:
+        profile_name = ProjectDeployer.get_profile_name(profile_name=profile)
+        profile_data = ProfileAdapter.get_profile(profile_name=profile_name)
+        if not profile_data.docker_registry_url:
+            raise click.ClickException("Missing docker_registry_url")
+
         client = docker.from_env()
-        client.login(username, password, registry=docker_registry_url, reauth=True)
-        click.echo(f"Successfully logged in to {docker_registry_url}")
+        client.login(
+            username, password, registry=profile_data.docker_registry_url, reauth=True
+        )
+        click.echo(f"Successfully logged in to {profile_data.docker_registry_url}")
         # it's a bit of a hack, docker-py login method does not update auth credentials in Docker config file
-        LoginCommand.update_docker_auths_config(username, password, docker_registry_url)
+        LoginCommand.update_docker_auths_config(
+            username, password, profile_data.docker_registry_url
+        )
 
     @staticmethod
     def update_docker_auths_config(

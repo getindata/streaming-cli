@@ -8,6 +8,8 @@ from docker.client import DockerClient
 from docker.errors import DockerException
 from docker.models.images import Image
 
+from streamingcli.profile.profile_adapter import ProfileAdapter
+from streamingcli.project.deploy_command import ProjectDeployer
 from streamingcli.project.local_project_config import LocalProjectConfigIO
 
 
@@ -20,20 +22,27 @@ class UserCredentials:
 class ProjectPublisher:
     @staticmethod
     def publish(
-        docker_repository_url: str,
+        profile: Optional[str] = None,
         docker_image_tag: Optional[str] = None,
         docker_credentials: Optional[UserCredentials] = None,
     ) -> None:
         local_project_config = LocalProjectConfigIO.load_project_config()
+        profile_name = ProjectDeployer.get_profile_name(profile_name=profile)
+        profile_data = ProfileAdapter.get_profile(profile_name=profile_name)
 
         client = docker.from_env()
         image_tag = docker_image_tag if docker_image_tag is not None else "latest"
         local_image_tag = f"{local_project_config.project_name}:{image_tag}"
-        repository_name = f"{docker_repository_url}/{local_project_config.project_name}"
+        repository_name = (
+            f"{profile_data.docker_registry_url}/{local_project_config.project_name}"
+        )
+
+        if not profile_data.docker_registry_url:
+            raise click.ClickException("Missing docker_registry_url")
 
         if docker_credentials is not None:
             ProjectPublisher.authenticate(
-                client, docker_credentials, docker_repository_url
+                client, docker_credentials, profile_data.docker_registry_url
             )
 
         image = ProjectPublisher.get_image(client, local_image_tag)
