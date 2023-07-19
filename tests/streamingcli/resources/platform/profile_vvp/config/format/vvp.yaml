@@ -1,0 +1,5 @@
+vvp:
+  url: https://localhost/
+  namespace: default
+  api_token: token
+  deployment_target: deploymenttarget

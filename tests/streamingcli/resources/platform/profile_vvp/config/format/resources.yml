@@ -1,0 +1,7 @@
+resources:
+  jobmanager:
+    cpu: 1
+    memory: 1G
+  taskmanager:
+    cpu: 1
+    memory: 1G

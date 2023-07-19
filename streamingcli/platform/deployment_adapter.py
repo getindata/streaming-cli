@@ -3,6 +3,8 @@ from typing import List, Optional
 
 from jinja2 import Environment
 
+from streamingcli.config import PROJECT_DEPLOYMENT_TEMPLATE
+from streamingcli.platform.jinja_prettifier import yaml_pretty
 from streamingcli.profile.profile_adapter import ScliProfile
 from streamingcli.project.template_loader import TemplateLoader
 
@@ -25,14 +27,16 @@ class DeploymentAdapter(ABC):
     def validate_profile_data(self) -> None:
         pass
 
-    @abstractmethod
-    def get_template_name(self) -> str:
-        pass
+    def generate_project_template(
+        self, dependencies: List[str], file_descriptor_path: Optional[str] = None
+    ) -> str:
+        descriptor_path = file_descriptor_path or PROJECT_DEPLOYMENT_TEMPLATE
+        template = TemplateLoader.load_project_template(descriptor_path)
 
-    def generate_project_template(self, dependencies: List[str]) -> str:
-        template = TemplateLoader.load_project_template(self.get_template_name())
         params = self.profile_data.__dict__.copy()
         params["project_name"] = self.project_name
         params["docker_image_tag"] = self.docker_image_tag
         params["dependencies"] = dependencies
-        return Environment().from_string(template).render(params)
+        env = Environment()
+        env.filters["pretty"] = yaml_pretty
+        return env.from_string(template).render(params)

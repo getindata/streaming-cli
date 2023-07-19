@@ -1,0 +1,11 @@
+k8s:
+  namespace: test_ns
+jobManager:
+  replicas: 1
+  resource:
+    memory: "2048m"
+    cpu: 0.5
+taskManager:
+  resource:
+    memory: "2048m"
+    cpu: 0.5
