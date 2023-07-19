@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## [2.0.1] - 2023-07-19
+
 ## [2.0.0] - 2023-05-30
 
 ## [1.11.1] - 2023-05-19
@@ -136,7 +138,9 @@
 
 # [Unreleased]&#x3A; <https://github.com/getindata/streaming-cli/compare/1.8.0...HEAD>
 
-[Unreleased]: https://github.com/getindata/streaming-cli/compare/2.0.0...HEAD
+[Unreleased]: https://github.com/getindata/streaming-cli/compare/2.0.1...HEAD
+
+[2.0.1]: https://github.com/getindata/streaming-cli/compare/2.0.0...2.0.1
 
 [2.0.0]: https://github.com/getindata/streaming-cli/compare/1.11.1...2.0.0
 
