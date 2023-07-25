@@ -5,7 +5,7 @@ from typing import List
 from setuptools import find_packages, setup
 from setuptools.command.install import install
 
-__version__ = "2.0.2"
+__version__ = "2.0.3"
 
 with open("README.md", "r") as fh:
     long_description = fh.read()
